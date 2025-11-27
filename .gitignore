@@ -1,0 +1,26 @@
+# ⛔️ node_modules — 설치 라이브러리
+node_modules/
+
+# ⚙️ 빌드 결과물 (Vite → dist 폴더)
+dist/
+
+# ⚙️ 환경 변수 파일
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 🧩 시스템 및 에디터 관련
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# 🚀 OS 및 임시 캐시
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
