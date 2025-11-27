@@ -100,7 +100,8 @@ export function UploadPage({
     useState(false);
   const [permissionsGranted, setPermissionsGranted] =
     useState(false);
-  const [isTextInputFocused, setIsTextInputFocused] = useState(false);
+  const [isTextInputFocused, setIsTextInputFocused] =
+    useState(false);
 
   const [isFrontCamera, setIsFrontCamera] = useState(true);
   const [stream, setStream] = useState<MediaStream | null>(
@@ -131,16 +132,18 @@ export function UploadPage({
     useState(false);
   const textInputRef = useRef<HTMLInputElement>(null);
 
-  const [showLeaveDetailAlert, setShowLeaveDetailAlert] = useState(false);
-const [showLeaveUploadAlert, setShowLeaveUploadAlert] = useState(false);
+  const [showLeaveDetailAlert, setShowLeaveDetailAlert] =
+    useState(false);
+  const [showLeaveUploadAlert, setShowLeaveUploadAlert] =
+    useState(false);
 
-const hasDraft =
-  !!selectedImage ||
-  !!textInput ||
-  !!locationInput ||
-  !!weatherInput ||
-  !!timeInput ||
-  !!healthInput;
+  const hasDraft =
+    !!selectedImage ||
+    !!textInput ||
+    !!locationInput ||
+    !!weatherInput ||
+    !!timeInput ||
+    !!healthInput;
 
   // 키보드 높이 감지 상태 및 Ref
   const initialViewportHeight = useRef(0);
@@ -209,57 +212,76 @@ const hasDraft =
   }, []);
 
   // 키보드 높이 감지
- useEffect(() => {
-  if (initialViewportHeight.current === 0) {
-    initialViewportHeight.current = window.innerHeight;
-  }
-
-  const handleResize = () => {
-    // 🔐 "실제로 텍스트 입력 중" + "세부조정 모드" + "모바일 폭" 일 때만 키보드로 취급
-    if (
-      !(
-        showTextInput &&
-        isDetailEditMode &&
-        isMobile &&
-        isTextInputFocused
-      )
-    ) {
-      setKeyboardHeight(0);
-      document.body.style.height = "";
-      return;
+  useEffect(() => {
+    if (initialViewportHeight.current === 0) {
+      initialViewportHeight.current = window.innerHeight;
     }
 
-    if (!window.visualViewport) return;
+    const handleResize = () => {
+      // 🔐 "실제로 텍스트 입력 중" + "세부조정 모드" + "모바일 폭" 일 때만 키보드로 취급
+      if (
+        !(
+          showTextInput &&
+          isDetailEditMode &&
+          isMobile &&
+          isTextInputFocused
+        )
+      ) {
+        setKeyboardHeight(0);
+        document.body.style.height = "";
+        return;
+      }
 
-    const currentVisualHeight = window.visualViewport.height;
-    const initialHeight = initialViewportHeight.current;
-    const layoutHeightNow = window.innerHeight;
+      if (!window.visualViewport) return;
 
-    const diff = initialHeight - currentVisualHeight;
+      const currentVisualHeight = window.visualViewport.height;
+      const initialHeight = initialViewportHeight.current;
+      const layoutHeightNow = window.innerHeight;
 
-    // ⚠️ 브라우저 창 자체를 줄인 경우: window.innerHeight도 같이 줄어든다
-    const isLayoutResized =
-      Math.abs(layoutHeightNow - initialViewportHeight.current) > 40;
+      const diff = initialHeight - currentVisualHeight;
 
-    if (diff > 80 && !isLayoutResized) {
-      // 👉 진짜 키보드가 올라온 상황으로 간주
-      setKeyboardHeight(diff);
-      document.body.style.height = currentVisualHeight + "px";
-    } else {
-      // 👉 단순 화면 리사이즈라면 키보드 아님
-      setKeyboardHeight(0);
-      document.body.style.height = "";
-    }
-  };
+      // ⚠️ 브라우저 창 자체를 줄인 경우: window.innerHeight도 같이 줄어든다
+      const isLayoutResized =
+        Math.abs(
+          layoutHeightNow - initialViewportHeight.current,
+        ) > 40;
 
-  window.visualViewport?.addEventListener("resize", handleResize);
-  window.visualViewport?.addEventListener("scroll", handleResize);
+      if (diff > 80 && !isLayoutResized) {
+        // 👉 진짜 키보드가 올라온 상황으로 간주
+        setKeyboardHeight(diff);
+        document.body.style.height = currentVisualHeight + "px";
+      } else {
+        // 👉 단순 화면 리사이즈라면 키보드 아님
+        setKeyboardHeight(0);
+        document.body.style.height = "";
+      }
+    };
 
-  return () => {
-    window.visualViewport?.removeEventListener("resize", handleResize);
-    window.visualViewport?.removeEventListener("scroll", handleResize);
-  };
-}, [showTextInput, isDetailEditMode, isMobile, isTextInputFocused]);
+    window.visualViewport?.addEventListener(
+      "resize",
+      handleResize,
+    );
+    window.visualViewport?.addEventListener(
+      "scroll",
+      handleResize,
+    );
+
+    return () => {
+      window.visualViewport?.removeEventListener(
+        "resize",
+        handleResize,
+      );
+      window.visualViewport?.removeEventListener(
+        "scroll",
+        handleResize,
+      );
+    };
+  }, [
+    showTextInput,
+    isDetailEditMode,
+    isMobile,
+    isTextInputFocused,
+  ]);
 
   // 카메라 스트림 시작
   useEffect(() => {
@@ -533,17 +555,17 @@ const hasDraft =
     setShowTextInput(false);
   };
 
-const handleTextInputToggle = () => {
-  if (showTextInput) {
-    setShowTextInput(false);
-    setIsTextInputFocused(false);
-    textInputRef.current?.blur();
-  } else {
-    setShowTextInput(true);
-    setIsTextInputFocused(true);   // 🔹 포커스 상태 미리 true
-    setTimeout(() => textInputRef.current?.focus(), 80);
-  }
-};
+  const handleTextInputToggle = () => {
+    if (showTextInput) {
+      setShowTextInput(false);
+      setIsTextInputFocused(false);
+      textInputRef.current?.blur();
+    } else {
+      setShowTextInput(true);
+      setIsTextInputFocused(true); // 🔹 포커스 상태 미리 true
+      setTimeout(() => textInputRef.current?.focus(), 80);
+    }
+  };
 
   const handleLocationInput = () =>
     setLocationInput("서울시 강남구");
@@ -577,48 +599,49 @@ const handleTextInputToggle = () => {
 
   const TOOLBAR_BASE_HEIGHT = 72; // 대략 툴바 자체 높이 (필요하면 조정)
 
-const AICaptionToolbar: React.FC = () => (
-  <motion.div
-    key="ai-caption-toolbar"
-    initial={{ y: "100%", opacity: 0 }}
-    animate={{ y: 0, opacity: 1 }}
-    exit={{ y: "100%", opacity: 0 }}
-    transition={{ type: "spring", damping: 24, stiffness: 260 }}
-    className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-3xl shadow-[0_-6px_20px_rgba(0,0,0,0.12)]"
-    style={{
-      // ✅ 키보드 있으면 키보드 위, 없으면 화면 맨 아래
-      bottom:
-        keyboardHeight > 0
-          ? keyboardHeight
-          : 0,
-      paddingBottom: "env(safe-area-inset-bottom)",
-    }}
-  >
-    <div className="px-4 pt-3 pb-2">
-      <p className="text-[15px] font-semibold text-[#222222] mb-2">
-        AI 추천 캡션
-      </p>
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-      {aiCaptions.map((caption, index) => (
-  <button
-    key={index}
-    onMouseDown={handleCaptionClick(caption.text)}
-    className="flex-shrink-0 px-4 py-2 text-[13px] font-medium border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#E0E0E0]"
-  >
-    {caption.text}
-  </button>
-))}
+  const AICaptionToolbar: React.FC = () => (
+    <motion.div
+      key="ai-caption-toolbar"
+      initial={{ y: "100%", opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: "100%", opacity: 0 }}
+      transition={{
+        type: "spring",
+        damping: 24,
+        stiffness: 260,
+      }}
+      className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-3xl shadow-[0_-6px_20px_rgba(0,0,0,0.12)]"
+      style={{
+        // ✅ 키보드 있으면 키보드 위, 없으면 화면 맨 아래
+        bottom: keyboardHeight > 0 ? keyboardHeight : 0,
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
+    >
+      <div className="px-4 pt-3 pb-2">
+        <p className="text-[15px] font-semibold text-[#222222] mb-2">
+          AI 추천 캡션
+        </p>
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+          {aiCaptions.map((caption, index) => (
+            <button
+              key={index}
+              onMouseDown={handleCaptionClick(caption.text)}
+              className="flex-shrink-0 px-4 py-2 text-[13px] font-medium border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#E0E0E0]"
+            >
+              {caption.text}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
 
-const cardTranslateY =
-  showTextInput && isDetailEditMode && isTextInputFocused
-    ? isMobile
-      ? -keyboardHeight          // 🔹모바일: 키보드가 0이면 안 올라감
-      : -180                     // 🔹데스크탑: 고정값 만큼만 위로
-    : 0;
+  const cardTranslateY =
+    showTextInput && isDetailEditMode && isTextInputFocused
+      ? isMobile
+        ? -keyboardHeight // 🔹모바일: 키보드가 0이면 안 올라감
+        : -180 // 🔹데스크탑: 고정값 만큼만 위로
+      : 0;
 
   return (
     <>
@@ -670,182 +693,236 @@ const cardTranslateY =
       </AlertDialog>
 
       <div className="relative w-full h-screen bg-white overflow-hidden">
-  {/* 카메라 / 이미지 영역 */}
-  <div className="absolute inset-0 flex justify-center items-center overflow-hidden">
-    <div
-      className="w-full h-full max-w-[500px] mx-auto pt-20 pb-[120px] px-5 xs:px-6 sm:px-8 flex justify-center items-center"
-      style={{
-        transform: `translateY(${cardTranslateY}px)`,
-        transition: "transform 0.25s ease-out",
-      }}
-    >
-      <div className="relative w-full max-w-[400px] aspect-[335/400] bg-gray-900 rounded-2xl overflow-hidden shadow-lg">
-              {/* 카메라 비디오 */}
-              {!isUploadMode && (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              )}
+        {/* 헤더(110px) + 툴바(대략 160px)를 제외한 영역 전체를 컨텐츠로 사용 */}
+        <div className="absolute inset-x-0 top-0 bottom-0 flex justify-center">
+          <div className="w-full max-w-[500px] h-full flex flex-col">
+            {/* 🔹헤더 아래 여백 + 툴바 위 여백 포함한 컨텐츠 영역 */}
+            <div className="flex-1 pt-[110px] pb-[160px] flex justify-center items-center px-5 xs:px-6 sm:px-8">
+              {/* 카드 래퍼: 키보드 뜨면 위로 슬라이드 */}
+              <div
+                className="w-full flex justify-center"
+                style={{
+                  transform: `translateY(${cardTranslateY}px)`,
+                  transition: "transform 0.25s ease-out",
+                }}
+              >
+                <div
+                  className="relative w-full aspect-[335/400] bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
+                  style={{
+                    // 📏 세로 공간(100vh - 헤더 - 툴바)에 맞춰 카드 폭 줄이기
+                    maxWidth:
+                      keyboardHeight > 0
+                        ? 400 // 키보드 있을 땐 폭 고정, 위치만 카드 전체 올리기
+                        : "min(400px, calc((100vh - 110px - 160px) * 335 / 400))",
+                  }}
+                >
+                  {/* 🔻 여기부터는 너가 이미 써둔 내용 그대로 붙이면 돼 🔻 */}
 
-              {/* 선택된 이미지 */}
-              {selectedImage && (
-                <div className="absolute inset-0 bg-white">
-                  <ImageWithFallback
-                    src={selectedImage}
-                    alt="Selected Image"
-                    className="w-full h-full object-cover"
-                    style={{
-                      filter:
-                        ORIGINAL_FILTERS.find(
-                          (f) => f.name === selectedFilter,
-                        )?.filter || "none",
-                    }}
-                  />
-
-                  {/* 텍스트 입력 시 이미지 어둡게 */}
-                  {showTextInput && (
-                    <div className="absolute inset-0 bg-black/35" />
+                  {/* 카메라 비디오 */}
+                  {!isUploadMode && (
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
                   )}
 
-                  {/* 위치/날씨/시간/건강 캡슐 */}
-                  {(locationInput ||
-                    weatherInput ||
-                    timeInput ||
-                    healthInput) && (
-                    <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
-                     {locationInput && (
-  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-    <MapPin size={16} className="text-white" />
-    <span className="text-white text-sm">
-      {locationInput}
-    </span>
-    <button
-      type="button"
-      onClick={() => setLocationInput("")}
-      className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-    >
-      <X size={10} className="text-white" />
-    </button>
-  </div>
-)}
+                  {/* 선택된 이미지 */}
+                  {selectedImage && (
+                    <div className="absolute inset-0 bg-white">
+                      <ImageWithFallback
+                        src={selectedImage}
+                        alt="Selected Image"
+                        className="w-full h-full object-cover"
+                        style={{
+                          filter:
+                            ORIGINAL_FILTERS.find(
+                              (f) => f.name === selectedFilter,
+                            )?.filter || "none",
+                        }}
+                      />
 
-                      {weatherInput && (
-  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-    <Cloud size={16} className="text-white" />
-    <span className="text-white text-sm">
-      {weatherInput}
-    </span>
-    <button
-      type="button"
-      onClick={() => setWeatherInput("")}
-      className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-    >
-      <X size={10} className="text-white" />
-    </button>
-  </div>
-)}
+                      {/* 텍스트 모드일 때 이미지 어둡게 */}
+                      {showTextInput && (
+                        <div className="absolute inset-0 bg-black/35" />
+                      )}
 
-{timeInput && (
-  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-    <Clock size={16} className="text-white" />
-    <span className="text-white text-sm">
-      {timeInput}
-    </span>
-    <button
-      type="button"
-      onClick={() => setTimeInput("")}
-      className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-    >
-      <X size={10} className="text-white" />
-    </button>
-  </div>
-)}
+                      {/* 위치 / 날씨 / 시간 / 건강 캡슐들 */}
+                      {(locationInput ||
+                        weatherInput ||
+                        timeInput ||
+                        healthInput) && (
+                        <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
+                          {/* 위치 */}
+                          {locationInput && (
+                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <MapPin
+                                size={16}
+                                className="text-white"
+                              />
+                              <span className="text-white text-sm">
+                                {locationInput}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setLocationInput("")
+                                }
+                                className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                              >
+                                <X
+                                  size={10}
+                                  className="text-white"
+                                />
+                              </button>
+                            </div>
+                          )}
+                          {/* 날씨 */}
+                          {weatherInput && (
+                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <Cloud
+                                size={16}
+                                className="text-white"
+                              />
+                              <span className="text-white text-sm">
+                                {weatherInput}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setWeatherInput("")
+                                }
+                                className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                              >
+                                <X
+                                  size={10}
+                                  className="text-white"
+                                />
+                              </button>
+                            </div>
+                          )}
+                          {/* 시간 */}
+                          {timeInput && (
+                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <Clock
+                                size={16}
+                                className="text-white"
+                              />
+                              <span className="text-white text-sm">
+                                {timeInput}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setTimeInput("")}
+                                className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                              >
+                                <X
+                                  size={10}
+                                  className="text-white"
+                                />
+                              </button>
+                            </div>
+                          )}
+                          {/* 건강 */}
+                          {healthInput && (
+                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <Heart
+                                size={16}
+                                className="text-white"
+                              />
+                              <span className="text-white text-sm">
+                                {healthInput}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setHealthInput("")
+                                }
+                                className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                              >
+                                <X
+                                  size={10}
+                                  className="text-white"
+                                />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
-{healthInput && (
-  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-    <Heart size={16} className="text-white" />
-    <span className="text-white text-sm">
-      {healthInput}
-    </span>
-    <button
-      type="button"
-      onClick={() => setHealthInput("")}
-      className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-    >
-      <X size={10} className="text-white" />
-    </button>
-  </div>
-)}
-
+                      {/* 텍스트 입력 / 캡슐 */}
+                      <div
+                        className="absolute left-4 right-4 transition-all duration-200 ease-out"
+                        style={{ bottom: getTextBottom() }}
+                      >
+                        {showTextInput ? (
+                          <input
+                            ref={textInputRef}
+                            type="text"
+                            value={textInput}
+                            onChange={(e) =>
+                              setTextInput(e.target.value)
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                setShowTextInput(false);
+                                setIsTextInputFocused(false);
+                                textInputRef.current?.blur();
+                              }
+                            }}
+                            onFocus={() =>
+                              setIsTextInputFocused(true)
+                            }
+                            onBlur={() =>
+                              setIsTextInputFocused(false)
+                            }
+                            placeholder="텍스트를 입력하세요"
+                            className="w-full text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-md outline-none focus:ring-2 focus:ring-[#36D2C5] placeholder:text-gray-500/70"
+                          />
+                        ) : textInput ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowTextInput(true);
+                              setIsTextInputFocused(true);
+                              setTimeout(
+                                () =>
+                                  textInputRef.current?.focus(),
+                                80,
+                              );
+                            }}
+                            className="w-full text-left text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-md"
+                          >
+                            {textInput}
+                          </button>
+                        ) : null}
+                      </div>
                     </div>
                   )}
 
-                  {/* 텍스트 입력 / 캡슐 */}
-                  <div
-                    className="absolute left-4 right-4 transition-all duration-200 ease-out"
-                    style={{ bottom: getTextBottom() }}
-                  >
-                    {showTextInput ? (
-                    <input
-  ref={textInputRef}
-  type="text"
-  value={textInput}
-  onChange={(e) => setTextInput(e.target.value)}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      setShowTextInput(false);
-      setIsTextInputFocused(false);
-      textInputRef.current?.blur();
-    }
-  }}
-  onFocus={() => setIsTextInputFocused(true)}
-  onBlur={() => setIsTextInputFocused(false)}
-  placeholder="텍스트를 입력하세요"
-  className="w-full text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-md outline-none focus:ring-2 focus:ring-[#36D2C5] placeholder:text-gray-500/70"
-/>
-                    ) : textInput ? (
-                        <button
-    type="button"
-    onClick={() => {
-      setShowTextInput(true);
-      setIsTextInputFocused(true);  // 🔹 다시 열 때도 AI 캡션 같이
-      setTimeout(
-        () => textInputRef.current?.focus(),
-        80,
-                          );
-                        }}
-                        className="w-full text-left text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-md"
-                      >
-                        {textInput}
-                      </button>
-                    ) : null}
-                  </div>
+                  {/* 카메라 에러 (업로드 모드 아닐 때만) */}
+                  {cameraError && !isUploadMode && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm rounded-2xl z-20">
+                      <div className="text-center px-6">
+                        <Camera
+                          size={48}
+                          className="text-gray-400 mx-auto mb-4"
+                        />
+                        <p className="text-white mb-2">
+                          {cameraError}
+                        </p>
+                        <p className="text-gray-400 text-sm">
+                          갤러리 버튼을 눌러 사진을 업로드할 수
+                          있습니다.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-
-              {/* 카메라 에러 - 업로드 모드가 아닐 때만 표시 */}
-              {cameraError && !isUploadMode && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm rounded-2xl z-20">
-                  <div className="text-center px-6">
-                    <Camera
-                      size={48}
-                      className="text-gray-400 mx-auto mb-4"
-                    />
-                    <p className="text-white mb-2">
-                      {cameraError}
-                    </p>
-                    <p className="text-gray-400 text-sm">
-                      갤러리 버튼을 눌러 사진을 업로드할 수
-                      있습니다.
-                    </p>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -876,17 +953,17 @@ const cardTranslateY =
           ) : isDetailEditMode ? (
             <>
               <button
-  onClick={() => {
-    if (hasDraft) {
-      setShowLeaveDetailAlert(true);
-    } else {
-      handleCloseDetailEdit();
-    }
-  }}
-  className="absolute left-4 p-1"
->
-  <X size={24} className="text-[#1A1A1A]" />
-</button>
+                onClick={() => {
+                  if (hasDraft) {
+                    setShowLeaveDetailAlert(true);
+                  } else {
+                    handleCloseDetailEdit();
+                  }
+                }}
+                className="absolute left-4 p-1"
+              >
+                <X size={24} className="text-[#1A1A1A]" />
+              </button>
               {/* ✅ 세부조정 완료: 업로드 X, 세부조정 모드만 종료 */}
               <button
                 onClick={() => {
@@ -899,20 +976,20 @@ const cardTranslateY =
                 완료
               </button>
             </>
-         ) : (
-  <button
-    onClick={() => {
-      if (hasDraft) {
-        setShowLeaveUploadAlert(true);
-      } else {
-        onBack();
-      }
-    }}
-    className="absolute left-4 p-1"
-  >
-    <ArrowLeft size={24} className="text-[#1A1A1A]" />
-  </button>
-)}
+          ) : (
+            <button
+              onClick={() => {
+                if (hasDraft) {
+                  setShowLeaveUploadAlert(true);
+                } else {
+                  onBack();
+                }
+              }}
+              className="absolute left-4 p-1"
+            >
+              <ArrowLeft size={24} className="text-[#1A1A1A]" />
+            </button>
+          )}
 
           <h1 className="text-xl font-bold text-[#1A1A1A] text-center">
             {isFilterMode
@@ -924,7 +1001,18 @@ const cardTranslateY =
         </header>
 
         {/* 하단 컨트롤 */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 pt-4 pb-10 bg-white max-w-[500px] mx-auto">
+        <div
+          className="absolute left-0 right-0 z-10 pt-4 pb-10 bg-white max-w-[500px] mx-auto"
+          style={
+            showTextInput &&
+            isDetailEditMode &&
+            isMobile &&
+            isTextInputFocused &&
+            keyboardHeight > 0
+              ? { bottom: -keyboardHeight } // 키보드만큼 내려서 가려지게
+              : { bottom: 0 } // 평소엔 화면 맨 아래 고정
+          }
+        >
           <input
             ref={fileInputRef}
             type="file"
@@ -985,9 +1073,8 @@ const cardTranslateY =
             </div>
           ) : isDetailEditMode ? (
             <div className="flex flex-col items-center gap-3 max-w-md mx-auto px-4">
-              {showTextInput && !isMobile ? (
-                <div className="w-full h-[64px]" />
-              ) : (
+              {/* 🔹텍스트 모드가 아닐 때만 툴바 노출 */}
+              {!showTextInput && (
                 <div className="flex items-center justify-center gap-4">
                   <button
                     onClick={handleTextInputToggle}
@@ -1051,6 +1138,7 @@ const cardTranslateY =
                 </div>
               )}
 
+              {/* 업로드 버튼은 그대로 유지 (키보드에 가려지는 건 괜찮으면 그대로 두고, 필요하면 나중에 조정) */}
               <button
                 onClick={handleCapture}
                 className="w-16 h-16 rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
@@ -1241,79 +1329,81 @@ const cardTranslateY =
       </AlertDialog>
 
       {/* AI 추천 캡션 바: 텍스트 입력 모드 + 세부조정 모드일 때 */}
-     <AnimatePresence>
-  {selectedImage &&
-    isDetailEditMode &&
-    showTextInput &&
-    isTextInputFocused && (
-      <AICaptionToolbar />
-    )}
-</AnimatePresence>
+      <AnimatePresence>
+        {selectedImage &&
+          isDetailEditMode &&
+          showTextInput &&
+          isTextInputFocused && <AICaptionToolbar />}
+      </AnimatePresence>
 
       {/* 세부조정 종료 확인 */}
-<AlertDialog open={showLeaveDetailAlert}>
-  <AlertDialogContent className="max-w-[340px]">
-    <AlertDialogHeader>
-      <AlertDialogTitle>세부조정을 종료할까요?</AlertDialogTitle>
-      <AlertDialogDescription>
-        입력한 내용은 그대로 유지되지만 세부조정 화면을 닫습니다.
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-    <AlertDialogFooter>
-      <AlertDialogCancel
-        onClick={() => setShowLeaveDetailAlert(false)}
-      >
-        취소
-      </AlertDialogCancel>
-      <AlertDialogAction
-        onClick={() => {
-          setShowLeaveDetailAlert(false);
-          handleCloseDetailEdit();
-        }}
-      >
-        종료
-      </AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
+      <AlertDialog open={showLeaveDetailAlert}>
+        <AlertDialogContent className="max-w-[340px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              세부조정을 종료할까요?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              입력한 내용은 그대로 유지되지만 세부조정 화면을
+              닫습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => setShowLeaveDetailAlert(false)}
+            >
+              취소
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowLeaveDetailAlert(false);
+                handleCloseDetailEdit();
+              }}
+            >
+              종료
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-{/* 업로드 작성 취소 확인 */}
-<AlertDialog open={showLeaveUploadAlert}>
-  <AlertDialogContent className="max-w-[340px]">
-    <AlertDialogHeader>
-      <AlertDialogTitle>작성을 취소할까요?</AlertDialogTitle>
-      <AlertDialogDescription>
-        지금까지 작성한 내용이 모두 사라집니다.
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-    <AlertDialogFooter>
-      <AlertDialogCancel
-        onClick={() => setShowLeaveUploadAlert(false)}
-      >
-        계속 작성
-      </AlertDialogCancel>
-      <AlertDialogAction
-        onClick={() => {
-          // 전체 작성 내용 초기화
-          setShowLeaveUploadAlert(false);
-          setSelectedImage(null);
-          setTextInput("");
-          setLocationInput("");
-          setWeatherInput("");
-          setTimeInput("");
-          setHealthInput("");
-          setIsUploadMode(false);
-          setIsDetailEditMode(false);
-          setShowTextInput(false);
-          onBack();
-        }}
-      >
-        취소하고 나가기
-      </AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
-
+      {/* 업로드 작성 취소 확인 */}
+      <AlertDialog open={showLeaveUploadAlert}>
+        <AlertDialogContent className="max-w-[340px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              작성을 취소할까요?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              지금까지 작성한 내용이 모두 사라집니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => setShowLeaveUploadAlert(false)}
+            >
+              계속 작성
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                // 전체 작성 내용 초기화
+                setShowLeaveUploadAlert(false);
+                setSelectedImage(null);
+                setTextInput("");
+                setLocationInput("");
+                setWeatherInput("");
+                setTimeInput("");
+                setHealthInput("");
+                setIsUploadMode(false);
+                setIsDetailEditMode(false);
+                setShowTextInput(false);
+                onBack();
+              }}
+            >
+              취소하고 나가기
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

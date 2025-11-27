@@ -16,7 +16,12 @@ import {
   Smile,
   Trash2,
 } from "lucide-react";
-import { useState, useRef, useEffect, type CSSProperties } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  type CSSProperties,
+} from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, AnimatePresence } from "motion/react";
@@ -246,8 +251,9 @@ export function CommunityPage({
   }>({});
 
   const emojis = ["❤️", "😊", "👍", "🎉"];
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isKeyboardVisible, setIsKeyboardVisible] =
+    useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const [floatingEmojis, setFloatingEmojis] = useState<
     Array<{
@@ -259,7 +265,6 @@ const [keyboardHeight, setKeyboardHeight] = useState(0);
       delay: number;
     }>
   >([]);
-
 
   const triggerReactionAnimation = (emoji: string) => {
     if (emoji === "🎉") {
@@ -564,27 +569,42 @@ const [keyboardHeight, setKeyboardHeight] = useState(0);
   }, [filteredPosts, currentPostId]);
 
   useEffect(() => {
-  if (typeof window === "undefined" || !window.visualViewport) return;
+    if (typeof window === "undefined" || !window.visualViewport)
+      return;
 
-  const handleResize = () => {
-    const viewport = window.visualViewport;
-    if (!viewport) return;
+    const handleResize = () => {
+      const viewport = window.visualViewport;
+      if (!viewport) return;
 
-    const diff = window.innerHeight - viewport.height; // 🔹키보드가 차지한 높이(대략)
-    const isKeyboard = diff > 80;                      // 너무 민감하지 않게 임계값
+      const diff = window.innerHeight - viewport.height; // 🔹키보드가 차지한 높이(대략)
+      const isKeyboard = diff > 80; // 너무 민감하지 않게 임계값
 
-    setIsKeyboardVisible(isKeyboard);
-    setKeyboardHeight(isKeyboard ? diff : 0);
-  };
+      setIsKeyboardVisible(isKeyboard);
+      setKeyboardHeight(isKeyboard ? diff : 0);
+    };
 
-window.visualViewport?.addEventListener("resize", handleResize);
-window.visualViewport?.addEventListener("scroll", handleResize);
+    window.visualViewport.addEventListener(
+      "resize",
+      handleResize,
+    );
+    window.visualViewport.addEventListener(
+      "scroll",
+      handleResize,
+    );
 
-return () => {
-  window.visualViewport?.removeEventListener("resize", handleResize);
-  window.visualViewport?.removeEventListener("scroll", handleResize);
-};
-}, []);
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener(
+          "resize",
+          handleResize,
+        );
+        window.visualViewport.removeEventListener(
+          "scroll",
+          handleResize,
+        );
+      }
+    };
+  }, []);
 
   return (
     <div className="relative bg-white flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden">
@@ -889,42 +909,44 @@ return () => {
               ))}
             </div>
           </div>
-                ) : (
+        ) : (
           // ===== 리스트 뷰 (스냅) =====
           <div className="w-full px-5 xs:px-6 sm:px-8 snap-y snap-mandatory overflow-y-auto h-full scrollbar-hide">
             {filteredPosts.map((post) => {
-  const isDeleting = postToDelete === post.id;
+              const isDeleting = postToDelete === post.id;
+              const isFocusedCard =
+                isKeyboardVisible && currentPostId === post.id;
 
-  // 🔹 여기서 카드마다 계산
-  const isFocusedCard =
-    isKeyboardVisible && currentPostId === post.id;
+              // 키보드 높이에서 약간(24px)만 빼서 여유
+              const shift = Math.max(0, keyboardHeight - 24);
 
- const imageAndInputMaxWidth: CSSProperties = {
-  maxWidth: isKeyboardVisible
-    ? "min(100%, 335px)"
-    : "min(100%, calc((100vh - 264px) * 335 / 400))",
-};
+              const cardTransform =
+                isFocusedCard && isKeyboardVisible
+                  ? `translateY(-${shift}px)`
+                  : "translateY(0)";
 
+              const imageAndInputMaxWidth: CSSProperties = {
+                maxWidth:
+                  "min(100%, calc((100vh - 264px) * 335 / 400))",
+              };
               return (
-  <div
-    key={post.id}
-    className={`snap-start snap-always h-full w-full flex justify-center ${
-      isKeyboardVisible ? "items-start pt-5" : "items-center"
-    }`}
-  >
-    {/* 카드 전체 : 이미지 + 이모지/댓글창 (가로폭 동일) */}
-    <div
-      className="w-full flex flex-col items-center"
-      style={{
-        transform: isFocusedCard
-          ? `translateY(-${Math.min(
-              keyboardHeight * 0.6,
-              220,
-            )}px)` // 🔹키보드 높이의 60%만큼 (최대 220px) 위로
-          : "translateY(0)",
-        transition: "transform 0.25s ease-out",
-      }}
-    >
+                <div
+                  key={post.id}
+                  className={`snap-start snap-always h-full w-full flex justify-center ${
+                    isKeyboardVisible
+                      ? "items-start pt-5"
+                      : "items-center"
+                  }`}
+                >
+                  {/* 카드 전체 : 이미지 + 이모지/댓글창 (가로폭 동일) */}
+                  <div
+                    className="w-full flex flex-col items-center"
+                    style={{
+                      transform: cardTransform,
+                      transition: "transform 0.25s ease-out",
+                    }}
+                  >
+                    {" "}
                     {/* 1) 이미지 카드 - 비율 유지 aspect-[335/400] */}
                     <div
                       className="relative w-full aspect-[335/400] overflow-visible flex-shrink-0"
@@ -948,7 +970,10 @@ return () => {
                             ? "x"
                             : false
                         }
-                        dragConstraints={{ left: -120, right: 0 }}
+                        dragConstraints={{
+                          left: -120,
+                          right: 0,
+                        }}
                         dragElastic={0.1}
                         dragMomentum={false}
                         dragSnapToOrigin={!isDeleting}
@@ -983,7 +1008,8 @@ return () => {
                         />
 
                         {/* ====== 디테일 모드 (탭해서 들어간 상태) ====== */}
-                        {selectedPostForReaction === post.id && (
+                        {selectedPostForReaction ===
+                          post.id && (
                           <div
                             className="absolute inset-0 bg-black/70 z-10 flex flex-col cursor-pointer"
                             onClick={(e) => {
@@ -1034,8 +1060,7 @@ return () => {
                                               }`}
                                               style={{
                                                 zIndex:
-                                                  reaction
-                                                    .users
+                                                  reaction.users
                                                     .length -
                                                   userIdx,
                                               }}
@@ -1050,8 +1075,8 @@ return () => {
                                           style={{ zIndex: 0 }}
                                         >
                                           +
-                                          {reaction.users.length -
-                                            3}
+                                          {reaction.users
+                                            .length - 3}
                                         </div>
                                       )}
                                     </div>
@@ -1093,9 +1118,7 @@ return () => {
                                     className="inline-flex flex-row-reverse items-center bg-white/90 backdrop-blur-sm rounded-full pl-5 pr-1 py-3 gap-3 shadow-sm border border-white/20"
                                   >
                                     <ImageWithFallback
-                                      src={
-                                        comment.userAvatar
-                                      }
+                                      src={comment.userAvatar}
                                       alt={comment.userName}
                                       className="w-9 h-9 rounded-full object-cover border-2 border-white -my-4 -mr-0.5 shadow-sm"
                                     />
@@ -1110,7 +1133,8 @@ return () => {
                         )}
 
                         {/* ====== 기본 카드 상태 ====== */}
-                        {selectedPostForReaction !== post.id && (
+                        {selectedPostForReaction !==
+                          post.id && (
                           <>
                             {/* 상단 태그들 */}
                             <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
@@ -1210,7 +1234,6 @@ return () => {
                         )}
                       </motion.div>
                     </div>
-
                     {/* 2) 이모지 + 댓글 입력창  */}
                     {/*   → 이미지와 같은 가로폭, 위에서 정확히 16px 떨어짐 (mt-4) */}
                     <div
@@ -1236,8 +1259,7 @@ return () => {
                                 initial={false}
                               >
                                 {showEmojiPicker &&
-                                currentPostId ===
-                                  post.id ? (
+                                currentPostId === post.id ? (
                                   <motion.div
                                     key="close-icon"
                                     initial={{
@@ -1291,8 +1313,7 @@ return () => {
                                 initial={false}
                               >
                                 {showEmojiPicker &&
-                                currentPostId ===
-                                  post.id ? (
+                                currentPostId === post.id ? (
                                   <motion.div
                                     key="emoji-list"
                                     initial={{
@@ -1377,8 +1398,7 @@ return () => {
                                       }
                                       onKeyDown={(e) => {
                                         if (
-                                          e.key ===
-                                            "Enter" &&
+                                          e.key === "Enter" &&
                                           !e.shiftKey
                                         ) {
                                           e.preventDefault();
@@ -1408,7 +1428,6 @@ return () => {
             })}
           </div>
         )}
-
       </div>
 
       <AnimatePresence>
@@ -1483,7 +1502,7 @@ return () => {
       </AnimatePresence>
 
       {/* 하단 네비 (커뮤니티 탭 전용) */}
-      {!isGridView && !isReactionView && (
+      {!isGridView && !isReactionView && !isKeyboardVisible && (
         <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[500px] mx-auto bg-white">
           <div className="relative px-4 pt-2 pb-4 shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] h-[80px]">
             <div className="flex items-center justify-around">

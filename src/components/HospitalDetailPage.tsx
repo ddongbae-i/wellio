@@ -660,8 +660,8 @@ export function HospitalDetailPage({
           <h3 className="text-[19px] font-semibold text-[#202020] mb-2 ml-[6px]">
             병원 접수 안내
           </h3>
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <ul className="list-disc list-outside space-y-2 pl-5 text-sm text-gray-600 leading-relaxed">
+          <div className="bg-white rounded-[16px] px-5 pt-[22px] pb-[26px] shadow-sm">
+            <ul className="list-disc list-outside space-y-1 text-sm text-[#2b2b2b] leading-[1.4]">
               <li>
                 [즉시 접수] 후 병원 방문 시 꼭 성함과 함께
                 접수처에 말씀해 주세요.
