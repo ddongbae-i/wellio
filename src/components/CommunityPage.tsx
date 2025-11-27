@@ -16,7 +16,7 @@ import {
   Smile,
   Trash2,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type CSSProperties } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, AnimatePresence } from "motion/react";
@@ -219,9 +219,6 @@ export function CommunityPage({
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [isKeyboardVisible, setIsKeyboardVisible] =
-    useState(false);
-
   const currentUser = {
     userName: currentUserName,
     userAvatar:
@@ -249,6 +246,8 @@ export function CommunityPage({
   }>({});
 
   const emojis = ["❤️", "😊", "👍", "🎉"];
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const [floatingEmojis, setFloatingEmojis] = useState<
     Array<{
@@ -260,6 +259,7 @@ export function CommunityPage({
       delay: number;
     }>
   >([]);
+
 
   const triggerReactionAnimation = (emoji: string) => {
     if (emoji === "🎉") {
@@ -564,40 +564,27 @@ export function CommunityPage({
   }, [filteredPosts, currentPostId]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !window.visualViewport)
-      return;
+  if (typeof window === "undefined" || !window.visualViewport) return;
 
-    const handleResize = () => {
-      const viewport = window.visualViewport;
-      if (!viewport) return;
+  const handleResize = () => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
 
-      const isKeyboard =
-        viewport.height < window.innerHeight * 0.75;
-      setIsKeyboardVisible(isKeyboard);
-    };
+    const diff = window.innerHeight - viewport.height; // 🔹키보드가 차지한 높이(대략)
+    const isKeyboard = diff > 80;                      // 너무 민감하지 않게 임계값
 
-    window.visualViewport.addEventListener(
-      "resize",
-      handleResize,
-    );
-    window.visualViewport.addEventListener(
-      "scroll",
-      handleResize,
-    );
+    setIsKeyboardVisible(isKeyboard);
+    setKeyboardHeight(isKeyboard ? diff : 0);
+  };
 
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener(
-          "resize",
-          handleResize,
-        );
-        window.visualViewport.removeEventListener(
-          "scroll",
-          handleResize,
-        );
-      }
-    };
-  }, []);
+window.visualViewport?.addEventListener("resize", handleResize);
+window.visualViewport?.addEventListener("scroll", handleResize);
+
+return () => {
+  window.visualViewport?.removeEventListener("resize", handleResize);
+  window.visualViewport?.removeEventListener("scroll", handleResize);
+};
+}, []);
 
   return (
     <div className="relative bg-white flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden">
@@ -906,28 +893,38 @@ export function CommunityPage({
           // ===== 리스트 뷰 (스냅) =====
           <div className="w-full px-5 xs:px-6 sm:px-8 snap-y snap-mandatory overflow-y-auto h-full scrollbar-hide">
             {filteredPosts.map((post) => {
-              const isDeleting = postToDelete === post.id;
+  const isDeleting = postToDelete === post.id;
 
-              // 이미지 + 댓글창의 최대 가로폭
-              // 1) 항상 패딩 안에서 100% 사용
-              // 2) 세로가 부족해질 때는 비율 335:400 유지하면서 더 작게 줄어듦
-              const imageAndInputMaxWidth: React.CSSProperties = {
-                maxWidth:
-                  "min(100%, calc((100vh - 264px) * 335 / 400))",
-              };
-              // 264px = 헤더80 + 바텀80 + 상/하 여백20+20 + 댓글48 + 이미지↔댓글 간격16
+  // 🔹 여기서 카드마다 계산
+  const isFocusedCard =
+    isKeyboardVisible && currentPostId === post.id;
+
+ const imageAndInputMaxWidth: CSSProperties = {
+  maxWidth: isKeyboardVisible
+    ? "min(100%, 335px)"
+    : "min(100%, calc((100vh - 264px) * 335 / 400))",
+};
 
               return (
-                <div
-                  key={post.id}
-                  className={`snap-start snap-always h-full w-full flex justify-center ${
-                    isKeyboardVisible
-                      ? "items-start pt-5"
-                      : "items-center"
-                  }`}
-                >
-                  {/* 카드 전체 : 이미지 + 이모지/댓글창 (가로폭 동일) */}
-                  <div className="w-full flex flex-col items-center">
+  <div
+    key={post.id}
+    className={`snap-start snap-always h-full w-full flex justify-center ${
+      isKeyboardVisible ? "items-start pt-5" : "items-center"
+    }`}
+  >
+    {/* 카드 전체 : 이미지 + 이모지/댓글창 (가로폭 동일) */}
+    <div
+      className="w-full flex flex-col items-center"
+      style={{
+        transform: isFocusedCard
+          ? `translateY(-${Math.min(
+              keyboardHeight * 0.6,
+              220,
+            )}px)` // 🔹키보드 높이의 60%만큼 (최대 220px) 위로
+          : "translateY(0)",
+        transition: "transform 0.25s ease-out",
+      }}
+    >
                     {/* 1) 이미지 카드 - 비율 유지 aspect-[335/400] */}
                     <div
                       className="relative w-full aspect-[335/400] overflow-visible flex-shrink-0"

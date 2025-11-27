@@ -1048,10 +1048,6 @@
     width: calc(var(--spacing) * 1.5);
   }
 
-  .w-2 {
-    width: calc(var(--spacing) * 2);
-  }
-
   .w-3 {
     width: calc(var(--spacing) * 3);
   }
@@ -1869,10 +1865,6 @@
     background-color: #f8f9fa;
   }
 
-  .bg-\[\#FAFAFA\] {
-    background-color: #fafafa;
-  }
-
   .bg-\[\#FFEBEE\] {
     background-color: #ffebee;
   }
@@ -2063,6 +2055,16 @@
 
   .bg-white {
     background-color: var(--color-white);
+  }
+
+  .bg-white\/20 {
+    background-color: #fff3;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-white\/20 {
+      background-color: color-mix(in oklab, var(--color-white) 20%, transparent);
+    }
   }
 
   .bg-white\/30 {
@@ -2705,6 +2707,10 @@
 
   .text-\[\#202020\] {
     color: #202020;
+  }
+
+  .text-\[\#222222\] {
+    color: #222;
   }
 
   .text-\[\#333333\] {
@@ -3397,13 +3403,6 @@
     .focus-visible\:ring-ring\/50:focus-visible {
       --tw-ring-color: color-mix(in oklab, var(--ring) 50%, transparent);
     }
-  }
-
-  .active\:scale-95:active {
-    --tw-scale-x: 95%;
-    --tw-scale-y: 95%;
-    --tw-scale-z: 95%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
   }
 
   .active\:scale-100:active {

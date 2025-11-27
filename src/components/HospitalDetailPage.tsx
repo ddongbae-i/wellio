@@ -638,7 +638,7 @@ export function HospitalDetailPage({
                     ))}
                   </div>
 
-                  <p className="text-sm text-[#555555] leading-[1.3] whitespace-pre-line">
+                  <p className="text-sm text-[#555555] leading-[1.4] whitespace-pre-line">
                     {review.content}
                   </p>
                 </div>
@@ -647,7 +647,7 @@ export function HospitalDetailPage({
 
             <Button
               variant="outline"
-              className="w-full mt-6 h-12 text-gray-600 border-gray-200 rounded-xl hover:bg-gray-50"
+              className="w-full mt-6 h-12 text-[#2b2b2b] border-[#e8e8e8] rounded-xl bg-white hover:bg-gray-50"
               onClick={onReviewsClick}
             >
               {reviewCount - 3}개 리뷰 더보기
@@ -656,7 +656,7 @@ export function HospitalDetailPage({
         </div>
 
         {/* 5. 병원 접수 안내 */}
-        <div className="mt-8 px-4 xs:px-6 sm:px-8">
+        <div className="mt-4 px-4 xs:px-6 sm:px-8">
           <h3 className="text-[19px] font-semibold text-[#202020] mb-2 ml-[6px]">
             병원 접수 안내
           </h3>
