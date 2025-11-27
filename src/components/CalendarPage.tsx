@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronDown, Target, Trophy } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 
 // 💡 Swiper 라이브러리 임포트
@@ -8,22 +8,26 @@ import "swiper/css";
 
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
+interface Post {
+  id: number;
+  image: string;
+  createdAt?: string; // YYYY-MM-DD 형식
+}
+
 interface CalendarPageProps {
   onBack: () => void;
+  posts: Post[]; // 커뮤니티 피드 데이터
 }
 
 interface DayData {
   date: number;
-  image?: string;
-  tripStart?: boolean;
-  tripEnd?: boolean;
-  inTrip?: boolean;
-  tripImage?: boolean;
-  badge?: boolean;
-  avatar?: string;
+  images?: string[]; // 여러 개의 피드 이미지
+  challengeStart?: boolean; // 챌린지 시작
+  challengeEnd?: boolean; // 챌린지 끝
+  inChallenge?: boolean; // 챌린지 기간 중
 }
 
-// 특정 년/월의 날짜 배열 생성 (동일)
+// 특정 년/월의 날짜 배열 생성
 const generateMonthDays = (
   year: number,
   month: number,
@@ -41,48 +45,46 @@ const generateMonthDays = (
   return days;
 };
 
-// =========================================================================
-
-export function CalendarPage({ onBack }: CalendarPageProps) {
+export function CalendarPage({ onBack, posts }: CalendarPageProps) {
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
-  const swiperRef = useRef<SwiperCore | null>(null); // Swiper 인스턴스 Ref
+  const swiperRef = useRef<SwiperCore | null>(null);
 
-  // 💡 이벤트 데이터 업데이트 (동일)
-  const specialEvents: { [key: string]: Partial<DayData> } = {
-    // === 10월 이벤트 ===
-    "2025-10-5": { image: "https://i.pravatar.cc/100?img=50" },
-    "2025-10-14": { tripStart: true },
-    "2025-10-15": { inTrip: true },
-    "2025-10-16": { tripEnd: true, inTrip: true },
+  // 날짜별 피드 이미지 맵핑
+  const postsByDate = useMemo(() => {
+    const map: { [key: string]: string[] } = {};
+    posts.forEach((post) => {
+      if (post.createdAt) {
+        if (!map[post.createdAt]) {
+          map[post.createdAt] = [];
+        }
+        map[post.createdAt].push(post.image);
+      }
+    });
+    return map;
+  }, [posts]);
 
-    // === 11월 이벤트 ===
-    "2025-11-1": { image: "https://i.pravatar.cc/100?img=3" },
-    "2025-11-2": { image: "https://i.pravatar.cc/100?img=33" },
-    "2025-11-3": { image: "https://i.pravatar.cc/100?img=12" },
-    "2025-11-4": { image: "https://i.pravatar.cc/100?img=59" },
-    "2025-11-7": { image: "https://i.pravatar.cc/100?img=20" },
-    "2025-11-10": { image: "https://i.pravatar.cc/100?img=15" },
-    "2025-11-13": { image: "https://i.pravatar.cc/100?img=53" },
-    "2025-11-16": { tripStart: true },
-    "2025-11-17": { inTrip: true },
-    "2025-11-18": {
-      inTrip: true,
-      image: "https://i.pravatar.cc/100?img=18",
-    },
-    "2025-11-19": { inTrip: true },
-    "2025-11-20": { inTrip: true },
-    "2025-11-21": { inTrip: true },
-    "2025-11-22": { tripEnd: true, inTrip: true },
-    "2025-11-23": {
-      tripStart: true,
-      inTrip: true,
-      image: "https://i.pravatar.cc/100?img=23",
-    },
-    "2025-11-24": { inTrip: true },
-    "2025-11-25": { tripEnd: true, inTrip: true },
+  // 챌린지 데이터 (가족 간 챌린지)
+  const challengeData: { [key: string]: Partial<DayData> } = {
+    // 첫 번째 챌린지: 10월 14-16일
+    "2025-10-14": { challengeStart: true, inChallenge: true },
+    "2025-10-15": { inChallenge: true },
+    "2025-10-16": { challengeEnd: true, inChallenge: true },
+    
+    // 두 번째 챌린지: 11월 16-22일
+    "2025-11-16": { challengeStart: true, inChallenge: true },
+    "2025-11-17": { inChallenge: true },
+    "2025-11-18": { inChallenge: true },
+    "2025-11-19": { inChallenge: true },
+    "2025-11-20": { inChallenge: true },
+    "2025-11-21": { inChallenge: true },
+    "2025-11-22": { challengeEnd: true, inChallenge: true },
+    
+    // 세 번째 챌린지: 11월 23-25일
+    "2025-11-23": { challengeStart: true, inChallenge: true },
+    "2025-11-24": { inChallenge: true },
+    "2025-11-25": { challengeEnd: true, inChallenge: true },
   };
 
-  // 표시 범위 (동일)
   const calendarRange = useMemo(() => {
     const range = [];
     range.push({ year: 2025, month: 8 });
@@ -98,7 +100,6 @@ export function CalendarPage({ onBack }: CalendarPageProps) {
     return range;
   }, []);
 
-  // 💡 초기 진입 시 11월(인덱스 3)로 이동 (동일)
   useEffect(() => {
     if (swiperRef.current) {
       setTimeout(() => {
@@ -107,7 +108,7 @@ export function CalendarPage({ onBack }: CalendarPageProps) {
     }
   }, []);
 
-  // 달력 일자 렌더링 함수 (수정)
+  // 달력 일자 렌더링 함수
   const renderDay = (
     day: DayData,
     year: number,
@@ -115,12 +116,15 @@ export function CalendarPage({ onBack }: CalendarPageProps) {
     idx: number,
   ) => {
     const dateKey = `${year}-${month}-${day.date}`;
-    const eventData = specialEvents[dateKey];
-    const currentDay = eventData
-      ? { ...day, ...eventData }
-      : day;
+    const feedImages = postsByDate[dateKey] || [];
+    const challengeInfo = challengeData[dateKey] || {};
+    
+    const currentDay = {
+      ...day,
+      images: feedImages,
+      ...challengeInfo,
+    };
 
-    // 💡 날짜가 없으면 (빈 칸) null 반환
     if (currentDay.date === 0) {
       return (
         <div
@@ -130,17 +134,14 @@ export function CalendarPage({ onBack }: CalendarPageProps) {
       );
     }
 
-    // 여행 일정이 있는 날짜인지 확인
-    const isInTripPeriod =
-      currentDay.tripStart ||
-      currentDay.tripEnd ||
-      currentDay.inTrip;
+    const isInChallengePeriod = currentDay.inChallenge;
+    const isChalllengeStart = currentDay.challengeStart;
 
-    // 여행 일정 기간의 배경 클래스
-    const tripBgClass = `absolute top-0 bottom-0 left-0 right-0 bg-[#e0f8f8] z-0 ${
-      currentDay.tripStart && !currentDay.tripEnd
+    // 챌린지 배경 스타일
+    const challengeBgClass = `absolute top-0 bottom-0 left-0 right-0 bg-[#e0f8f8] z-0 ${
+      currentDay.challengeStart && !currentDay.challengeEnd
         ? "rounded-l-full"
-        : currentDay.tripEnd && !currentDay.tripStart
+        : currentDay.challengeEnd && !currentDay.challengeStart
           ? "rounded-r-full"
           : ""
     }`;
@@ -150,32 +151,34 @@ export function CalendarPage({ onBack }: CalendarPageProps) {
         key={`${year}-${month}-${idx}`}
         className="relative h-12 flex justify-center items-center"
       >
-        {/* 💡 여행 일정 배경이 있는 경우 먼저 렌더링 */}
-        {isInTripPeriod && <div className={tripBgClass} />}
+        {/* 챌린지 배경 */}
+        {isInChallengePeriod && <div className={challengeBgClass} />}
 
-        {currentDay.image ? (
-          // 💡 이미지가 있는 경우 (아이콘 대신 숫자로 통일)
-          <div
-            className={`w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center text-white shadow-md ${
-              currentDay.tripStart ? "bg-[#2a8f8f]" : "" // 여행 시작일이면 진한 배경
-            }`}
-          >
-            {/* 이미지 배경 */}
+        {isChalllengeStart ? (
+          // 챌린지 시작일: 아이콘 표시
+          <div className="w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center text-white shadow-md bg-[#36D2C5]">
+            <Target size={20} className="relative z-10 text-white" />
+            <span className="absolute bottom-0.5 text-[9px] font-bold z-10">
+              {currentDay.date}
+            </span>
+          </div>
+        ) : currentDay.images && currentDay.images.length > 0 ? (
+          // 피드가 있는 날짜: 피드 이미지 작게 표시
+          <div className="w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center shadow-md">
             <ImageWithFallback
-              src={currentDay.image}
+              src={currentDay.images[0]}
               alt=""
               className="absolute w-full h-full object-cover z-0"
             />
             {/* 이미지 위에 어두운 오버레이 */}
             <div className="absolute inset-0 bg-black opacity-30 z-0" />
-
-            {/* 💡 날짜 숫자를 중앙에 크게 표시 (기존의 일반 포스팅 스타일) */}
-            <span className="relative z-10 drop-shadow-md">
+            {/* 날짜 숫자 */}
+            <span className="relative z-10 text-white drop-shadow-md">
               {currentDay.date}
             </span>
           </div>
         ) : (
-          // 이미지가 없고 일반 텍스트 날짜만 있는 경우
+          // 일반 날짜
           <span className="relative z-10 text-gray-700">
             {currentDay.date}
           </span>
@@ -189,14 +192,14 @@ export function CalendarPage({ onBack }: CalendarPageProps) {
       <style>{`
         /* Swiper의 슬라이드가 내용물 크기를 갖도록 조정 */
         .swiper-wrapper {
-          align-items: flex-start; /* 슬라이드가 상단부터 시작하도록 정렬 */
+          align-items: flex-start;
         }
         .swiper-slide {
-            height: auto !important; /* 내용물 크기에 맞게 높이 설정 */
+            height: auto !important;
         }
       `}</style>
 
-      {/* Header - 기존과 동일 + Sticky 유지 */}
+      {/* Header */}
       <div className="sticky top-0 z-10 bg-white px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center shadow-sm relative">
         <button onClick={onBack} className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6">
           <ChevronLeft size={24} className="text-gray-800" />
@@ -209,24 +212,23 @@ export function CalendarPage({ onBack }: CalendarPageProps) {
         </div>
       </div>
 
-      {/* 💡 Swiper 영역 */}
+      {/* Swiper 영역 */}
       <div className="flex-1 overflow-hidden bg-gray-100">
         <Swiper
           onSwiper={(swiper) => {
             swiperRef.current = swiper;
           }}
           direction={"vertical"}
-          slidesPerView={"auto"} // auto로 설정하여 다음 달이 보이도록 함
-          spaceBetween={40} // 월 간의 간격 40px 유지
-          mousewheel={true} // 휠 스크롤 지원
-          grabCursor={true} // 드래그 시 커서 변경
+          slidesPerView={"auto"}
+          spaceBetween={40}
+          mousewheel={true}
+          grabCursor={true}
           className="swiper-container h-full"
         >
           {calendarRange.map(({ year, month }) => {
             const days = generateMonthDays(year, month);
 
             return (
-              // h-auto로 설정하여 내용물 크기에 맞춥니다.
               <SwiperSlide
                 key={`${year}-${month}`}
                 className="h-auto"

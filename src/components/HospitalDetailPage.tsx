@@ -572,11 +572,11 @@ export function HospitalDetailPage({
               )}
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-5">
               {userReviews.map((review) => (
                 <div
                   key={review.id}
-                  className="border-b border-[#f0f0f0] last:border-0 py-3 last:pb-0"
+                  className="border-b border-[#f0f0f0] last:border-0 pb-5 last:pb-0"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-1">

@@ -52,6 +52,7 @@ interface Post {
   weather?: string;
   time?: string;
   health?: string;
+  createdAt?: string; // 추가: 작성 날짜 (YYYY-MM-DD 형식)
   comments?: Array<{
     userName: string;
     userAvatar: string;
@@ -763,6 +764,7 @@ export default function App() {
       caption: "챌린지 첫 시작!",
       userName: "관리자",
       textOverlay: "오늘부터 시작하는 건강한 습관!",
+      createdAt: "2025-11-1",
       comments: [
         {
           userName: "엄마",
@@ -814,6 +816,7 @@ export default function App() {
       location: "한강공원",
       time: "오전 6:30",
       weather: "맑음 18°C",
+      createdAt: "2025-11-2",
       comments: [
         {
           userName: "엄마",
@@ -849,6 +852,7 @@ export default function App() {
       userName: "엄마",
       textOverlay: "하루를 평화롭게 시작하는 아침 요가",
       health: "혈압 120/80",
+      createdAt: "2025-11-3",
       comments: [
         {
           userName: "관리자",
@@ -895,6 +899,7 @@ export default function App() {
       userName: "엄마",
       textOverlay: "신선한 채소로 만든 사랑의 한 끼",
       time: "오후 12:30",
+      createdAt: "2025-11-4",
       comments: [
         {
           userName: "관리자",
@@ -937,6 +942,7 @@ export default function App() {
       location: "근린공원",
       weather: "맑음 20°C",
       health: "걸음수 8,432보",
+      createdAt: "2025-11-7",
       comments: [
         {
           userName: "아빠",
@@ -974,6 +980,7 @@ export default function App() {
       location: "올림픽공원",
       time: "오전 6:00",
       weather: "맑음 15°C",
+      createdAt: "2025-11-10",
       comments: [
         {
           userName: "엄마",
@@ -1024,6 +1031,7 @@ export default function App() {
       userName: "아빠",
       textOverlay: "건강이 최고!",
       health: "혈압 118/75, 콜레스테롤 정상",
+      createdAt: "2025-11-13",
       comments: [
         {
           userName: "엄마",
@@ -1054,6 +1062,48 @@ export default function App() {
         }
       ]
     },
+    {
+      id: 8,
+      image:
+        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+      badge: "🧘‍♀️ 매일 요가",
+      userAvatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
+      caption: "여행 중 아침 요가",
+      userName: "엄마",
+      textOverlay: "자연 속에서 하는 요가",
+      createdAt: "2025-11-18",
+      comments: [],
+      reactions: []
+    },
+    {
+      id: 9,
+      image:
+        "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=800&q=80",
+      badge: "🥗 건강한 식단",
+      userAvatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
+      caption: "새로운 챌린지 시작!",
+      userName: "엄마",
+      textOverlay: "30일 채소 챌린지",
+      createdAt: "2025-11-23",
+      comments: [],
+      reactions: []
+    },
+    {
+      id: 10,
+      image:
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+      badge: "🏃‍♂️ 주 3회 러닝",
+      userAvatar:
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
+      caption: "10월 산책 기록",
+      userName: "아빠",
+      textOverlay: "가을 산책",
+      createdAt: "2025-10-5",
+      comments: [],
+      reactions: []
+    },
   ]);
 
   const handleLogin = (name: string) => {
@@ -1067,11 +1117,15 @@ export default function App() {
   };
 
   const handleUpload = (newPost: Omit<Post, "id" | "userName" | "userAvatar">) => {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    
     const post: Post = {
       ...newPost,
       id: Math.max(0, ...posts.map(p => p.id)) + 1,
       userName: userName,
       userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
+      createdAt: newPost.createdAt || dateStr, // 날짜가 없으면 오늘 날짜 사용
     };
     setPosts([post, ...posts]); // 맨 앞에 추가
     navigateTo("community"); // 커뮤니티로 이동
@@ -1424,7 +1478,7 @@ export default function App() {
         )}
         {/* 👇 11. '캘린더' 페이지 추가 */}
         {currentPage === "calendar" && (
-          <CalendarPage onBack={navigateBack} />
+          <CalendarPage onBack={navigateBack} posts={posts} />
         )}
       </div>
       {/* 👇 Toaster 추가 - 화면 하단에 토스트 메시지 표시 */}
