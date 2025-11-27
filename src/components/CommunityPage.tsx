@@ -825,8 +825,8 @@ export function CommunityPage({
         style={{
           height:
             isGridView || isReactionView
-              ? "calc(100vh - 110px)"
-              : "calc(100vh - 110px - 80px)",
+              ? "calc(100vh - 80px)"
+              : "calc(100vh - 80px - 80px)",
         }}
       >
         {isReactionView ? (
@@ -954,7 +954,7 @@ export function CommunityPage({
               return (
                 <div
                   // [수정] 사진+댓글창 그룹을 한 화면에 정확히 표시
-                  className={`snap-start snap-always flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 justify-start
+                  className={`snap-start snap-always flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 justify-center
                   ${
                     isKeyboardVisible
                       ? "pt-12 overflow-y-auto"
@@ -962,8 +962,8 @@ export function CommunityPage({
                   }`}
                   key={post.id}
                   style={{
-                    height: "calc(100vh - 190px)", // 헤더(110px) + nav(80px)
-                    minHeight: "calc(100vh - 190px)",
+                    height: "calc(100vh - 160px)", // 헤더(110px) + nav(80px)
+                    minHeight: "calc(100vh - 160px)",
                   }}
                 >
                   <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
