@@ -704,8 +704,8 @@ export function UploadPage({
             >
               {/* ✅ 수정 2: cardTranslateY 제거, 이미지 wrapper에서 transform 제거 */}
               <div className="w-full flex justify-center">
-                {/* ✅ 수정 3: 이미지 크기를 고정 (335x400px), aspect-ratio 제거 */}
-                <div className="relative w-[335px] h-[400px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg">
+                {/* ✅ 수정 3: 이미지 크기를 고정 (335x400px), z-index 추가 */}
+                <div className="relative w-[335px] h-[400px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg z-50">
                   {/* 카메라 비디오 */}
                   {!isUploadMode && (
                     <video
