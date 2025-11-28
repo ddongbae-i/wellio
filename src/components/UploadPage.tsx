@@ -693,19 +693,16 @@ export function UploadPage({
           transition: 'height 0.3s ease'
         }}
       >
-        {/* 헤더(110px) + 툴바(대략 160px)를 제외한 영역 전체를 컨텐츠로 사용 */}
-        <div className="absolute inset-x-0 top-0 bottom-0 flex justify-center">
-          <div className="w-full max-w-[500px] h-full flex flex-col">
-            {/* 🔹헤더 아래 여백 + 툴바 위 여백 포함한 컨텐츠 영역 - overflow 제거 */}
+        {/* 컨테이너를 absolute로 변경하여 이미지가 자유롭게 이동 가능하도록 */}
+        <div className="absolute inset-0 flex justify-center">
+          <div className="relative w-full max-w-[500px] h-full">
+            {/* 이미지 컨테이너 - 키보드 올라올 때 상단으로 이동 */}
             <div 
-              className={`flex-1 pb-[160px] flex justify-center px-5 xs:px-6 sm:px-8 overflow-visible ${
-                keyboardHeight > 0 ? 'items-start pt-0' : 'items-center pt-[110px]'
+              className={`absolute left-0 right-0 flex justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300 ${
+                keyboardHeight > 0 ? 'top-0' : 'top-1/2 -translate-y-1/2'
               }`}
             >
-              {/* ✅ 수정 2: cardTranslateY 제거, 이미지 wrapper에서 transform 제거 */}
-              <div className="w-full flex justify-center">
-                {/* ✅ 수정 3: 이미지 크기를 고정 (335x400px), z-index 추가 */}
-                <div className="relative w-[335px] h-[400px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg z-50">
+              <div className="relative w-[335px] h-[400px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg z-50">
                   {/* 카메라 비디오 */}
                   {!isUploadMode && (
                     <video
