@@ -956,8 +956,8 @@ export function CommunityPage({
                     }`}
                   key={post.id}
                   style={{
-                    // 헤더(110px) + nav(80px)
-                    minHeight: "calc(100vh - 190px)",
+                    height: "calc(100vh - 290px)", // 헤더(110px) + nav(80px)
+                    minHeight: "calc(100vh - 290px)",
                   }}
                 >
                   <div className="relative w-full">
