@@ -136,21 +136,19 @@ const FamilyDropdown = ({
                   setShowFamilyDropdown(false);
                 }}
                 className={`w-full flex items-center px-4 py-3 rounded-xl transition-colors text-lg font-medium whitespace-nowrap justify-start
-                  ${
-                    isGrayedOut
-                      ? "text-gray-400 cursor-default"
-                      : isSelected
-                        ? "text-[#1A1A1A] bg-gray-100"
-                        : "text-[#1A1A1A] hover:bg-gray-50"
+                  ${isGrayedOut
+                    ? "text-gray-400 cursor-default"
+                    : isSelected
+                      ? "text-[#1A1A1A] bg-gray-100"
+                      : "text-[#1A1A1A] hover:bg-gray-50"
                   }`}
                 disabled={isGrayedOut}
               >
                 <span
-                  className={`${
-                    isGrayedOut
+                  className={`${isGrayedOut
                       ? "text-gray-400"
                       : "text-[#1A1A1A]"
-                  } leading-none`}
+                    } leading-none`}
                 >
                   {memberName}
                 </span>
@@ -649,11 +647,10 @@ export function CommunityPage({
               />
             </button>
             <div
-              className={`bg-gray-100 rounded-lg px-4 py-2 flex items-center gap-2 transition-all border-2 flex-1 ${
-                isSearchFocused
+              className={`bg-gray-100 rounded-lg px-4 py-2 flex items-center gap-2 transition-all border-2 flex-1 ${isSearchFocused
                   ? "border-[#36D9D9]"
                   : "border-transparent"
-              }`}
+                }`}
             >
               <Search size={20} className="text-gray-400" />
               <input
@@ -716,11 +713,11 @@ export function CommunityPage({
                 <span className="text-lg font-bold text-[#1A1A1A]">
                   {selectedFamilyMember
                     ? familyMembers.find(
-                        (m) =>
-                          (m.id === "me"
-                            ? currentUserName
-                            : m.name) === selectedFamilyMember,
-                      )?.name || "모아보기"
+                      (m) =>
+                        (m.id === "me"
+                          ? currentUserName
+                          : m.name) === selectedFamilyMember,
+                    )?.name || "모아보기"
                     : "모아보기"}
                 </span>
                 <ChevronDown
@@ -772,11 +769,11 @@ export function CommunityPage({
                 <span className="text-lg font-bold text-[#1A1A1A]">
                   {selectedFamilyMember
                     ? familyMembers.find(
-                        (m) =>
-                          (m.id === "me"
-                            ? currentUserName
-                            : m.name) === selectedFamilyMember,
-                      )?.name || "우리가족"
+                      (m) =>
+                        (m.id === "me"
+                          ? currentUserName
+                          : m.name) === selectedFamilyMember,
+                    )?.name || "우리가족"
                     : "우리가족"}
                 </span>
                 <ChevronDown
@@ -836,11 +833,10 @@ export function CommunityPage({
               {/* ALL 버튼 */}
               <button
                 onClick={() => setReactionFilter("ALL")}
-                className={`flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center text-sm font-bold transition-all border-2 ${
-                  reactionFilter === "ALL"
+                className={`flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center text-sm font-bold transition-all border-2 ${reactionFilter === "ALL"
                     ? "bg-[#F0F0F0] text-[#1A1A1A] border-[#36D2C5]"
                     : "bg-[#F0F0F0] text-[#999999] border-transparent"
-                }`}
+                  }`}
               >
                 ALL
               </button>
@@ -850,11 +846,10 @@ export function CommunityPage({
                 <button
                   key={emoji}
                   onClick={() => setReactionFilter(emoji)}
-                  className={`flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center text-2xl transition-all border-2 ${
-                    reactionFilter === emoji
+                  className={`flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center text-2xl transition-all border-2 ${reactionFilter === emoji
                       ? "bg-[#FFF8F8] border-[#36D2C5]"
                       : "bg-[#F0F0F0] border-transparent"
-                  }`}
+                    }`}
                 >
                   {emoji}
                 </button>
@@ -888,7 +883,7 @@ export function CommunityPage({
                       style={{
                         zIndex:
                           expandedPostId === post.id ||
-                          lastExpandedId === post.id
+                            lastExpandedId === post.id
                             ? 50
                             : 0,
                       }}
@@ -927,7 +922,7 @@ export function CommunityPage({
                   style={{
                     zIndex:
                       expandedPostId === post.id ||
-                      lastExpandedId === post.id
+                        lastExpandedId === post.id
                         ? 50
                         : 0,
                   }}
@@ -955,18 +950,17 @@ export function CommunityPage({
                 <div
                   // [수정] 사진+댓글창 그룹을 한 화면에 정확히 표시
                   className={`snap-start snap-always flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 justify-center
-                  ${
-                    isKeyboardVisible
+                  ${isKeyboardVisible
                       ? "pt-12 overflow-y-auto"
                       : ""
-                  }`}
+                    }`}
                   key={post.id}
                   style={{
                     height: "calc(100vh - 190px)", // 헤더(110px) + nav(80px)
                     minHeight: "calc(100vh - 190px)",
                   }}
                 >
-                  <div>
+                  <div className="relative w-full">
                     <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
                       {post.userName === currentUser.userName &&
                         isDragging && (
@@ -981,7 +975,7 @@ export function CommunityPage({
                         className="relative h-full w-full rounded-2xl overflow-hidden shadow-lg touch-none"
                         drag={
                           !isScrolling &&
-                          post.userName === currentUser.userName
+                            post.userName === currentUser.userName
                             ? "x"
                             : false
                         }
@@ -1023,242 +1017,241 @@ export function CommunityPage({
                         />
                         {selectedPostForReaction ===
                           post.id && (
-                          <div
-                            className="absolute inset-0 bg-black/70 z-10 flex flex-col cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedPostForReaction(null);
-                            }}
-                          >
-                            {/* === [수정된 부분: 리액션 묶음 표시 - 배경 투명] === */}
-                            {getAllReactions(
-                              post.id,
-                              post.reactions,
-                            ).length > 0 && (
-                              <div className="absolute top-4 right-4 flex flex-wrap gap-2 justify-end max-w-[60%] z-20">
-                                {getAllReactions(
-                                  post.id,
-                                  post.reactions,
-                                ).map((reaction) => (
-                                  <div
-                                    key={reaction.emoji}
-                                    // 배경 투명
-                                    className="rounded-full pl-2 pr-3 py-1.5 flex items-center gap-2"
-                                    // === [NEW] 클릭 시 애니메이션 재실행 ===
-                                    onClick={(e) => {
-                                      e.stopPropagation(); // 오버레이 닫힘 방지
-                                      triggerReactionAnimation(
-                                        reaction.emoji,
-                                      ); // 애니메이션 실행
-                                    }}
-                                    // ======================================
-                                  >
-                                    <span className="text-base">
-                                      {reaction.emoji}
-                                    </span>
+                            <div
+                              className="absolute inset-0 bg-black/70 z-10 flex flex-col cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPostForReaction(null);
+                              }}
+                            >
+                              {/* === [수정된 부분: 리액션 묶음 표시 - 배경 투명] === */}
+                              {getAllReactions(
+                                post.id,
+                                post.reactions,
+                              ).length > 0 && (
+                                  <div className="absolute top-4 right-4 flex flex-wrap gap-2 justify-end max-w-[60%] z-20">
+                                    {getAllReactions(
+                                      post.id,
+                                      post.reactions,
+                                    ).map((reaction) => (
+                                      <div
+                                        key={reaction.emoji}
+                                        // 배경 투명
+                                        className="rounded-full pl-2 pr-3 py-1.5 flex items-center gap-2"
+                                        // === [NEW] 클릭 시 애니메이션 재실행 ===
+                                        onClick={(e) => {
+                                          e.stopPropagation(); // 오버레이 닫힘 방지
+                                          triggerReactionAnimation(
+                                            reaction.emoji,
+                                          ); // 애니메이션 실행
+                                        }}
+                                      // ======================================
+                                      >
+                                        <span className="text-base">
+                                          {reaction.emoji}
+                                        </span>
 
-                                    {/* 사용자 프로필 겹쳐서 표시 */}
-                                    <div className="flex -space-x-2.5">
-                                      {/* 최대 3명의 사용자만 표시 (겹치는 효과를 위해) */}
-                                      {reaction.users
-                                        .slice(0, 3)
-                                        .map(
-                                          (user, userIdx) => (
-                                            <ImageWithFallback
-                                              key={`${reaction.emoji}-${user.userName}-${userIdx}`}
-                                              src={
-                                                user.userAvatar
-                                              }
-                                              alt={
-                                                user.userName
-                                              }
-                                              // 프로필 이미지 스타일: 크기, 겹침 효과를 위한 -space-x-2.5 와 대비되는 왼쪽 마진 0
-                                              className={`w-6 h-6 rounded-full object-cover border border-[#f0f0f0] transition-all duration-300 ${
-                                                userIdx === 0
-                                                  ? "ml-0"
-                                                  : ""
-                                              }`}
-                                              style={{
-                                                // 겹치는 정도를 조정
-                                                zIndex:
-                                                  reaction.users
-                                                    .length -
-                                                  userIdx,
-                                              }}
-                                            />
-                                          ),
-                                        )}
-
-                                      {/* 3명 초과 시 카운트 표시 */}
-                                      {reaction.users.length >
-                                        3 && (
-                                        <div
-                                          className="w-7 h-7 rounded-full bg-gray-500/80 backdrop-blur-sm flex items-center justify-center text-white text-xs font-semibold border-2 border-white relative"
-                                          style={{ zIndex: 0 }}
-                                        >
-                                          +
+                                        {/* 사용자 프로필 겹쳐서 표시 */}
+                                        <div className="flex -space-x-2.5">
+                                          {/* 최대 3명의 사용자만 표시 (겹치는 효과를 위해) */}
                                           {reaction.users
-                                            .length - 3}
+                                            .slice(0, 3)
+                                            .map(
+                                              (user, userIdx) => (
+                                                <ImageWithFallback
+                                                  key={`${reaction.emoji}-${user.userName}-${userIdx}`}
+                                                  src={
+                                                    user.userAvatar
+                                                  }
+                                                  alt={
+                                                    user.userName
+                                                  }
+                                                  // 프로필 이미지 스타일: 크기, 겹침 효과를 위한 -space-x-2.5 와 대비되는 왼쪽 마진 0
+                                                  className={`w-6 h-6 rounded-full object-cover border border-[#f0f0f0] transition-all duration-300 ${userIdx === 0
+                                                      ? "ml-0"
+                                                      : ""
+                                                    }`}
+                                                  style={{
+                                                    // 겹치는 정도를 조정
+                                                    zIndex:
+                                                      reaction.users
+                                                        .length -
+                                                      userIdx,
+                                                  }}
+                                                />
+                                              ),
+                                            )}
+
+                                          {/* 3명 초과 시 카운트 표시 */}
+                                          {reaction.users.length >
+                                            3 && (
+                                              <div
+                                                className="w-7 h-7 rounded-full bg-gray-500/80 backdrop-blur-sm flex items-center justify-center text-white text-xs font-semibold border-2 border-white relative"
+                                                style={{ zIndex: 0 }}
+                                              >
+                                                +
+                                                {reaction.users
+                                                  .length - 3}
+                                              </div>
+                                            )}
                                         </div>
-                                      )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              {/* ================================================= */}
+
+                              {/* [수정: Pressed 상태의 캡슐 위치 및 스타일 통일] */}
+                              {(post.textOverlay ||
+                                post.userName) && (
+                                  <div className="absolute bottom-5 left-5 flex items-center gap-3 z-20 max-w-[90%]">
+                                    {/* 1. 프로필 + 텍스트 캡슐 - shrink-0 제거 */}
+                                    <div className="inline-flex items-center bg-white/90 backdrop-blur-sm rounded-full pl-1 pr-4 py-2 gap-2">
+                                      <ImageWithFallback
+                                        src={post.userAvatar}
+                                        alt={post.userName}
+                                        className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0] -my-4 -ml-2"
+                                      />
+                                      <p className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink">
+                                        {post.textOverlay ||
+                                          post.userName}
+                                      </p>
                                     </div>
                                   </div>
-                                ))}
-                              </div>
-                            )}
-                            {/* ================================================= */}
-
-                            {/* [수정: Pressed 상태의 캡슐 위치 및 스타일 통일] */}
-                            {(post.textOverlay ||
-                              post.userName) && (
-                              <div className="absolute bottom-5 left-5 flex items-center gap-3 z-20 max-w-[90%]">
-                                {/* 1. 프로필 + 텍스트 캡슐 - shrink-0 제거 */}
-                                <div className="inline-flex items-center bg-white/90 backdrop-blur-sm rounded-full pl-1 pr-4 py-2 gap-2">
-                                  <ImageWithFallback
-                                    src={post.userAvatar}
-                                    alt={post.userName}
-                                    className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0] -my-4 -ml-2"
-                                  />
-                                  <p className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink">
-                                    {post.textOverlay ||
-                                      post.userName}
-                                  </p>
-                                </div>
-                              </div>
-                            )}
-                            {getAllComments(
-                              post.id,
-                              post.comments,
-                            ).length > 0 && (
-                              <div
-                                // [수정] right-4 -> right-0 변경. p-4가 있으므로 시각적으로는 16px 떨어짐.
-                                className="absolute bottom-20 right-0 flex flex-col gap-5 items-end max-w-[70%] max-h-[50vh] overflow-y-auto z-20 p-4 scrollbar-hide"
-                              >
-                                {getAllComments(
-                                  post.id,
-                                  post.comments,
-                                ).map((comment, idx) => (
+                                )}
+                              {getAllComments(
+                                post.id,
+                                post.comments,
+                              ).length > 0 && (
                                   <div
-                                    key={`comment-${post.id}-${idx}-${comment.userName}-${comment.timestamp}`}
-                                    // [수정] 댓글 캡슐: 우측 정렬이므로 flex-row-reverse 및 padding 반전 (pl-5 pr-1)
-                                    className="inline-flex flex-row-reverse items-center bg-white/70 backdrop-blur-sm rounded-full pl-4 pr-1 py-3"
+                                    // [수정] right-4 -> right-0 변경. p-4가 있으므로 시각적으로는 16px 떨어짐.
+                                    className="absolute bottom-20 right-0 flex flex-col gap-5 items-end max-w-[70%] max-h-[50vh] overflow-y-auto z-20 p-4 scrollbar-hide"
                                   >
-                                    <ImageWithFallback
-                                      src={comment.userAvatar}
-                                      alt={comment.userName}
-                                      // [수정] 이미지: w-11 h-11, -my-4, -mr-2(오른쪽돌출)
-                                      className="w-9 h-9 rounded-full object-cover -my-4 -mr-0.5 shadow-sm"
-                                    />
-                                    {/* [수정] max-w-[180px], truncate 유지, flex-shrink 추가 */}
-                                    <p className="text-[15px] text-[#202020] font-medium leading-none max-w-[85%] truncate flex-shrink">
-                                      {comment.text}
-                                    </p>
+                                    {getAllComments(
+                                      post.id,
+                                      post.comments,
+                                    ).map((comment, idx) => (
+                                      <div
+                                        key={`comment-${post.id}-${idx}-${comment.userName}-${comment.timestamp}`}
+                                        // [수정] 댓글 캡슐: 우측 정렬이므로 flex-row-reverse 및 padding 반전 (pl-5 pr-1)
+                                        className="inline-flex flex-row-reverse items-center bg-white/70 backdrop-blur-sm rounded-full pl-4 pr-1 py-3"
+                                      >
+                                        <ImageWithFallback
+                                          src={comment.userAvatar}
+                                          alt={comment.userName}
+                                          // [수정] 이미지: w-11 h-11, -my-4, -mr-2(오른쪽돌출)
+                                          className="w-9 h-9 rounded-full object-cover -my-4 -mr-0.5 shadow-sm"
+                                        />
+                                        {/* [수정] max-w-[180px], truncate 유지, flex-shrink 추가 */}
+                                        <p className="text-[15px] text-[#202020] font-medium leading-none max-w-[85%] truncate flex-shrink">
+                                          {comment.text}
+                                        </p>
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
+                                )}
+                            </div>
+                          )}
                         {selectedPostForReaction !==
                           post.id && (
-                          <>
-                            <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
-                              {post.location && (
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <MapPin
-                                    size={16}
-                                    className="text-white"
-                                  />
-                                  <span className="text-white text-sm">
-                                    {post.location}
-                                  </span>
-                                </div>
-                              )}
-                              {post.weather && (
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <Cloud
-                                    size={16}
-                                    className="text-white"
-                                  />
-                                  <span className="text-white text-sm">
-                                    {post.weather}
-                                  </span>
-                                </div>
-                              )}
-                              {post.time && (
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <Clock
-                                    size={16}
-                                    className="text-white"
-                                  />
-                                  <span className="text-white text-sm">
-                                    {post.time}
-                                  </span>
-                                </div>
-                              )}
-                              {post.health && (
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <Heart
-                                    size={16}
-                                    className="text-white"
-                                  />
-                                  <span className="text-white text-sm">
-                                    {post.health}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                            {post.badge &&
-                              !post.location &&
-                              !post.weather &&
-                              !post.time &&
-                              !post.health && (
-                                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1 text-sm font-medium">
-                                  <span>{post.badge}</span>
-                                </div>
-                              )}
-
-                            {/* === [수정된 부분: 하단 프로필 캡슐 및 댓글 카운트 (Outside State)] === */}
-                            <div className="absolute bottom-5 left-5 flex items-center gap-2 z-10 max-w-[90%]">
-                              {/* 1. 프로필 + 텍스트 캡슐 - shrink-0 제거 */}
-                              <div className="inline-flex items-center bg-white/70 backdrop-blur-sm rounded-full pl-1 pr-4 py-2 gap-2">
-                                <ImageWithFallback
-                                  src={
-                                    post.userName ===
-                                    currentUserName
-                                      ? currentUserAvatar
-                                      : post.userAvatar
-                                  }
-                                  alt={post.userName}
-                                  className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0] -my-4 -ml-2 "
-                                />
-                                {/* [수정] max-w-[150px] -> max-w-[130px] */}
-                                <span className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink">
-                                  {post.textOverlay ||
-                                    post.userName}
-                                </span>
-                              </div>
-
-                              {/* 2. 댓글 카운트 말풍선 */}
-                              <div className="bg-white/70 backdrop-blur-sm rounded-full px-2.5 py-2 font-medium flex items-center justify-center shrink-0 relative text-[15px]">
-                                +
-                                {
-                                  getAllComments(
-                                    post.id,
-                                    post.comments,
-                                  ).length
-                                }
-                                {getAllComments(
-                                  post.id,
-                                  post.comments,
-                                ).length > 0 && (
-                                  <span className="absolute top-[1px] right-[1px] w-[10px] h-[10px] bg-[#FF3333] rounded-full"></span>
+                            <>
+                              <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
+                                {post.location && (
+                                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                    <MapPin
+                                      size={16}
+                                      className="text-white"
+                                    />
+                                    <span className="text-white text-sm">
+                                      {post.location}
+                                    </span>
+                                  </div>
+                                )}
+                                {post.weather && (
+                                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                    <Cloud
+                                      size={16}
+                                      className="text-white"
+                                    />
+                                    <span className="text-white text-sm">
+                                      {post.weather}
+                                    </span>
+                                  </div>
+                                )}
+                                {post.time && (
+                                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                    <Clock
+                                      size={16}
+                                      className="text-white"
+                                    />
+                                    <span className="text-white text-sm">
+                                      {post.time}
+                                    </span>
+                                  </div>
+                                )}
+                                {post.health && (
+                                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                    <Heart
+                                      size={16}
+                                      className="text-white"
+                                    />
+                                    <span className="text-white text-sm">
+                                      {post.health}
+                                    </span>
+                                  </div>
                                 )}
                               </div>
-                            </div>
-                            {/* ================================================= */}
-                          </>
-                        )}
+                              {post.badge &&
+                                !post.location &&
+                                !post.weather &&
+                                !post.time &&
+                                !post.health && (
+                                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1 text-sm font-medium">
+                                    <span>{post.badge}</span>
+                                  </div>
+                                )}
+
+                              {/* === [수정된 부분: 하단 프로필 캡슐 및 댓글 카운트 (Outside State)] === */}
+                              <div className="absolute bottom-5 left-5 flex items-center gap-2 z-10 max-w-[90%]">
+                                {/* 1. 프로필 + 텍스트 캡슐 - shrink-0 제거 */}
+                                <div className="inline-flex items-center bg-white/70 backdrop-blur-sm rounded-full pl-1 pr-4 py-2 gap-2">
+                                  <ImageWithFallback
+                                    src={
+                                      post.userName ===
+                                        currentUserName
+                                        ? currentUserAvatar
+                                        : post.userAvatar
+                                    }
+                                    alt={post.userName}
+                                    className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0] -my-4 -ml-2 "
+                                  />
+                                  {/* [수정] max-w-[150px] -> max-w-[130px] */}
+                                  <span className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink">
+                                    {post.textOverlay ||
+                                      post.userName}
+                                  </span>
+                                </div>
+
+                                {/* 2. 댓글 카운트 말풍선 */}
+                                <div className="bg-white/70 backdrop-blur-sm rounded-full px-2.5 py-2 font-medium flex items-center justify-center shrink-0 relative text-[15px]">
+                                  +
+                                  {
+                                    getAllComments(
+                                      post.id,
+                                      post.comments,
+                                    ).length
+                                  }
+                                  {getAllComments(
+                                    post.id,
+                                    post.comments,
+                                  ).length > 0 && (
+                                      <span className="absolute top-[1px] right-[1px] w-[10px] h-[10px] bg-[#FF3333] rounded-full"></span>
+                                    )}
+                                </div>
+                              </div>
+                              {/* ================================================= */}
+                            </>
+                          )}
                       </motion.div>
 
                       {/* 댓글 입력창 - 이미지 카드 바로 아래 16px 간격 */}
@@ -1279,7 +1272,7 @@ export function CommunityPage({
                                 initial={false}
                               >
                                 {showEmojiPicker &&
-                                currentPostId === post.id ? (
+                                  currentPostId === post.id ? (
                                   <motion.div
                                     key="close-icon"
                                     initial={{
@@ -1329,7 +1322,7 @@ export function CommunityPage({
                                 initial={false}
                               >
                                 {showEmojiPicker &&
-                                currentPostId === post.id ? (
+                                  currentPostId === post.id ? (
                                   <motion.div
                                     key="emoji-list"
                                     initial={{
@@ -1392,7 +1385,7 @@ export function CommunityPage({
                                       className="w-full bg-transparent outline-none text-[#1A1A1A] placeholder:text-gray-400"
                                       value={
                                         currentPostId ===
-                                        post.id
+                                          post.id
                                           ? newComment
                                           : ""
                                       }
