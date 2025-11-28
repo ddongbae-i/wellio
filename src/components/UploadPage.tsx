@@ -911,7 +911,6 @@ export function UploadPage({
               </div>
             </div>
           </div>
-        </div>
 
         {/* 헤더 */}
         <header className="fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-center w-full bg-white max-w-[500px] mx-auto min-h-[110px]">
