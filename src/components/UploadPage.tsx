@@ -698,8 +698,8 @@ export function UploadPage({
           <div className="w-full max-w-[500px] h-full flex flex-col">
             {/* 🔹헤더 아래 여백 + 툴바 위 여백 포함한 컨텐츠 영역 - overflow 제거 */}
             <div 
-              className={`flex-1 pt-[110px] pb-[160px] flex justify-center px-5 xs:px-6 sm:px-8 overflow-visible ${
-                keyboardHeight > 0 ? 'items-start' : 'items-center'
+              className={`flex-1 pb-[160px] flex justify-center px-5 xs:px-6 sm:px-8 overflow-visible ${
+                keyboardHeight > 0 ? 'items-start pt-0' : 'items-center pt-[110px]'
               }`}
             >
               {/* ✅ 수정 2: cardTranslateY 제거, 이미지 wrapper에서 transform 제거 */}
