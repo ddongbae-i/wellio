@@ -956,12 +956,12 @@ export function CommunityPage({
                     }`}
                   key={post.id}
                   style={{
-                    height: "calc(100vh - 290px)", // 헤더(110px) + nav(80px)
-                    minHeight: "calc(100vh - 290px)",
+                    height: "calc(100vh - 190px)", // 헤더(110px) + nav(80px)
+                    minHeight: "calc(100vh - 190px)",
                   }}
                 >
                   <div className="relative w-full">
-                    <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
+                    <div className="relative w-full mx-auto overflow-visible  aspect-[335/400] max-h-[calc(100vh-280px)]">
                       {post.userName === currentUser.userName &&
                         isDragging && (
                           <div className="absolute inset-y-0 -right-8 w-24 flex items-center justify-start z-0 pr-4">
