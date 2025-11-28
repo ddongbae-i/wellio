@@ -146,8 +146,8 @@ const FamilyDropdown = ({
               >
                 <span
                   className={`${isGrayedOut
-                      ? "text-gray-400"
-                      : "text-[#1A1A1A]"
+                    ? "text-gray-400"
+                    : "text-[#1A1A1A]"
                     } leading-none`}
                 >
                   {memberName}
@@ -648,8 +648,8 @@ export function CommunityPage({
             </button>
             <div
               className={`bg-gray-100 rounded-lg px-4 py-2 flex items-center gap-2 transition-all border-2 flex-1 ${isSearchFocused
-                  ? "border-[#36D9D9]"
-                  : "border-transparent"
+                ? "border-[#36D9D9]"
+                : "border-transparent"
                 }`}
             >
               <Search size={20} className="text-gray-400" />
@@ -834,8 +834,8 @@ export function CommunityPage({
               <button
                 onClick={() => setReactionFilter("ALL")}
                 className={`flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center text-sm font-bold transition-all border-2 ${reactionFilter === "ALL"
-                    ? "bg-[#F0F0F0] text-[#1A1A1A] border-[#36D2C5]"
-                    : "bg-[#F0F0F0] text-[#999999] border-transparent"
+                  ? "bg-[#F0F0F0] text-[#1A1A1A] border-[#36D2C5]"
+                  : "bg-[#F0F0F0] text-[#999999] border-transparent"
                   }`}
               >
                 ALL
@@ -847,8 +847,8 @@ export function CommunityPage({
                   key={emoji}
                   onClick={() => setReactionFilter(emoji)}
                   className={`flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center text-2xl transition-all border-2 ${reactionFilter === emoji
-                      ? "bg-[#FFF8F8] border-[#36D2C5]"
-                      : "bg-[#F0F0F0] border-transparent"
+                    ? "bg-[#FFF8F8] border-[#36D2C5]"
+                    : "bg-[#F0F0F0] border-transparent"
                     }`}
                 >
                   {emoji}
@@ -956,7 +956,7 @@ export function CommunityPage({
                     }`}
                   key={post.id}
                   style={{
-                    height: "calc(100vh - 190px)", // 헤더(110px) + nav(80px)
+                    // 헤더(110px) + nav(80px)
                     minHeight: "calc(100vh - 190px)",
                   }}
                 >
@@ -1068,8 +1068,8 @@ export function CommunityPage({
                                                   }
                                                   // 프로필 이미지 스타일: 크기, 겹침 효과를 위한 -space-x-2.5 와 대비되는 왼쪽 마진 0
                                                   className={`w-6 h-6 rounded-full object-cover border border-[#f0f0f0] transition-all duration-300 ${userIdx === 0
-                                                      ? "ml-0"
-                                                      : ""
+                                                    ? "ml-0"
+                                                    : ""
                                                     }`}
                                                   style={{
                                                     // 겹치는 정도를 조정
