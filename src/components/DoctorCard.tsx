@@ -15,10 +15,10 @@ interface DoctorCardProps {
 export function DoctorCard({ doctor }: DoctorCardProps) {
   return (
     // [수정] w-[263px] -> w-full (반응형 대응을 위해 꽉 차게 변경)
-    <button className="w-full h-[93px] bg-white rounded-2xl p-5 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-transparent hover:border-gray-100 hover:bg-gray-50 transition-all text-left">
+    <button className="w-full h-[93px] bg-white rounded-2xl px-5 pt-[22px] pb-[26px] flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all text-left">
       <div className="flex items-center gap-4 overflow-hidden">
         {/* 의사 사진 (원형) */}
-        <div className="w-[52px] h-[52px] rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-50">
+        <div className="w-[45px] h-[45px] rounded-full overflow-hidden flex-shrink-0 border border-[#f0f0f0]">
           <ImageWithFallback
             src={doctor.image}
             alt={doctor.name}
@@ -28,11 +28,11 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
         {/* 텍스트 정보 */}
         <div className="flex flex-col justify-center overflow-hidden">
           {/* 1. 전문과목 (위쪽, 회색) */}
-          <span className="text-[13px] text-gray-500 leading-tight mb-1 truncate font-medium">
+          <span className="text-[15px] text-[#555555] leading-[1.3] mb-1 truncate">
             {doctor.specialty}
           </span>
           {/* 2. 이름 (아래쪽, 굵은 검정) */}
-          <span className="text-[16px] font-bold text-gray-900 leading-tight truncate">
+          <span className="text-[17px] font-medium text-[#2b2b2b] leading-[1.3] truncate">
             {doctor.name}
           </span>
         </div>
@@ -40,8 +40,8 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
 
       {/* 화살표 아이콘 */}
       <ChevronRight
-        size={20}
-        className="text-gray-400 flex-shrink-0 ml-2"
+        size={24}
+        className="text-[#555555]0 flex-shrink-0 ml-2"
       />
     </button>
   );
