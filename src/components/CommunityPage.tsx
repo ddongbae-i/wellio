@@ -266,6 +266,13 @@ export function CommunityPage({
     }>
   >([]);
 
+  const scrollContainerRef = useRef<HTMLDivElement | null>(
+    null,
+  );
+  const cardRefs = useRef<
+    Record<number, HTMLDivElement | null>
+  >({});
+
   const triggerReactionAnimation = (emoji: string) => {
     if (emoji === "🎉") {
       confetti({
@@ -606,6 +613,48 @@ export function CommunityPage({
     };
   }, []);
 
+  const scrollCardIntoView = (postId: number) => {
+    const container = scrollContainerRef.current;
+    const card = cardRefs.current[postId];
+
+    if (!container || !card) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+
+    // 위쪽/아래쪽 안전 구역 (24px 여백)
+    const safeTop = containerRect.top + 24;
+    const safeBottom =
+      containerRect.bottom -
+      (isKeyboardVisible ? keyboardHeight : 0) -
+      24;
+
+    let delta = 0;
+
+    // 카드가 너무 위로 붙어 있으면 아래로 조금 내리고
+    if (cardRect.top < safeTop) {
+      delta = cardRect.top - safeTop;
+    }
+    // 카드 아래쪽이 키보드 쪽과 겹치면 위로 올림
+    else if (cardRect.bottom > safeBottom) {
+      delta = cardRect.bottom - safeBottom;
+    }
+
+    if (delta !== 0) {
+      container.scrollBy({
+        top: delta,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // 키보드가 떴을 때 현재 선택된 카드 위치 한 번 더 맞추기
+  useEffect(() => {
+    if (isKeyboardVisible && currentPostId) {
+      scrollCardIntoView(currentPostId);
+    }
+  }, [isKeyboardVisible, currentPostId]);
+
   return (
     <div className="relative bg-white flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden">
       {/* Header (80px) */}
@@ -911,23 +960,17 @@ export function CommunityPage({
           </div>
         ) : (
           // ===== 리스트 뷰 (스냅) =====
-          <div className="w-full px-5 xs:px-6 sm:px-8 snap-y snap-mandatory overflow-y-auto h-full scrollbar-hide">
+          <div
+            ref={scrollContainerRef}
+            className="w-full px-5 xs:px-6 sm:px-8 snap-y snap-mandatory overflow-y-auto h-full scrollbar-hide"
+          >
             {filteredPosts.map((post) => {
               const isDeleting = postToDelete === post.id;
-              const isFocusedCard =
-                isKeyboardVisible && currentPostId === post.id;
-
-              // 키보드 높이에서 약간(24px)만 빼서 여유
-              const shift = Math.max(0, keyboardHeight - 24);
-
-              const cardTransform =
-                isFocusedCard && isKeyboardVisible
-                  ? `translateY(-${shift}px)`
-                  : "translateY(0)";
 
               const imageAndInputMaxWidth: CSSProperties = {
-                maxWidth:
-                  "min(100%, calc((100vh - 264px) * 335 / 400))",
+                // 화면 너비 안에서만 줄어들고, 최대 400px까지만
+                width: "100%",
+                maxWidth: "400px", // 필요하면 360, 380 등으로 조정 가능
               };
               return (
                 <div
@@ -941,9 +984,8 @@ export function CommunityPage({
                   {/* 카드 전체 : 이미지 + 이모지/댓글창 (가로폭 동일) */}
                   <div
                     className="w-full flex flex-col items-center"
-                    style={{
-                      transform: cardTransform,
-                      transition: "transform 0.25s ease-out",
+                    ref={(el) => {
+                      if (el) cardRefs.current[post.id] = el;
                     }}
                   >
                     {" "}
@@ -1391,11 +1433,14 @@ export function CommunityPage({
                                           );
                                         }
                                       }}
-                                      onFocus={() =>
+                                      onFocus={() => {
                                         setCurrentPostId(
                                           post.id,
-                                        )
-                                      }
+                                        );
+                                        scrollCardIntoView(
+                                          post.id,
+                                        );
+                                      }}
                                       onKeyDown={(e) => {
                                         if (
                                           e.key === "Enter" &&

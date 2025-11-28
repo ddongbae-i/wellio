@@ -639,10 +639,9 @@ export function UploadPage({
   const cardTranslateY =
     showTextInput && isDetailEditMode && isTextInputFocused
       ? isMobile
-        ? -keyboardHeight // 🔹모바일: 키보드가 0이면 안 올라감
-        : -180 // 🔹데스크탑: 고정값 만큼만 위로
+        ? -keyboardHeight
+        : 0 // ✅ 웹(데스크탑)에서는 위치 이동 없음
       : 0;
-
   return (
     <>
       {/* 카메라/갤러리 권한 다이얼로그 */}
@@ -876,9 +875,10 @@ export function UploadPage({
                             onFocus={() =>
                               setIsTextInputFocused(true)
                             }
-                            onBlur={() =>
-                              setIsTextInputFocused(false)
-                            }
+                            onBlur={() => {
+                              setIsTextInputFocused(false);
+                              setShowTextInput(false);
+                            }}
                             placeholder="텍스트를 입력하세요"
                             className="w-full text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-md outline-none focus:ring-2 focus:ring-[#36D2C5] placeholder:text-gray-500/70"
                           />
@@ -1073,78 +1073,80 @@ export function UploadPage({
             </div>
           ) : isDetailEditMode ? (
             <div className="flex flex-col items-center gap-3 max-w-md mx-auto px-4">
-              {/* 🔹텍스트 모드가 아닐 때만 툴바 노출 */}
+              {/* 👇 1. 여기서부터 "텍스트 입력 중이 아닐 때(!showTextInput)" 조건을 시작합니다 */}
               {!showTextInput && (
-                <div className="flex items-center justify-center gap-4">
-                  <button
-                    onClick={handleTextInputToggle}
-                    className="flex flex-col items-center gap-2"
-                  >
-                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#E5F9F8] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
-                      <Type size={24} />
-                    </div>
-                    <span className="text-xs text-gray-600">
-                      텍스트
-                    </span>
-                  </button>
+                <>
+                  <div className="flex items-center justify-center gap-4">
+                    <button
+                      onClick={handleTextInputToggle}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#E5F9F8] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
+                        <Type size={24} />
+                      </div>
+                      <span className="text-xs text-gray-600">
+                        텍스트
+                      </span>
+                    </button>
 
-                  <button
-                    onClick={handleLocationInput}
-                    className="flex flex-col items-center gap-2"
-                  >
-                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#FFF4E5] text-[#FF9800] transition-colors hover:bg-[#FFE8CC]">
-                      <MapPin size={24} />
-                    </div>
-                    <span className="text-xs text-gray-600">
-                      위치
-                    </span>
-                  </button>
+                    <button
+                      onClick={handleLocationInput}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#FFF4E5] text-[#FF9800] transition-colors hover:bg-[#FFE8CC]">
+                        <MapPin size={24} />
+                      </div>
+                      <span className="text-xs text-gray-600">
+                        위치
+                      </span>
+                    </button>
 
-                  <button
-                    onClick={handleWeatherInput}
-                    className="flex flex-col items-center gap-2"
-                  >
-                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#E8F8F7] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
-                      <Cloud size={24} />
-                    </div>
-                    <span className="text-xs text-gray-600">
-                      날씨
-                    </span>
-                  </button>
+                    <button
+                      onClick={handleWeatherInput}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#E8F8F7] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
+                        <Cloud size={24} />
+                      </div>
+                      <span className="text-xs text-gray-600">
+                        날씨
+                      </span>
+                    </button>
 
-                  <button
-                    onClick={handleTimeInput}
-                    className="flex flex-col items-center gap-2"
-                  >
-                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#F3E5F5] text-[#9C27B0] transition-colors hover:bg-[#E1BEE7]">
-                      <Clock size={24} />
-                    </div>
-                    <span className="text-xs text-gray-600">
-                      시간
-                    </span>
-                  </button>
+                    <button
+                      onClick={handleTimeInput}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#F3E5F5] text-[#9C27B0] transition-colors hover:bg-[#E1BEE7]">
+                        <Clock size={24} />
+                      </div>
+                      <span className="text-xs text-gray-600">
+                        시간
+                      </span>
+                    </button>
 
+                    <button
+                      onClick={handleHealthInput}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#FFEBEE] text-[#F44336] transition-colors hover:bg-[#FFCDD2]">
+                        <Heart size={24} />
+                      </div>
+                      <span className="text-xs text-gray-600">
+                        건강
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* 👇 2. 원래 밖에 있던 "업로드 버튼"을 여기(조건문 안)로 가져왔습니다 */}
                   <button
-                    onClick={handleHealthInput}
-                    className="flex flex-col items-center gap-2"
+                    onClick={handleCapture}
+                    className="w-16 h-16 rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
                   >
-                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#FFEBEE] text-[#F44336] transition-colors hover:bg-[#FFCDD2]">
-                      <Heart size={24} />
-                    </div>
-                    <span className="text-xs text-gray-600">
-                      건강
-                    </span>
+                    <Upload size={28} className="text-white" />
                   </button>
-                </div>
+                </>
               )}
-
-              {/* 업로드 버튼은 그대로 유지 (키보드에 가려지는 건 괜찮으면 그대로 두고, 필요하면 나중에 조정) */}
-              <button
-                onClick={handleCapture}
-                className="w-16 h-16 rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
-              >
-                <Upload size={28} className="text-white" />
-              </button>
             </div>
           ) : (
             <div className="flex items-center justify-between max-w-md mx-auto px-6">
