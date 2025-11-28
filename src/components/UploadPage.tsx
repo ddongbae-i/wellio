@@ -42,7 +42,6 @@ import "swiper/css";
 import { toast } from "sonner@2.0.3";
 import { motion, AnimatePresence } from "framer-motion";
 
-// 원본 필터 목록
 const ORIGINAL_FILTERS = [
   { name: "Normal", filter: "none" },
   {
@@ -120,7 +119,6 @@ export function UploadPage({
   const [isDetailEditMode, setIsDetailEditMode] =
     useState(false);
 
-  // 세부 입력 state
   const [textInput, setTextInput] = useState("");
   const [locationInput, setLocationInput] = useState("");
   const [weatherInput, setWeatherInput] = useState("");
@@ -145,24 +143,20 @@ export function UploadPage({
     !!timeInput ||
     !!healthInput;
 
-  // 키보드 높이 감지 상태 및 Ref
   const initialViewportHeight = useRef(0);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  // 필터 모드 state
   const [isFilterMode, setIsFilterMode] = useState(false);
   const [selectedFilter, setSelectedFilter] =
     useState("Normal");
   const [previousFilter, setPreviousFilter] =
     useState("Normal");
 
-  // 모바일 감지 state
   const [isMobile, setIsMobile] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // AI 추천 캡션 데이터
   const aiCaptions = [
     { text: "오랫동안 ❤️" },
     { text: "오운완 💪" },
@@ -179,7 +173,6 @@ export function UploadPage({
           ? `${textInput.trim()} ${caption}`
           : caption;
         setTextInput(newText);
-        // 이미 텍스트 모드이므로 포커스만 다시
         if (textInputRef.current) {
           textInputRef.current.focus();
         }
@@ -196,7 +189,6 @@ export function UploadPage({
     [],
   );
 
-  // 권한은 디자인 상 이미 허용된 상태로 가정
   useEffect(() => {
     setPermissionsGranted(true);
   }, []);
@@ -211,14 +203,12 @@ export function UploadPage({
       window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // 키보드 높이 감지
   useEffect(() => {
     if (initialViewportHeight.current === 0) {
       initialViewportHeight.current = window.innerHeight;
     }
 
     const handleResize = () => {
-      // 🔐 "실제로 텍스트 입력 중" + "세부조정 모드" + "모바일 폭" 일 때만 키보드로 취급
       if (
         !(
           showTextInput &&
@@ -240,18 +230,15 @@ export function UploadPage({
 
       const diff = initialHeight - currentVisualHeight;
 
-      // ⚠️ 브라우저 창 자체를 줄인 경우: window.innerHeight도 같이 줄어든다
       const isLayoutResized =
         Math.abs(
           layoutHeightNow - initialViewportHeight.current,
         ) > 40;
 
       if (diff > 80 && !isLayoutResized) {
-        // 👉 진짜 키보드가 올라온 상황으로 간주
         setKeyboardHeight(diff);
         document.body.style.height = currentVisualHeight + "px";
       } else {
-        // 👉 단순 화면 리사이즈라면 키보드 아님
         setKeyboardHeight(0);
         document.body.style.height = "";
       }
@@ -283,7 +270,6 @@ export function UploadPage({
     isTextInputFocused,
   ]);
 
-  // 카메라 스트림 시작
   useEffect(() => {
     if (!permissionsGranted || isUploadMode) return;
 
@@ -358,7 +344,6 @@ export function UploadPage({
     onBack();
   };
 
-  // 이미지를 335x400 크기로 크롭/리사이즈
   const resizeAndCropImage = (
     imageSrc: string,
   ): Promise<string> =>
@@ -412,7 +397,6 @@ export function UploadPage({
       img.src = imageSrc;
     });
 
-  // Canvas 필터 적용
   const applyFilterToImage = (
     imageSrc: string,
     filterString: string,
@@ -442,7 +426,6 @@ export function UploadPage({
     });
 
   const handleCapture = async () => {
-    // 업로드 모드일 때: 최종 업로드
     if (isUploadMode) {
       if (!selectedImage) {
         setShowNoImageAlert(true);
@@ -484,7 +467,6 @@ export function UploadPage({
       return;
     }
 
-    // 카메라 캡처
     if (hasCameraDevice && videoRef.current && stream) {
       const canvas = document.createElement("canvas");
       canvas.width = videoRef.current.videoWidth;
@@ -540,7 +522,7 @@ export function UploadPage({
         setSelectedImage(originalImage);
       }
       setIsUploadMode(true);
-      setCameraError(null); // 갤러리 업로드 시 카메라 오류 문구 제거
+      setCameraError(null);
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
         setStream(null);
@@ -562,7 +544,7 @@ export function UploadPage({
       textInputRef.current?.blur();
     } else {
       setShowTextInput(true);
-      setIsTextInputFocused(true); // 🔹 포커스 상태 미리 true
+      setIsTextInputFocused(true);
       setTimeout(() => textInputRef.current?.focus(), 80);
     }
   };
@@ -592,12 +574,9 @@ export function UploadPage({
     setPreviousFilter(selectedFilter);
   };
 
-  // 텍스트 인풋/캡슐 bottom 위치 (카드 안에서 12px)
   const getTextBottom = () => {
     return 12;
   };
-
-  const TOOLBAR_BASE_HEIGHT = 72; // 대략 툴바 자체 높이 (필요하면 조정)
 
   const AICaptionToolbar: React.FC = () => (
     <motion.div
@@ -612,7 +591,6 @@ export function UploadPage({
       }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-3xl shadow-[0_-6px_20px_rgba(0,0,0,0.12)]"
       style={{
-        // ✅ 키보드 있으면 키보드 위, 없으면 화면 맨 아래
         bottom: keyboardHeight > 0 ? keyboardHeight : 0,
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
@@ -636,15 +614,8 @@ export function UploadPage({
     </motion.div>
   );
 
-  const cardTranslateY =
-    showTextInput && isDetailEditMode && isTextInputFocused
-      ? isMobile
-        ? -(keyboardHeight > 0 ? keyboardHeight - 40 : 150)
-        : 0 // ✅ 웹(데스크탑)에서는 위치 이동 없음
-      : 0;
   return (
     <>
-      {/* 카메라/갤러리 권한 다이얼로그 */}
       <AlertDialog open={showCameraPermission}>
         <AlertDialogContent className="max-w-[340px]">
           <AlertDialogHeader>
@@ -692,36 +663,28 @@ export function UploadPage({
       </AlertDialog>
 
       <div className="relative w-full h-screen bg-white overflow-hidden">
-        {/* 헤더(110px) + 툴바(대략 160px)를 제외한 영역 전체를 컨텐츠로 사용 */}
-        <div className="absolute inset-x-0 top-0 bottom-0 flex justify-center">
+        <div 
+          className="absolute inset-x-0 top-0 bottom-0 flex justify-center"
+          style={{
+            // 키보드가 올라오면 전체 높이를 줄여서 자연스럽게 위로 밀림
+            height: keyboardHeight > 0 
+              ? `${window.innerHeight - keyboardHeight}px` 
+              : '100vh',
+            transition: 'height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+          }}
+        >
           <div className="w-full max-w-[500px] h-full flex flex-col">
-            {/* 🔹헤더 아래 여백 + 툴바 위 여백 포함한 컨텐츠 영역 */}
-            <div className="flex-1 pt-[110px] pb-[160px] flex justify-center items-center px-5 xs:px-6 sm:px-8">
-              {/* 카드 래퍼: 키보드 뜨면 위로 슬라이드 */}
-              <div
-                className="w-full flex justify-center"
-                style={{
-                  // ✅ 핵심 1: 위치 이동 (기존과 동일하지만, 모바일 키보드 높이만큼 정확히 올림)
-                  transform: `translateY(${cardTranslateY}px)`,
-                  transition:
-                    "transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)", // 부드러운 이동 애니메이션
-                }}
-              >
+            <div 
+              className="flex-1 flex justify-center items-center px-5 xs:px-6 sm:px-8"
+              style={{
+                paddingTop: '110px',
+                paddingBottom: isDetailEditMode && !showTextInput ? '172px' : '160px',
+              }}
+            >
+              <div className="w-full flex justify-center">
                 <div
-                  className="relative w-full aspect-[335/400] bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
-                  style={{
-                    // ✅ 핵심 2: 높이 제한 (Problem 1 해결)
-                    // 헤더(110px) + 툴바/여백(약 180px) = 290px을 뺀 나머지 공간에 이미지를 맞춤.
-                    // 이렇게 하면 툴바가 이미지를 가리지 않음.
-                    maxHeight: `calc(${initialViewportHeight.current || "100vh"} - 290px)`,
-
-                    // ✅ 핵심 3: 너비 제한 (Problem 2 해결)
-                    // maxHeight에 맞춰서 비율(335/400)대로 너비가 결정되도록 설정.
-                    // 키보드가 올라와도 이 값은 'initialViewportHeight' 기준이므로 변하지 않음.
-                    maxWidth: `calc((${initialViewportHeight.current || "100vh"} - 290px) * (335 / 400))`,
-                  }}
+                  className="relative w-[335px] h-[400px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg flex-shrink-0"
                 >
-                  {/* 카메라 비디오 */}
                   {!isUploadMode && (
                     <video
                       ref={videoRef}
@@ -732,7 +695,6 @@ export function UploadPage({
                     />
                   )}
 
-                  {/* 선택된 이미지 */}
                   {selectedImage && (
                     <div className="absolute inset-0 bg-white">
                       <ImageWithFallback
@@ -747,18 +709,15 @@ export function UploadPage({
                         }}
                       />
 
-                      {/* 텍스트 모드일 때 이미지 어둡게 */}
                       {showTextInput && (
                         <div className="absolute inset-0 bg-black/35" />
                       )}
 
-                      {/* 위치 / 날씨 / 시간 / 건강 캡슐들 */}
                       {(locationInput ||
                         weatherInput ||
                         timeInput ||
                         healthInput) && (
                         <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
-                          {/* 위치 */}
                           {locationInput && (
                             <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
                               <MapPin
@@ -782,7 +741,6 @@ export function UploadPage({
                               </button>
                             </div>
                           )}
-                          {/* 날씨 */}
                           {weatherInput && (
                             <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
                               <Cloud
@@ -806,7 +764,6 @@ export function UploadPage({
                               </button>
                             </div>
                           )}
-                          {/* 시간 */}
                           {timeInput && (
                             <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
                               <Clock
@@ -828,7 +785,6 @@ export function UploadPage({
                               </button>
                             </div>
                           )}
-                          {/* 건강 */}
                           {healthInput && (
                             <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
                               <Heart
@@ -855,7 +811,6 @@ export function UploadPage({
                         </div>
                       )}
 
-                      {/* 텍스트 입력 / 캡슐 */}
                       <div
                         className="absolute left-4 right-4 transition-all duration-200 ease-out"
                         style={{ bottom: getTextBottom() }}
@@ -907,7 +862,6 @@ export function UploadPage({
                     </div>
                   )}
 
-                  {/* 카메라 에러 (업로드 모드 아닐 때만) */}
                   {cameraError && !isUploadMode && (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm rounded-2xl z-20">
                       <div className="text-center px-6">
@@ -931,7 +885,6 @@ export function UploadPage({
           </div>
         </div>
 
-        {/* 헤더 */}
         <header className="fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-center w-full bg-white max-w-[500px] mx-auto min-h-[110px]">
           {isFilterMode ? (
             <>
@@ -968,12 +921,11 @@ export function UploadPage({
               >
                 <X size={24} className="text-[#1A1A1A]" />
               </button>
-              {/* ✅ 세부조정 완료: 업로드 X, 세부조정 모드만 종료 */}
               <button
                 onClick={() => {
                   setShowTextInput(false);
                   textInputRef.current?.blur();
-                  setIsDetailEditMode(false); // 다시 업로드 상태로
+                  setIsDetailEditMode(false);
                 }}
                 className="absolute right-4 px-4 py-2 text-[#36D2C5] font-semibold"
               >
@@ -1004,18 +956,14 @@ export function UploadPage({
           </h1>
         </header>
 
-        {/* 하단 컨트롤 */}
         <div
           className="absolute left-0 right-0 z-10 pt-4 pb-10 bg-white max-w-[500px] mx-auto"
-          style={
-            showTextInput &&
-            isDetailEditMode &&
-            isMobile &&
-            isTextInputFocused &&
-            keyboardHeight > 0
-              ? { bottom: -keyboardHeight } // 키보드만큼 내려서 가려지게
-              : { bottom: 0 } // 평소엔 화면 맨 아래 고정
-          }
+          style={{
+            bottom: showTextInput && isDetailEditMode && isTextInputFocused
+              ? -200
+              : 0,
+            transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+          }}
         >
           <input
             ref={fileInputRef}
@@ -1077,7 +1025,6 @@ export function UploadPage({
             </div>
           ) : isDetailEditMode ? (
             <div className="flex flex-col items-center gap-3 max-w-md mx-auto px-4">
-              {/* 👇 1. 여기서부터 "텍스트 입력 중이 아닐 때(!showTextInput)" 조건을 시작합니다 */}
               {!showTextInput && (
                 <>
                   <div className="flex items-center justify-center gap-4">
@@ -1142,7 +1089,6 @@ export function UploadPage({
                     </button>
                   </div>
 
-                  {/* 👇 2. 원래 밖에 있던 "업로드 버튼"을 여기(조건문 안)로 가져왔습니다 */}
                   <button
                     onClick={handleCapture}
                     className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
@@ -1199,7 +1145,6 @@ export function UploadPage({
         </div>
       </div>
 
-      {/* 건강 기록 모달 */}
       <AnimatePresence>
         {showHealthModal && (
           <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -1313,7 +1258,6 @@ export function UploadPage({
         )}
       </AnimatePresence>
 
-      {/* 이미지 선택 안 했을 때 경고 */}
       <AlertDialog open={showNoImageAlert}>
         <AlertDialogContent className="max-w-[340px]">
           <AlertDialogHeader>
@@ -1334,7 +1278,6 @@ export function UploadPage({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* AI 추천 캡션 바: 텍스트 입력 모드 + 세부조정 모드일 때 */}
       <AnimatePresence>
         {selectedImage &&
           isDetailEditMode &&
@@ -1342,7 +1285,6 @@ export function UploadPage({
           isTextInputFocused && <AICaptionToolbar />}
       </AnimatePresence>
 
-      {/* 세부조정 종료 확인 */}
       <AlertDialog open={showLeaveDetailAlert}>
         <AlertDialogContent className="max-w-[340px]">
           <AlertDialogHeader>
@@ -1372,7 +1314,6 @@ export function UploadPage({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 업로드 작성 취소 확인 */}
       <AlertDialog open={showLeaveUploadAlert}>
         <AlertDialogContent className="max-w-[340px]">
           <AlertDialogHeader>
@@ -1391,7 +1332,6 @@ export function UploadPage({
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                // 전체 작성 내용 초기화
                 setShowLeaveUploadAlert(false);
                 setSelectedImage(null);
                 setTextInput("");
