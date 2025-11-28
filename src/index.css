@@ -514,10 +514,6 @@
     inset-block: calc(var(--spacing) * 1);
   }
 
-  .-top-0\.5 {
-    top: calc(var(--spacing) * -.5);
-  }
-
   .-top-\[16px\] {
     top: -16px;
   }
@@ -542,6 +538,10 @@
     top: calc(var(--spacing) * 4);
   }
 
+  .top-\[1px\] {
+    top: 1px;
+  }
+
   .top-\[50\%\] {
     top: 50%;
   }
@@ -550,12 +550,8 @@
     top: 100%;
   }
 
-  .-right-0\.5 {
-    right: calc(var(--spacing) * -.5);
-  }
-
-  .-right-16 {
-    right: calc(var(--spacing) * -16);
+  .-right-8 {
+    right: calc(var(--spacing) * -8);
   }
 
   .right-0 {
@@ -574,6 +570,10 @@
     right: calc(var(--spacing) * 5);
   }
 
+  .right-\[1px\] {
+    right: 1px;
+  }
+
   .bottom-0 {
     bottom: calc(var(--spacing) * 0);
   }
@@ -586,8 +586,8 @@
     bottom: calc(var(--spacing) * 3);
   }
 
-  .bottom-4 {
-    bottom: calc(var(--spacing) * 4);
+  .bottom-5 {
+    bottom: calc(var(--spacing) * 5);
   }
 
   .bottom-20 {
@@ -608,6 +608,10 @@
 
   .left-4 {
     left: calc(var(--spacing) * 4);
+  }
+
+  .left-5 {
+    left: calc(var(--spacing) * 5);
   }
 
   .left-\[50\%\] {
@@ -888,10 +892,6 @@
     height: calc(var(--spacing) * 2);
   }
 
-  .h-3 {
-    height: calc(var(--spacing) * 3);
-  }
-
   .h-4 {
     height: calc(var(--spacing) * 4);
   }
@@ -956,6 +956,10 @@
     height: calc(var(--spacing) * 40);
   }
 
+  .h-\[10px\] {
+    height: 10px;
+  }
+
   .h-\[45\%\] {
     height: 45%;
   }
@@ -1008,6 +1012,10 @@
     height: 250px;
   }
 
+  .h-\[400px\] {
+    height: 400px;
+  }
+
   .h-auto {
     height: auto;
   }
@@ -1050,10 +1058,6 @@
 
   .w-1\.5 {
     width: calc(var(--spacing) * 1.5);
-  }
-
-  .w-3 {
-    width: calc(var(--spacing) * 3);
   }
 
   .w-4 {
@@ -1116,6 +1120,10 @@
     width: 1px;
   }
 
+  .w-\[10px\] {
+    width: 10px;
+  }
+
   .w-\[45px\] {
     width: 45px;
   }
@@ -1156,6 +1164,10 @@
     width: 263px;
   }
 
+  .w-\[335px\] {
+    width: 335px;
+  }
+
   .w-fit {
     width: fit-content;
   }
@@ -1174,6 +1186,10 @@
 
   .max-w-\[80\%\] {
     max-width: 80%;
+  }
+
+  .max-w-\[85\%\] {
+    max-width: 85%;
   }
 
   .max-w-\[90\%\] {
@@ -1570,10 +1586,6 @@
     border-radius: var(--radius-3xl);
   }
 
-  .rounded-\[6px\] {
-    border-radius: 6px;
-  }
-
   .rounded-\[8px\] {
     border-radius: 8px;
   }
@@ -1655,11 +1667,6 @@
   .border-2 {
     border-style: var(--tw-border-style);
     border-width: 2px;
-  }
-
-  .border-3 {
-    border-style: var(--tw-border-style);
-    border-width: 3px;
   }
 
   .border-4 {
@@ -1767,16 +1774,6 @@
     border-color: var(--color-white);
   }
 
-  .border-white\/20 {
-    border-color: #fff3;
-  }
-
-  @supports (color: color-mix(in lab, red, red)) {
-    .border-white\/20 {
-      border-color: color-mix(in oklab, var(--color-white) 20%, transparent);
-    }
-  }
-
   .bg-\[\#00bcd4\] {
     background-color: #00bcd4;
   }
@@ -1863,6 +1860,10 @@
 
   .bg-\[\#F8F9FA\] {
     background-color: #f8f9fa;
+  }
+
+  .bg-\[\#FF3333\] {
+    background-color: #f33;
   }
 
   .bg-\[\#FFEBEE\] {
@@ -2087,6 +2088,16 @@
     }
   }
 
+  .bg-white\/70 {
+    background-color: #ffffffb3;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-white\/70 {
+      background-color: color-mix(in oklab, var(--color-white) 70%, transparent);
+    }
+  }
+
   .bg-white\/80 {
     background-color: #fffc;
   }
@@ -2144,12 +2155,12 @@
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
 
-  .fill-\[\#36D2C5\] {
-    fill: #36d2c5;
-  }
-
   .fill-\[\#FFB800\] {
     fill: #ffb800;
+  }
+
+  .fill-\[\#e8e8e8\] {
+    fill: #e8e8e8;
   }
 
   .fill-red-500 {
@@ -2302,6 +2313,10 @@
 
   .py-\[7px\] {
     padding-block: 7px;
+  }
+
+  .py-\[28px\] {
+    padding-block: 28px;
   }
 
   .pt-1 {
@@ -2531,10 +2546,6 @@
     font-size: 15px;
   }
 
-  .text-\[16px\] {
-    font-size: 16px;
-  }
-
   .text-\[17px\] {
     font-size: 17px;
   }
@@ -2759,10 +2770,6 @@
 
   .text-\[\#d9d9d9\] {
     color: #d9d9d9;
-  }
-
-  .text-\[gray-200\] {
-    color: gray-200;
   }
 
   .text-black {
@@ -3629,6 +3636,12 @@
   @media (width >= 40rem) {
     .sm\:px-8 {
       padding-inline: calc(var(--spacing) * 8);
+    }
+  }
+
+  @media (width >= 40rem) {
+    .sm\:px-10 {
+      padding-inline: calc(var(--spacing) * 10);
     }
   }
 

@@ -231,7 +231,7 @@ export function HospitalReviewsPage({
             {sortedReviews.map((review) => (
               <div
                 key={review.id}
-                className="px-4 xs:px-6 sm:px-8 py-6"
+                className="px-[30px] xs:px-8 sm:px-10 py-[28px]"
               >
                 {/* 헤더: 별점, 유저정보, 좋아요 */}
                 <div className="flex justify-between items-start mb-2">
@@ -243,7 +243,7 @@ export function HospitalReviewsPage({
                         className={`${
                           i < review.rating
                             ? "text-[#FFB800] fill-[#FFB800]"
-                            : "text-[gray-200]"
+                            : "fill-[#e8e8e8]"
                         }`}
                       />
                     ))}
@@ -275,7 +275,7 @@ export function HospitalReviewsPage({
                     <ThumbsUp
                       size={16}
                       className={
-                        review.liked ? "fill-[#36D2C5]" : ""
+                        review.liked ? "border-[#2ECACA]" : ""
                       }
                     />
                     <span>{review.likes}</span>
@@ -284,11 +284,11 @@ export function HospitalReviewsPage({
 
                 {/* 태그 */}
                 {review.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="flex flex-wrap gap-2 mb-3">
                     {review.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2.5 py-1 rounded-[6px] border border-[#36D2C5] text-[#36D2C5] text-[11px] font-medium"
+                        className="text-[12px] text-[#239C9C] border border-[#2ECACA] px-2 py-0.5 rounded-full"
                       >
                         {tag}
                       </span>
