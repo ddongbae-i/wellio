@@ -636,6 +636,12 @@ export function UploadPage({
     </motion.div>
   );
 
+  const cardTranslateY =
+    showTextInput && isDetailEditMode && isTextInputFocused
+      ? isMobile
+        ? -keyboardHeight
+        : 0 // ✅ 웹(데스크탑)에서는 위치 이동 없음
+      : 0;
   return (
     <>
       {/* 카메라/갤러리 권한 다이얼로그 */}
@@ -685,31 +691,32 @@ export function UploadPage({
         </AlertDialogContent>
       </AlertDialog>
 
-      <div 
-        className="relative w-full bg-white overflow-hidden"
-        style={{
-          height: keyboardHeight > 0 
-            ? `${window.innerHeight - keyboardHeight}px`
-            : '100vh',
-          transition: 'height 0.3s ease'
-        }}
-      >
+      <div className="relative w-full h-screen bg-white overflow-hidden">
         {/* 헤더(110px) + 툴바(대략 160px)를 제외한 영역 전체를 컨텐츠로 사용 */}
         <div className="absolute inset-x-0 top-0 bottom-0 flex justify-center">
           <div className="w-full max-w-[500px] h-full flex flex-col">
             {/* 🔹헤더 아래 여백 + 툴바 위 여백 포함한 컨텐츠 영역 */}
-            <div 
-              className="flex-1 flex justify-center items-center px-5 xs:px-6 sm:px-8"
-              style={{
-                paddingTop: '110px', // 헤더 높이
-                paddingBottom: isDetailEditMode && !showTextInput ? '172px' : '160px', // 툴바 높이 + 12px 간격
-              }}
-            >
-              {/* 카드 래퍼 */}
-              <div className="w-full flex justify-center">
+            <div className="flex-1 pt-[110px] pb-[160px] flex justify-center items-center px-5 xs:px-6 sm:px-8">
+              {/* 카드 래퍼: 키보드 뜨면 위로 슬라이드 */}
+              <div
+                className="w-full flex justify-center"
+                style={{
+                  transform: `translateY(${cardTranslateY}px)`,
+                  transition: "transform 0.25s ease-out",
+                }}
+              >
                 <div
-                  className="relative w-[335px] h-[400px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
+                  className="relative w-full aspect-[335/400] bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
+                  style={{
+                    // 📏 세로 공간(100vh - 헤더 - 툴바)에 맞춰 카드 폭 줄이기
+                    maxWidth:
+                      keyboardHeight > 0
+                        ? 400 // 키보드 있을 땐 폭 고정, 위치만 카드 전체 올리기
+                        : "min(400px, calc((100vh - 110px - 160px) * 335 / 400))",
+                  }}
                 >
+                  {/* 🔻 여기부터는 너가 이미 써둔 내용 그대로 붙이면 돼 🔻 */}
+
                   {/* 카메라 비디오 */}
                   {!isUploadMode && (
                     <video
@@ -996,13 +1003,15 @@ export function UploadPage({
         {/* 하단 컨트롤 */}
         <div
           className="absolute left-0 right-0 z-10 pt-4 pb-10 bg-white max-w-[500px] mx-auto"
-          style={{
-            // 텍스트 입력 중일 때는 툴바를 숨김 (이미지에 가려지지 않도록)
-            bottom: showTextInput && isDetailEditMode && isTextInputFocused
-              ? -200 // 툴바를 화면 아래로 내려서 숨김
-              : 0, // 평소엔 화면 맨 아래 고정
-            transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
-          }}
+          style={
+            showTextInput &&
+            isDetailEditMode &&
+            isMobile &&
+            isTextInputFocused &&
+            keyboardHeight > 0
+              ? { bottom: -keyboardHeight } // 키보드만큼 내려서 가려지게
+              : { bottom: 0 } // 평소엔 화면 맨 아래 고정
+          }
         >
           <input
             ref={fileInputRef}
@@ -1072,7 +1081,7 @@ export function UploadPage({
                       onClick={handleTextInputToggle}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#E5F9F8] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#E5F9F8] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
                         <Type size={24} />
                       </div>
                       <span className="text-xs text-gray-600">
@@ -1084,7 +1093,7 @@ export function UploadPage({
                       onClick={handleLocationInput}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#FFF4E5] text-[#FF9800] transition-colors hover:bg-[#FFE8CC]">
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#FFF4E5] text-[#FF9800] transition-colors hover:bg-[#FFE8CC]">
                         <MapPin size={24} />
                       </div>
                       <span className="text-xs text-gray-600">
@@ -1096,7 +1105,7 @@ export function UploadPage({
                       onClick={handleWeatherInput}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#E8F8F7] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#E8F8F7] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
                         <Cloud size={24} />
                       </div>
                       <span className="text-xs text-gray-600">
@@ -1108,7 +1117,7 @@ export function UploadPage({
                       onClick={handleTimeInput}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#F3E5F5] text-[#9C27B0] transition-colors hover:bg-[#E1BEE7]">
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#F3E5F5] text-[#9C27B0] transition-colors hover:bg-[#E1BEE7]">
                         <Clock size={24} />
                       </div>
                       <span className="text-xs text-gray-600">
@@ -1120,7 +1129,7 @@ export function UploadPage({
                       onClick={handleHealthInput}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#FFEBEE] text-[#F44336] transition-colors hover:bg-[#FFCDD2]">
+                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#FFEBEE] text-[#F44336] transition-colors hover:bg-[#FFCDD2]">
                         <Heart size={24} />
                       </div>
                       <span className="text-xs text-gray-600">
@@ -1132,7 +1141,7 @@ export function UploadPage({
                   {/* 👇 2. 원래 밖에 있던 "업로드 버튼"을 여기(조건문 안)로 가져왔습니다 */}
                   <button
                     onClick={handleCapture}
-                    className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                    className="w-16 h-16 rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
                   >
                     <Upload size={28} className="text-white" />
                   </button>
