@@ -684,21 +684,24 @@ export function UploadPage({
       </AlertDialog>
 
       {/* ✅ 수정 1: 메인 div 높이를 동적으로 조절 */}
-      <div
+      <div 
         className="relative w-full bg-white overflow-hidden"
         style={{
-          height:
-            keyboardHeight > 0
-              ? `${window.innerHeight - keyboardHeight}px`
-              : "100vh",
-          transition: "height 0.3s ease",
+          height: keyboardHeight > 0 
+            ? `${window.innerHeight - keyboardHeight}px`
+            : '100vh',
+          transition: 'height 0.3s ease'
         }}
       >
         {/* 헤더(110px) + 툴바(대략 160px)를 제외한 영역 전체를 컨텐츠로 사용 */}
         <div className="absolute inset-x-0 top-0 bottom-0 flex justify-center">
           <div className="w-full max-w-[500px] h-full flex flex-col">
             {/* 🔹헤더 아래 여백 + 툴바 위 여백 포함한 컨텐츠 영역 - overflow 제거 */}
-            <div className="flex-1 pt-[110px] pb-[160px] flex justify-center items-center px-5 xs:px-6 sm:px-8 overflow-visible">
+            <div 
+              className={`flex-1 pt-[110px] pb-[160px] flex justify-center px-5 xs:px-6 sm:px-8 overflow-visible ${
+                keyboardHeight > 0 ? 'items-start' : 'items-center'
+              }`}
+            >
               {/* ✅ 수정 2: cardTranslateY 제거, 이미지 wrapper에서 transform 제거 */}
               <div className="w-full flex justify-center">
                 {/* ✅ 수정 3: 이미지 크기를 고정 (335x400px), aspect-ratio 제거 */}
