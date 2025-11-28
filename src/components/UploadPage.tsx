@@ -597,8 +597,6 @@ export function UploadPage({
     return 12;
   };
 
-  const TOOLBAR_BASE_HEIGHT = 72; // 대략 툴바 자체 높이 (필요하면 조정)
-
   const AICaptionToolbar: React.FC = () => (
     <motion.div
       key="ai-caption-toolbar"
@@ -636,12 +634,6 @@ export function UploadPage({
     </motion.div>
   );
 
-  const cardTranslateY =
-    showTextInput && isDetailEditMode && isTextInputFocused
-      ? isMobile
-        ? -keyboardHeight
-        : 0 // ✅ 웹(데스크탑)에서는 위치 이동 없음
-      : 0;
   return (
     <>
       {/* 카메라/갤러리 권한 다이얼로그 */}
@@ -691,32 +683,25 @@ export function UploadPage({
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="relative w-full h-screen bg-white overflow-hidden">
+      {/* ✅ 수정 1: 메인 div 높이를 동적으로 조절 */}
+      <div 
+        className="relative w-full bg-white overflow-hidden"
+        style={{
+          height: keyboardHeight > 0 
+            ? `${window.innerHeight - keyboardHeight}px`
+            : '100vh',
+          transition: 'height 0.3s ease'
+        }}
+      >
         {/* 헤더(110px) + 툴바(대략 160px)를 제외한 영역 전체를 컨텐츠로 사용 */}
         <div className="absolute inset-x-0 top-0 bottom-0 flex justify-center">
           <div className="w-full max-w-[500px] h-full flex flex-col">
             {/* 🔹헤더 아래 여백 + 툴바 위 여백 포함한 컨텐츠 영역 */}
             <div className="flex-1 pt-[110px] pb-[160px] flex justify-center items-center px-5 xs:px-6 sm:px-8">
-              {/* 카드 래퍼: 키보드 뜨면 위로 슬라이드 */}
-              <div
-                className="w-full flex justify-center"
-                style={{
-                  transform: `translateY(${cardTranslateY}px)`,
-                  transition: "transform 0.25s ease-out",
-                }}
-              >
-                <div
-                  className="relative w-full aspect-[335/400] bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
-                  style={{
-                    // 📏 세로 공간(100vh - 헤더 - 툴바)에 맞춰 카드 폭 줄이기
-                    maxWidth:
-                      keyboardHeight > 0
-                        ? 400 // 키보드 있을 땐 폭 고정, 위치만 카드 전체 올리기
-                        : "min(400px, calc((100vh - 110px - 160px) * 335 / 400))",
-                  }}
-                >
-                  {/* 🔻 여기부터는 너가 이미 써둔 내용 그대로 붙이면 돼 🔻 */}
-
+              {/* ✅ 수정 2: cardTranslateY 제거, 이미지 wrapper에서 transform 제거 */}
+              <div className="w-full flex justify-center">
+                {/* ✅ 수정 3: 이미지 크기를 고정 (335x400px), aspect-ratio 제거 */}
+                <div className="relative w-[335px] h-[400px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg">
                   {/* 카메라 비디오 */}
                   {!isUploadMode && (
                     <video
