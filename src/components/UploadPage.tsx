@@ -684,25 +684,31 @@ export function UploadPage({
       </AlertDialog>
 
       {/* ✅ 수정 1: 메인 div 높이를 동적으로 조절 */}
-      <div 
+      <div
         className="relative w-full bg-white overflow-hidden"
         style={{
-          height: keyboardHeight > 0 
-            ? `${window.innerHeight - keyboardHeight}px`
-            : '100vh',
-          transition: 'height 0.3s ease'
+          height:
+            keyboardHeight > 0
+              ? `${window.innerHeight - keyboardHeight}px`
+              : "100vh",
+          transition: "height 0.3s ease",
         }}
       >
-        {/* 컨테이너를 absolute로 변경하여 이미지가 자유롭게 이동 가능하도록 */}
-        <div className="absolute inset-0 flex justify-center">
+        <div className="absolute inset-0 flex justify-center overflow-visible">
           <div className="relative w-full max-w-[500px] h-full">
-            {/* 이미지 컨테이너 - 키보드 올라올 때 상단으로 이동 */}
-            <div 
-              className={`absolute left-0 right-0 flex justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300 ${
-                keyboardHeight > 0 ? 'top-0' : 'top-1/2 -translate-y-1/2'
-              }`}
+            {/* CommunityPage와 동일한 구조 */}
+            <div
+              className={`absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300`}
+              style={{
+                top:
+                  keyboardHeight > 0
+                    ? `calc(50% - ${keyboardHeight + 120}px)` // 키보드 + AI 툴바(100px) + 여유(20px)
+                    : "50%",
+                transform: "translateY(-50%)",
+              }}
             >
-              <div className="relative w-[335px] h-[400px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg z-50">
+              <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400]">
+                <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-lg z-50">
                   {/* 카메라 비디오 */}
                   {!isUploadMode && (
                     <video
@@ -911,9 +917,10 @@ export function UploadPage({
               </div>
             </div>
           </div>
+        </div>
 
         {/* 헤더 */}
-        <header className="fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-center w-full bg-white max-w-[500px] mx-auto min-h-[110px]">
+        <header className="fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-center w-full bg-white max-w-[500px] mx-auto min-h-[80px]">
           {isFilterMode ? (
             <>
               <button
