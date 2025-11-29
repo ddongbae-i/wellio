@@ -121,14 +121,14 @@ export function ReviewWritePage({
   const isEditMode = !!editingReview;
 
   return (
-    <motion.div 
+    <motion.div
       className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto min-h-screen"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
       {/* Header */}
-      <header className="sticky top-0 z-30 px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 w-full bg-[#f7f7f7] relative">
+      <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full bg-[#f7f7f7]/80 backdrop-blur-xs relative">
         <button
           type="button"
           onClick={(e) => {
@@ -185,11 +185,10 @@ export function ReviewWritePage({
               >
                 <Star
                   size={40}
-                  className={`${
-                    star <= (hoveredRating || rating)
-                      ? "fill-[#FFB800] text-[#FFB800]"
-                      : "text-gray-300"
-                  } transition-colors`}
+                  className={`${star <= (hoveredRating || rating)
+                    ? "fill-[#FFB800] text-[#FFB800]"
+                    : "text-gray-300"
+                    } transition-colors`}
                 />
               </button>
             ))}
@@ -201,11 +200,10 @@ export function ReviewWritePage({
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-[#1A1A1A]">키워드 선택</h3>
             <span
-              className={`${
-                selectedKeywords.length === 3
-                  ? "text-[#36D2C5]"
-                  : "text-gray-500"
-              }`}
+              className={`${selectedKeywords.length === 3
+                ? "text-[#36D2C5]"
+                : "text-gray-500"
+                }`}
             >
               {selectedKeywords.length}/3
             </span>
@@ -215,11 +213,10 @@ export function ReviewWritePage({
               <button
                 key={keyword}
                 onClick={() => handleKeywordClick(keyword)}
-                className={`px-3 py-2 rounded-[8px] text-sm transition-all ${
-                  selectedKeywords.includes(keyword)
-                    ? "bg-[#E2F7F7] text-[#2b2b2b] border-[#BCEEEE]"
-                    : "bg-white text-[#777777] border border-[#e8e8e8] hover:border-[#E2F7F7]"
-                }`}
+                className={`px-3 py-2 rounded-[8px] text-sm transition-all ${selectedKeywords.includes(keyword)
+                  ? "bg-[#E2F7F7] text-[#2b2b2b] border-[#BCEEEE]"
+                  : "bg-white text-[#777777] border border-[#e8e8e8] hover:border-[#E2F7F7]"
+                  }`}
               >
                 {keyword}
               </button>
@@ -242,10 +239,10 @@ export function ReviewWritePage({
           />
 
           {/* 글자수 카운트 → 내부 오른쪽 아래 배치 */}
-       <span className="absolute bottom-[26px] right-5 text-[12px]">
-  <span className="text-[#777777]">{reviewText.length}</span>
-  <span className="text-[#aeaeae]"> / 400</span>
-</span>
+          <span className="absolute bottom-[26px] right-5 text-[12px]">
+            <span className="text-[#777777]">{reviewText.length}</span>
+            <span className="text-[#aeaeae]"> / 400</span>
+          </span>
         </div>
       </div>
 
@@ -254,11 +251,10 @@ export function ReviewWritePage({
         <button
           onClick={handleSubmit}
           disabled={!isFormValid}
-          className={`h-[60px] w-full rounded-xl text-white transition-all ${
-            isFormValid
-              ? "bg-[#2ECACA] hover:bg-[#239C9C] cursor-pointer"
-              : "bg-[#f0f0f0] cursor-not-allowed text-[#aeaeae]"
-          }`}
+          className={`h-[60px] w-full rounded-xl text-white transition-all ${isFormValid
+            ? "bg-[#2ECACA] hover:bg-[#239C9C] cursor-pointer"
+            : "bg-[#f0f0f0] cursor-not-allowed text-[#aeaeae]"
+            }`}
         >
           {isEditMode ? "수정 완료" : "작성 완료"}
         </button>

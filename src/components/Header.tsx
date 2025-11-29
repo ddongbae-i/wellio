@@ -7,13 +7,13 @@ import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import Bell from "../assets/images/icon_alarm.svg";
 
 interface HeaderProps {
-  // --- 서브 페이지용 props ---
-  title?: string; // title이 있으면 서브 페이지 헤더
+  title?: string;
   showBackButton?: boolean;
   onBack?: () => void;
   showSearchButton?: boolean;
   showSettingsButton?: boolean;
-  onNotificationClick?: () => void; // 알림 버튼 클릭 핸들러 추가
+  onNotificationClick?: () => void;
+  hasUnreadNotification?: boolean; // 🔴 이거 추가
 }
 
 export function Header({
@@ -23,6 +23,7 @@ export function Header({
   showSearchButton = false,
   showSettingsButton = false,
   onNotificationClick,
+  hasUnreadNotification = false, // 👈 추가 + 기본값 false
 }: HeaderProps) {
   // 👇 브라우저의 뒤로가기 핸들러 (onBack이 없을 때 기본 동작)
   const handleBack = () => {
@@ -114,9 +115,13 @@ export function Header({
       {/* --- 오른쪽: 알림 아이콘 --- */}
       <button
         onClick={onNotificationClick}
-        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors flex-shrink-0"
+        className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors flex-shrink-0"
       >
         <img src={Bell} alt="알림" className="w-6 h-6" />
+
+        {hasUnreadNotification && (
+          <span className="absolute top-[10px] right-[10px] w-[7px] h-[7px] rounded-full bg-[#FF0000]" />
+        )}
       </button>
     </header>
   );

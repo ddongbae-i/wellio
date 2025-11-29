@@ -20,7 +20,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, AnimatePresence } from "motion/react";
 import confetti from "canvas-confetti";
 import "swiper/css";
-import { BottomNav } from "./BottomNav";
 import Bell from "../assets/images/icon_alarm.svg";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 
@@ -719,10 +718,7 @@ export function CommunityPage({
               onClick={() => setIsReactionView(false)}
               className="absolute left-0 w-6 h-6 flex items-center justify-center"
             >
-              <ChevronLeft
-                size={24}
-                className="text-[#1A1A1A]"
-              />
+              <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
             </button>
             <span className="text-lg font-bold text-[#1A1A1A]">
               리액션 모아보기
@@ -734,10 +730,7 @@ export function CommunityPage({
               onClick={() => setIsGridView(false)}
               className="absolute left-0 w-6 h-6 flex items-center justify-center"
             >
-              <ChevronLeft
-                size={24}
-                className="text-[#1A1A1A]"
-              />
+              <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
             </button>
 
             {/* [수정] Grid View - 드롭다운 Anchor */}
@@ -790,10 +783,7 @@ export function CommunityPage({
               onClick={onBack}
               className="absolute left-0 w-6 h-6 flex items-center justify-center"
             >
-              <ChevronLeft
-                size={24}
-                className="text-[#1A1A1A]"
-              />
+              <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
             </button>
 
             {/* [수정] Default View - 드롭다운 Anchor */}

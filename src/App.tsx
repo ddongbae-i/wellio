@@ -86,6 +86,15 @@ interface Review {
   visitType?: "첫방문" | "재방문";
 }
 
+interface Notification {
+  id: number;
+  type: "hospital" | "family" | "medicine" | "challenge" | "community";
+  category: string;
+  message: string;
+  time: string;
+  isRead: boolean;
+}
+
 // 👥 앱을 함께 사용하는 가족 구성원
 const USERS = {
   wellie: {
@@ -124,17 +133,85 @@ const REVIEW_AUTHORS = [
 export default function App() {
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // 온보딩 상태 관리
   const [showOnboarding, setShowOnboarding] = useState(false);
-  // 로그인 플로우 상태: 'welcome' | 'social' | 'email'
-  const [loginStep, setLoginStep] = useState<'welcome' | 'social' | 'email'>('welcome');
+  const [loginStep, setLoginStep] =
+    useState<"welcome" | "social" | "email">("welcome");
   const [userName, setUserName] = useState(USERS.wellie.name);
-  // 사용자 프로필 이미지 관리 (없으면 기본 이미지)
   const [userAvatar, setUserAvatar] = useState(USERS.wellie.avatar);
   const [currentPage, setCurrentPage] = useState<Page>("home");
-  const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [selectedHospital, setSelectedHospital] =
+    useState<Hospital | null>(null);
+  const [selectedPostId, setSelectedPostId] =
+    useState<number | null>(null);
 
+  // ✅ 여기로 옮기기: 알림 상태 + 함수들
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: 1,
+      type: "hospital",
+      category: "병원 예약",
+      message:
+        "**김동석**님 매일건강의원 **14:00 진료** 접수되었습니다.\n초진이라면 신분증을 반드시 챙겨주세요.",
+      time: "지금",
+      isRead: false,
+    },
+    {
+      id: 2,
+      type: "family",
+      category: "가족",
+      message: "**박승희**님이 가족에 추가됐어요.",
+      time: "5분전",
+      isRead: false,
+    },
+    {
+      id: 3,
+      type: "family",
+      category: "가족",
+      message: "**김동석**님이 가족에 추가됐어요.",
+      time: "5분전",
+      isRead: false,
+    },
+    {
+      id: 4,
+      type: "medicine",
+      category: "복약알림",
+      message: "오늘 오후 9시 복용할 약이 있습니다.",
+      time: "3시간전",
+      isRead: true,
+    },
+    {
+      id: 5,
+      type: "challenge",
+      category: "챌린지",
+      message:
+        "**김웰리**님 새로운 추천 챌린지가 있어요.\n눌러서 알아보세요.",
+      time: "12시간전",
+      isRead: true,
+    },
+    {
+      id: 6,
+      type: "medicine",
+      category: "복약알림",
+      message:
+        "오늘 오후 6시, **박승희**님의 약 복용 시간입니다.",
+      time: "1일전",
+      isRead: true,
+    },
+  ]);
+
+  const hasUnreadNotification = notifications.some((n) => !n.isRead);
+
+  const handleMarkNotificationAsRead = (id: number) => {
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === id ? { ...n, isRead: true } : n
+      )
+    );
+  };
+
+  const handleDeleteNotification = (id: number) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
   // 날짜 생성 헬퍼 함수 (현재 날짜 기준으로 랜덤하게 이전 날짜 생성)
   const getRandomPastDate = (maxDaysAgo: number = 365): Date => {
     const today = new Date();
@@ -821,6 +898,8 @@ export default function App() {
         }}
         userName={userName}
         posts={posts}
+        medicalRecords={medicalRecords}       // 👈 추가
+        reviewedHospitals={reviewedHospitals} // 👈 추가
       />
     );
   }
@@ -833,13 +912,15 @@ export default function App() {
             userName={userName}
             currentPage={currentPage}
             onPageChange={(page) => {
-              if (page === "notifications") {
-                setPreviousPage("home");
-              }
               navigateTo(page as Page);
             }}
             onHospitalClick={handleHospitalClick}
             getHospitalReviewCount={getHospitalReviewCount}
+            hasUnreadNotification={hasUnreadNotification}
+            onNotificationClick={() => {
+              setPreviousPage("home");
+              navigateTo("notifications" as Page);
+            }}
           />
         )}
         {currentPage === "hospital" && (
@@ -994,6 +1075,9 @@ export default function App() {
         {currentPage === "notifications" && (
           <NotificationPage
             onBack={navigateBack}
+            notifications={notifications}                     // 🔹 실제 알림 목록
+            onDeleteNotification={handleDeleteNotification}   // 🔹 삭제
+            onMarkAsRead={handleMarkNotificationAsRead}       // 🔹 읽음 처리
           />
         )}
         {/* 👇 9. '리뷰 작성' 페이지 추가 */}

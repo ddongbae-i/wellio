@@ -7,40 +7,24 @@ import { BottomNav } from "./BottomNav";
 import { SecondaryMenu } from "./SecondaryMenu";
 import { HealthKnowledge } from "./HealthKnowledge";
 import { motion, type Variants } from "framer-motion";
+import type { Page } from "../types/page";
 
 interface HomePageProps {
   userName: string;
-  currentPage: string;
-  onPageChange: (
-    page:
-      | "home"
-      | "community"
-      | "hospital"
-      | "profile"
-      | "medical-history",
-  ) => void;
+  currentPage: Page;
+  onPageChange: (page: Page) => void;
   onHospitalClick?: (hospital: any) => void;
   onCommunityClick?: (community: any) => void;
   getHospitalReviewCount?: (hospitalId: number) => number;
+  hasUnreadNotification?: boolean;
+  onNotificationClick?: () => void;
 }
-
-const pageVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: "easeOut"
-    }
-  }
-};
 
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.12 }
+    transition: { staggerChildren: 0.12 },
   },
 };
 
@@ -56,19 +40,19 @@ export function HomePage({
   onHospitalClick,
   onCommunityClick,
   getHospitalReviewCount,
+  hasUnreadNotification,
+  onNotificationClick,
 }: HomePageProps) {
   return (
     <>
+      {/* 🔔 상단 헤더 */}
       <Header
-        onNotificationClick={() =>
-          onPageChange("notifications" as any)
-        }
+        hasUnreadNotification={hasUnreadNotification}
+        onNotificationClick={onNotificationClick}
       />
 
-      {/* [수정] pt-4 제거: UserGreeting의 배경 SVG가 
-        화면 상단(헤더 뒤)까지 꽉 차도록 
-      */}
-      <motion.main 
+      {/* 메인 컨텐츠 */}
+      <motion.main
         className="bg-[#F7F7F7] pb-24"
         initial="hidden"
         animate="visible"
@@ -78,30 +62,43 @@ export function HomePage({
           <UserGreeting userName={userName} />
         </motion.div>
 
-        <motion.div className="relative -mt-10 z-10" variants={itemVariants}>
+        <motion.div
+          className="relative -mt-10 z-10"
+          variants={itemVariants}
+        >
           <CalendarCard />
         </motion.div>
 
-        <motion.div className="px-5 xs:px-6 sm:px-8 mt-5" variants={itemVariants}>
+        <motion.div
+          className="px-5 xs:px-6 sm:px-8 mt-5"
+          variants={itemVariants}
+        >
           <CTAButtons
             onHospitalClick={() => onPageChange("hospital")}
             onCommunityClick={() => onPageChange("community")}
           />
         </motion.div>
 
-        <motion.div className="px-5 xs:px-6 sm:px-8 mt-3" variants={itemVariants}>
+        <motion.div
+          className="px-5 xs:px-6 sm:px-8 mt-3"
+          variants={itemVariants}
+        >
           <SecondaryMenu />
         </motion.div>
 
-        <motion.div className="px-5 xs:px-6 sm:px-8 mt-5" variants={itemVariants}>
+        <motion.div
+          className="px-5 xs:px-6 sm:px-8 mt-5"
+          variants={itemVariants}
+        >
           <PromoBanner />
         </motion.div>
-        
+
         <motion.div className="mt-8" variants={itemVariants}>
           <HealthKnowledge />
         </motion.div>
       </motion.main>
 
+      {/* 하단 GNB */}
       <BottomNav
         currentPage={currentPage}
         onPageChange={onPageChange}
