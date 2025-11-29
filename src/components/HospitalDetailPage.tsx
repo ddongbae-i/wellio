@@ -2,19 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  ArrowLeft,
   MapPin,
   Clock,
-  Phone,
   Star,
-  ChevronRight,
-  ClipboardList,
   ThumbsUp,
   CheckCircle2,
   Bot,
   ChevronDown,
   TrendingUp,
-  ChevronLeft,
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { DoctorCard } from "./DoctorCard";
@@ -22,8 +17,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Progress } from "./ui/progress";
 import { Button } from "./ui/button";
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
+import Doctor1 from "../assets/images/doctor1.png";
+import Doctor2 from "../assets/images/doctor2.png";
 
-// 👇 발급받은 키를 여기에 유지해주세요
 const KAKAO_MAP_API_KEY = "ee7ef6c37b67c27768d7dcb2f13f0a83";
 
 // 이름 마스킹 함수 (뒤 2자를 **로 처리)
@@ -106,44 +103,44 @@ export function HospitalDetailPage({
     sortedReviews.length > 0
       ? sortedReviews.slice(0, 3)
       : [
-          {
-            id: 1,
-            author: "김웰리",
-            date: "2025.05.22",
-            rating: 5,
-            tags: ["진료 만족해요", "친절해요"],
-            content:
-              "목이 아프고 근육통이 심해서 방문했는데 친절하게 진료 잘 봐주셔서 좋았습니다!",
-            likes: 6,
-            visitType: "첫방문" as "첫방문" | "재방문",
-          },
-          {
-            id: 2,
-            author: "김동석",
-            date: "2025.01.29",
-            rating: 5,
-            tags: [
-              "진료 만족해요",
-              "재진료 희망해요",
-              "친절해요",
-            ],
-            content:
-              "만족스러운 첫 방문! 이사 와서 처음 방문했는데, 앞으로 꾸준히 다닐 것 같습니다.",
-            likes: 15,
-            visitType: "재방문" as "첫방문" | "재방문",
-          },
-          {
-            id: 3,
-            author: "박승희",
-            date: "2024.12.10",
-            rating: 4,
-            tags: ["대기시간이 짧아요", "친절해요"],
-            content:
-              "항상 친절하게 맞아주셔서 감사합니다. 대기 시간이 짧아서 바쁜 직장인에게 딱이에요.",
-            likes: 2,
-            visitType: "재방문" as "첫방문" | "재방문",
-          },
-        ];
+        {
+          id: 1,
+          author: "김웰리",
+          date: "2025.05.22",
+          rating: 5,
+          tags: ["진료 만족해요", "친절해요"],
+          content:
+            "목이 아프고 근육통이 심해서 방문했는데 친절하게 진료 잘 봐주셔서 좋았습니다!",
+          likes: 6,
+          visitType: "첫방문" as "첫방문" | "재방문",
+        },
+        {
+          id: 2,
+          author: "김동석",
+          date: "2025.01.29",
+          rating: 5,
+          tags: [
+            "진료 만족해요",
+            "재진료 희망해요",
+            "친절해요",
+          ],
+          content:
+            "만족스러운 첫 방문! 이사 와서 처음 방문했는데, 앞으로 꾸준히 다닐 것 같습니다.",
+          likes: 15,
+          visitType: "재방문" as "첫방문" | "재방문",
+        },
+        {
+          id: 3,
+          author: "박승희",
+          date: "2024.12.10",
+          rating: 4,
+          tags: ["대기시간이 짧아요", "친절해요"],
+          content:
+            "항상 친절하게 맞아주셔서 감사합니다. 대기 시간이 짧아서 바쁜 직장인에게 딱이에요.",
+          likes: 2,
+          visitType: "재방문" as "첫방문" | "재방문",
+        },
+      ];
 
   // 1. 카카오맵 스크립트 로드 (표준 방식)
   useEffect(() => {
@@ -271,22 +268,13 @@ export function HospitalDetailPage({
       id: 1,
       name: "박진희 의사",
       specialty: "가정의학과 전문의",
-      image:
-        "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&q=80",
+      image: Doctor1,
     },
     {
       id: 2,
-      name: "김민수 의사",
-      specialty: "내과 전문의",
-      image:
-        "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&q=80",
-    },
-    {
-      id: 3,
-      name: "이영희 의사",
-      specialty: "소아청소년과 전문의",
-      image:
-        "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=200&q=80",
+      name: "이진호 의사",
+      specialty: "가정의학과 전문의",
+      image: Doctor2,
     },
   ];
 
@@ -307,7 +295,7 @@ export function HospitalDetailPage({
           onClick={onBack}
           className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
         >
-          <ChevronLeft size={24} className="text-[#1A1A1A]" />
+          <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>
         <h1 className="text-[19px] font-semibold text-[#1A1A1A]">
           {hospital.name}
@@ -409,16 +397,9 @@ export function HospitalDetailPage({
             </h3>
           </div>
           <div>
-            <Swiper
-              slidesPerView="auto"
-              spaceBetween={12}
-              className="!px-4 xs:!px-6 sm:!px-8"
-            >
+            <Swiper slidesPerView="auto" spaceBetween={12} className="!px-4 xs:!px-6 sm:!px-8">
               {doctors.map((doctor) => (
-                <SwiperSlide
-                  key={doctor.id}
-                  style={{ width: "263px" }}
-                >
+                <SwiperSlide key={doctor.id} style={{ width: "263px" }}>
                   <DoctorCard doctor={doctor} />
                 </SwiperSlide>
               ))}
@@ -543,11 +524,10 @@ export function HospitalDetailPage({
               {isFilterOpen && (
                 <div className="absolute top-full mt-2 left-0 bg-white border border-[d9d9d9] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 w-24">
                   <button
-                    className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${
-                      sortFilter === "popular"
-                        ? "font-medium text-[#2b2b2b]"
-                        : ""
-                    }`}
+                    className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "popular"
+                      ? "font-medium text-[#2b2b2b]"
+                      : ""
+                      }`}
                     onClick={() => {
                       setSortFilter("popular");
                       setIsFilterOpen(false);
@@ -556,11 +536,10 @@ export function HospitalDetailPage({
                     인기순
                   </button>
                   <button
-                    className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${
-                      sortFilter === "latest"
-                        ? "font-bold text-[#aeaeae]"
-                        : ""
-                    }`}
+                    className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "latest"
+                      ? "font-bold text-[#aeaeae]"
+                      : ""
+                      }`}
                     onClick={() => {
                       setSortFilter("latest");
                       setIsFilterOpen(false);
@@ -584,11 +563,10 @@ export function HospitalDetailPage({
                         <Star
                           key={i}
                           size={14}
-                          className={`${
-                            i < review.rating
-                              ? "text-[#FFB800] fill-[#FFB800]"
-                              : "text-gray-200"
-                          }`}
+                          className={`${i < review.rating
+                            ? "text-[#FFB800] fill-[#FFB800]"
+                            : "text-gray-200"
+                            }`}
                         />
                       ))}
                       <span className="text-[12px] text-[#777777] ml-1">
@@ -601,21 +579,20 @@ export function HospitalDetailPage({
                       onClick={() =>
                         onToggleLike?.(
                           review.originalId ||
-                            (typeof review.id === "number"
-                              ? review.id
-                              : parseInt(
-                                  String(review.id).replace(
-                                    /^(sample-|user-)/,
-                                    "",
-                                  ),
-                                )),
+                          (typeof review.id === "number"
+                            ? review.id
+                            : parseInt(
+                              String(review.id).replace(
+                                /^(sample-|user-)/,
+                                "",
+                              ),
+                            )),
                         )
                       }
-                      className={`flex items-center gap-1 text-xs transition-colors active:scale-100 ${
-                        review.liked
-                          ? "text-[#36D2C5]"
-                          : "text-[#aeaeae]"
-                      }`}
+                      className={`flex items-center gap-1 text-xs transition-colors active:scale-100 ${review.liked
+                        ? "text-[#36D2C5]"
+                        : "text-[#aeaeae]"
+                        }`}
                     >
                       <ThumbsUp
                         size={16}

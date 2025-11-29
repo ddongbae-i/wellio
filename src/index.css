@@ -4549,3 +4549,39 @@ html {
 @theme inline {
   --breakpoint-xs: 400px;
 }
+
+/* 컨테이너는 패딩 0 */
+.filter-swiper-wrapper {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* 첫 번째 슬라이드만 왼쪽 여백 주기 */
+.filter-swiper-slide:first-child {
+  margin-left: 20px; /* 기본: pl-5 */
+}
+
+.filter-swiper-slide:last-child {
+  margin-right: 20px; /* 모바일 기준 */
+}
+
+@media (min-width: 400px) { /* xs */
+  .filter-swiper-slide:first-child {
+    margin-left: 24px; /* xs:pl-6 */
+    
+  }
+
+  .filter-swiper-slide:last-child {
+  margin-right: 24px; /* 모바일 기준 */
+}
+}
+
+@media (min-width: 640px) { /* sm */
+  .filter-swiper-slide:first-child {
+    margin-left: 32px; /* sm:pl-8 */
+    
+  }
+  .filter-swiper-slide:last-child {
+  margin-right: 32px; /* 모바일 기준 */
+}
+}

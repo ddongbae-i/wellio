@@ -39,7 +39,7 @@ export function HospitalSearchPage({
   ];
 
   // ✅ 이 페이지에서 보여줄 카드 id 순서
-  const cardIds = [1, 2, 3, 3, 4, 5, 6, 7];
+  const cardIds = [1, 2, 3, 4, 5, 6, 7];
 
   // id 배열 기준으로 hospitalInfo에서 데이터 가져오기
   const hospitalsToShow: Hospital[] = cardIds
@@ -81,76 +81,68 @@ export function HospitalSearchPage({
   return (
     <div className="bg-[#f7f7f7] flex flex-col min-h-screen">
       {/* Header */}
-      <motion.header
-        className="sticky top-0 z-10 bg-[#f7f7f7]/80 backdrop-blur-xs relative pl-5 xs:pl-6 sm:pl-8 pt-4 pb-2 space-y-4"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="flex items-center justify-center pb-2 relative ">
-          <button
-            onClick={onBack}
-            className="absolute left-0 w-10 p-2 -ml-2"
-          >
-            <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
-          </button>
-          <h1 className="text-[19px] font-semibold text-[#202020]">
-            병원 찾기
-          </h1>
-        </div>
-
-        {/* Search */}
-        <div className="flex items-center gap-3 pr-5 xs:pr-6 sm:pr-8">
-          <div
-            className={`flex-1 rounded-[12px] px-5 py-2 flex items-center gap-2 transition-all border-[1.6px] h-10 bg-white ${isSearchFocused
-              ? "border-[#2ECACA]"
-              : "border-[#2ECACA]"
-              }`}
-          >
-            <Search size={20} className="text-[#2ECACA]" />
-            <input
-              type="text"
-              placeholder="진료과, 병원이름을 검색해보세요"
-              className="flex-1 bg-transparent outline-none text-[#1A1A1A] placeholder:text-[#aeaeae] text-sm text-[#777777] font-normal leading-[1.4]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-            />
-          </div>
-          <button className="text-[#777777] text-[17px] font-noraml">
-            취소
-          </button>
-        </div>
-
-        {/* Filter Tags */}
-        <Swiper
-          slidesPerView="auto"
-          spaceBetween={8}
-          className="w-full !pb-3"
+      <div className="sticky top-0 z-10 bg-[#f7f7f7]/80 backdrop-blur-xs">
+        <motion.header
+          className="relative px-5 xs:px-6 sm:px-8 pt-4 space-y-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          {filters.map((filter) => (
-            <SwiperSlide
-              key={filter}
-              className="!w-auto first:!ml-0"
-            >
-              <button
-                onClick={() => setSelectedFilter(filter)}
-                className={`px-3 py-2 rounded-full whitespace-nowrap transition-colors text-sm ${selectedFilter === filter
-                  ? "bg-[#BCEEEE] border border-[#BCEEEE] text-[#2b2b2b] font-medium"
-                  : "border border-[#aeaeae] text-[#777] font-normal"
-                  }`}
-              >
-                {filter}
-              </button>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </motion.header>
+          <div className="flex items-center justify-center pb-2 relative">
+            <button onClick={onBack} className="absolute left-0 w-10 p-2 -ml-2">
+              <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
+            </button>
+            <h1 className="text-[19px] font-semibold text-[#202020]">병원 찾기</h1>
+          </div>
 
+          {/* Search */}
+          <div className="flex items-center gap-3">
+            <div className={`flex-1 rounded-[12px] px-5 py-2 flex items-center gap-2 transition-all border-[1.6px] h-10 bg-white ${isSearchFocused ? "border-[#2ECACA]" : "border-[#2ECACA]"}`}>
+              <Search size={20} className="text-[#2ECACA]" />
+              <input
+                type="text"
+                placeholder="진료과, 병원이름을 검색해보세요"
+                className="flex-1 bg-transparent outline-none text-[#1A1A1A] placeholder:text-[#aeaeae] text-sm text-[#777777] font-normal leading-[1.4]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+              />
+            </div>
+            <button className="text-[#777777] text-[17px] font-noraml">취소</button>
+          </div>
+        </motion.header>
+
+        {/* Filter Tags - 헤더 밖, 하지만 sticky 영역 안 */}
+        <div className="filter-swiper-wrapper pb-5 mt-4">
+          <Swiper
+            slidesPerView="auto"
+            spaceBetween={8}
+            className="w-full !pb-3"
+          >
+            {filters.map((filter) => (
+              <SwiperSlide
+                key={filter}
+                className="!w-auto filter-swiper-slide"  // ✅ 별도 클래스만
+              >
+                <button
+                  onClick={() => setSelectedFilter(filter)}
+                  className={`px-3 py-2 rounded-full whitespace-nowrap transition-colors text-sm ${selectedFilter === filter
+                    ? "bg-[#BCEEEE] border border-[#BCEEEE] text-[#2b2b2b] font-medium"
+                    : "border border-[#aeaeae] text-[#777] font-normal"
+                    }`}
+                >
+                  {filter}
+                </button>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+
+      </div>
       {/* Hospital List */}
       <motion.div
-        className="overflow-y-hidden pb-20 space-y-3 px-4 xs:px-6 sm:px-8"
+        className="overflow-y-hidden pb-10 space-y-3 px-5 xs:px-6 sm:px-8"
         initial="hidden"
         animate="visible"
         variants={staggerContainer}

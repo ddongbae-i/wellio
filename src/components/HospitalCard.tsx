@@ -64,6 +64,9 @@ export function HospitalCard({
     },
   } as const;
 
+  const isClosed = hospital.todayStatus === "closed";
+  const isBreak = hospital.todayStatus === "break";
+
   const todayStatusStyle = statusConfig[hospital.todayStatus];
 
   return (
@@ -91,7 +94,7 @@ export function HospitalCard({
         {/* 병원 정보 */}
         <div className={hospitalCardClasses.infoWrapper}>
           <div className={hospitalCardClasses.infoHeaderRow}>
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-0">
               <h3 className={hospitalCardClasses.title}>
                 {hospital.name}
               </h3>
@@ -103,8 +106,8 @@ export function HospitalCard({
             {/* 찜하기 버튼 */}
             <button
               className={`${hospitalCardClasses.favoriteButtonBase} ${isHospitalFavorite
-                  ? "text-[#FF0000]"
-                  : "text-[#AEAEAE] hover:text-[#FF6666]"
+                ? "text-[#FF0000]"
+                : "text-[#AEAEAE] hover:text-[#FF6666]"
                 }`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -134,7 +137,12 @@ export function HospitalCard({
           >
             {todayStatusStyle.label}
           </span>
-          <span className="font-normal text-[#555555]">
+          <span
+            className={
+              "font-normal " +
+              (isClosed ? "text-[#777777]" : "text-[#555555]")
+            }
+          >
             {hospital.hours}
           </span>
         </div>
@@ -148,9 +156,13 @@ export function HospitalCard({
 
         {/* 뱃지 + 별점 */}
         <div className={hospitalCardClasses.badgeRow}>
-          {hospital.todayStatus === "open" && (
+          {hospital.todayStatus === "open" ? (
             <span className={hospitalCardClasses.badgeImmediate}>
               즉시 접수 가능
+            </span>
+          ) : (
+            <span className={hospitalCardClasses.badgeReserve}>
+              예약 가능
             </span>
           )}
 
@@ -201,7 +213,8 @@ export const hospitalCardClasses = {
 
   // 병원명
   title:
-    "text-[19px] font-semibold text-[#202020] leading-[1.3] truncate",
+    "text-[19px] font-semibold text-[#202020] leading-[1.3] " +
+    "truncate overflow-hidden text-ellipsis whitespace-nowrap",
 
   // 진료과/설명
   specialty: "text-sm text-[#777777] mt-0.5 font-normal",
@@ -221,11 +234,14 @@ export const hospitalCardClasses = {
     "text-[15px] text-[#777777] mb-1 truncate font-medium mr-1",
 
   // 뱃지 + 별점 row
-  badgeRow: "flex items-center gap-2 mt-2",
+  badgeRow: "flex items-center gap-2 mt-1",
 
   // '즉시 접수 가능' 뱃지
   badgeImmediate:
     "bg-[#2ECACA] text-white text-[12px] font-medium px-2 py-[4px] rounded-[20px]",
+
+  badgeReserve:
+    "bg-[#008ADF] text-white text-[12px] font-medium px-2 py-[4px] rounded-[20px] ",
 
   // 별점 영역
   ratingRow: "flex items-center gap-1 text-[14px]",
