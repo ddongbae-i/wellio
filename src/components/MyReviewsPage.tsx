@@ -193,7 +193,7 @@ export function MyReviewsPage({
 
                 {/* 리뷰 카드 */}
                 <motion.div
-                  className={`pt-[22px] pb-[26px] px-[20px] bg-white rounded-xl shadow-sm transition-colors relative flex flex-col overflow-hidden ${isEditing ? "cursor-default" : "cursor-pointer hover:shadow-md"} z-10`}
+                  className={`pt-[22px] pb-[26px] px-[20px] bg-white rounded-xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] transition-colors relative flex flex-col overflow-hidden ${isEditing ? "cursor-default" : "cursor-pointer hover:shadow-[0_4px_6px_0_rgba(201,208,216,0.25)]"} z-10`}
                   onClick={() => handleCardClick(review.id)}
                   drag="x"
                   dragConstraints={{ left: -120, right: 0 }}
@@ -404,7 +404,7 @@ export function MyReviewsPage({
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] bg-white rounded-2xl shadow-2xl z-50 overflow-hidden"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] bg-white rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50 overflow-hidden"
             >
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">

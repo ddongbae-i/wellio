@@ -1,10 +1,8 @@
 "use client";
 
 import {
-  ChevronLeft,
   ChevronDown,
   Search,
-  Bell,
   LayoutGrid,
   Calendar,
   Plus,
@@ -23,12 +21,15 @@ import { motion, AnimatePresence } from "motion/react";
 import confetti from "canvas-confetti";
 import "swiper/css";
 import { BottomNav } from "./BottomNav";
+import Bell from "../assets/images/icon_alarm.svg";
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 
 interface CommunityPageProps {
   onBack: () => void;
   onUploadClick: () => void;
   onNotificationClick?: () => void;
   onDeletePost?: (postId: number) => void;
+  initialPostId?: number; // 캘린더에서 클릭한 포스트 ID
   posts: Array<{
     id: number;
     image: string;
@@ -63,10 +64,10 @@ interface CommunityPageProps {
 
 // 가족 구성원 목데이터
 const familyMembers = [
-  { id: "all", name: "전체보기", avatar: "" },
+  { id: "all", name: "우리가족", avatar: "" },
   {
     id: "admin",
-    name: "관리자",
+    name: "김웰리",
     avatar:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
   },
@@ -108,7 +109,7 @@ const FamilyDropdown = ({
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
         // [수정] absolute 위치, 버튼 아래에 붙고, 그림자/둥근 모서리 유지
-        className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-fit bg-white rounded-2xl shadow-xl z-50 overflow-hidden border border-gray-100"
+        className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-fit bg-white rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50 overflow-hidden border border-gray-100"
       >
         <div className="p-2 min-w-[140px]">
           {familyMembers.map((member) => {
@@ -135,20 +136,22 @@ const FamilyDropdown = ({
                   }
                   setShowFamilyDropdown(false);
                 }}
-                className={`w-full flex items-center px-4 py-3 rounded-xl transition-colors text-lg font-medium whitespace-nowrap justify-start
+                className={`w-full flex items-center px-6 py-3 rounded-[12px] transition-colors text-[15px] font-medium whitespace-nowrap justify-start
                   ${isGrayedOut
-                    ? "text-gray-400 cursor-default"
+                    ? "text-[#2b2b2b] cursor-default"
                     : isSelected
-                      ? "text-[#1A1A1A] bg-gray-100"
-                      : "text-[#1A1A1A] hover:bg-gray-50"
+                      ? "text-[#2b2b2b] bg-white"
+                      : "text-[#2b2b2b] hover:bg-gray-50"
                   }`}
                 disabled={isGrayedOut}
               >
                 <span
                   className={`${isGrayedOut
-                    ? "text-gray-400"
-                    : "text-[#1A1A1A]"
-                    } leading-none`}
+                    ? "text-[#aeaeae]"
+                    : isSelected
+                      ? "text-[#2b2b2b] font-medium"
+                      : "text-[#aeaeae]"
+                    } leading-[1.3]`}
                 >
                   {memberName}
                 </span>
@@ -167,6 +170,7 @@ export function CommunityPage({
   onUploadClick,
   onNotificationClick,
   onDeletePost,
+  initialPostId,
   posts,
   currentUserName,
   currentUserAvatar,
@@ -220,6 +224,8 @@ export function CommunityPage({
 
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const postRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
   // 키보드 감지를 위한 state 추가
   const [isKeyboardVisible, setIsKeyboardVisible] =
@@ -429,7 +435,10 @@ export function CommunityPage({
   };
 
   const getFilteredReactionPosts = () => {
+    // 이미지가 있는 포스트만 필터링
     const myReactedPosts = posts.filter((post) => {
+      // 이미지가 없으면 제외
+      if (!post.image) return false;
       // 1. 내가 작성한 댓글 확인
       const hasMyComment = addedComments[post.id]?.some(
         (comment) => comment.userName === currentUser.userName,
@@ -465,9 +474,15 @@ export function CommunityPage({
             hasMyReaction && post.userName === currentUserName
           );
         } else {
+          // 가족 멤버 이름 매핑: "엄마" -> "박승희", "아빠" -> "김동석"
+          const nameMapping: { [key: string]: string } = {
+            "엄마": "박승희",
+            "아빠": "김동석",
+          };
+          const actualName = nameMapping[selectedFamilyMember] || selectedFamilyMember;
           return (
             hasMyReaction &&
-            post.userName === selectedFamilyMember
+            post.userName === actualName
           );
         }
       }
@@ -561,8 +576,16 @@ export function CommunityPage({
         if (post.userName !== currentUserName) {
           return false;
         }
-      } else if (post.userName !== selectedFamilyMember) {
-        return false;
+      } else {
+        // 가족 멤버 이름 매핑: "엄마" -> "박승희", "아빠" -> "김동석"
+        const nameMapping: { [key: string]: string } = {
+          "엄마": "박승희",
+          "아빠": "김동석",
+        };
+        const actualName = nameMapping[selectedFamilyMember] || selectedFamilyMember;
+        if (post.userName !== actualName) {
+          return false;
+        }
       }
     }
 
@@ -592,6 +615,25 @@ export function CommunityPage({
       setCurrentPostId(filteredPosts[0].id);
     }
   }, [filteredPosts, currentPostId]);
+
+  // 캘린더에서 클릭한 포스트로 스크롤
+  useEffect(() => {
+    if (initialPostId && postRefs.current[initialPostId] && scrollContainerRef.current && !isGridView && !isReactionView) {
+      const postElement = postRefs.current[initialPostId];
+      const container = scrollContainerRef.current;
+
+      // 짧은 지연 후 스크롤 (DOM 렌더링 완료 대기)
+      setTimeout(() => {
+        if (postElement && container) {
+          const postTop = postElement.offsetTop;
+          container.scrollTo({
+            top: postTop,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    }
+  }, [initialPostId, isGridView, isReactionView]);
 
   // 모바일 키보드 감지 useEffect
   useEffect(() => {
@@ -632,19 +674,15 @@ export function CommunityPage({
   }, []);
 
   return (
-    <div className="relative bg-white flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden">
-      {/* Header (110px) */}
-      <header className="sticky top-0 z-30 px-4 flex flex-col justify-center w-full bg-white min-h-[80px]">
+    <div className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden">
+      <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 flex flex-col justify-center w-full  bg-[#f7f7f7]/80 backdrop-blur-xs min-h-[80px]">
         {isSearchActive ? (
           <div className="flex items-center gap-3">
             <button
               onClick={onBack}
               className="w-6 h-6 flex items-center justify-center flex-shrink-0"
             >
-              <ChevronLeft
-                size={24}
-                className="text-[#1A1A1A]"
-              />
+              <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
             </button>
             <div
               className={`bg-gray-100 rounded-lg px-4 py-2 flex items-center gap-2 transition-all border-2 flex-1 ${isSearchFocused
@@ -766,7 +804,7 @@ export function CommunityPage({
                   setShowFamilyDropdown(!showFamilyDropdown)
                 }
               >
-                <span className="text-lg font-bold text-[#1A1A1A]">
+                <span className="text-[19px] font-semibold text-[#202020]">
                   {selectedFamilyMember
                     ? familyMembers.find(
                       (m) =>
@@ -809,7 +847,7 @@ export function CommunityPage({
                 className="w-6 h-6 flex items-center justify-center"
                 onClick={onNotificationClick}
               >
-                <Bell size={20} className="text-[#1A1A1A]" />
+                <img src={Bell} alt="알림" className="w-6 h-6" />
               </button>
             </div>
           </div>
@@ -901,7 +939,7 @@ export function CommunityPage({
                         className="w-full h-full object-cover"
                       />
                       {reactionFilter !== "ALL" && (
-                        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-sm">
+                        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
                           {reactionFilter}
                         </div>
                       )}
@@ -914,7 +952,7 @@ export function CommunityPage({
         ) : isGridView ? (
           <div className="px-4 py-4 pb-20">
             <div className="grid grid-cols-3 gap-1">
-              {filteredPosts.map((post) => (
+              {filteredPosts.filter(post => post.image).map((post) => (
                 <motion.div
                   key={post.id}
                   layoutId={`post-${post.id}`}
@@ -943,11 +981,17 @@ export function CommunityPage({
             </div>
           </div>
         ) : (
-          <div className="w-full px-5 xs:px-6 sm:px-8 snap-y snap-mandatory overflow-y-auto h-full scrollbar-hide">
+          <div
+            ref={scrollContainerRef}
+            className="w-full px-5 xs:px-6 sm:px-8 snap-y snap-mandatory overflow-y-auto h-full scrollbar-hide"
+          >
             {filteredPosts.map((post, index) => {
               const isDeleting = postToDelete === post.id;
               return (
                 <div
+                  ref={(el) => {
+                    postRefs.current[post.id] = el;
+                  }}
                   // [수정] 사진+댓글창 그룹을 한 화면에 정확히 표시
                   className={`snap-start snap-always flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 justify-center
                   ${isKeyboardVisible
@@ -956,12 +1000,12 @@ export function CommunityPage({
                     }`}
                   key={post.id}
                   style={{
-                    height: "calc(100vh - 190px)", // 헤더(110px) + nav(80px)
-                    minHeight: "calc(100vh - 190px)",
+                    height: "calc(100vh - 160px)", // 헤더(110px) + nav(80px)
+                    minHeight: "calc(100vh - 160px)",
                   }}
                 >
-                  <div className="relative w-full">
-                    <div className="relative w-full mx-auto overflow-visible  aspect-[335/400] max-h-[calc(100vh-280px)]">
+                  <div>
+                    <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
                       {post.userName === currentUser.userName &&
                         isDragging && (
                           <div className="absolute inset-y-0 -right-8 w-24 flex items-center justify-start z-0 pr-4">
@@ -972,7 +1016,7 @@ export function CommunityPage({
                           </div>
                         )}
                       <motion.div
-                        className="relative h-full w-full rounded-2xl overflow-hidden shadow-lg touch-none"
+                        className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] touch-none"
                         drag={
                           !isScrolling &&
                             post.userName === currentUser.userName
@@ -1052,7 +1096,7 @@ export function CommunityPage({
                                         </span>
 
                                         {/* 사용자 프로필 겹쳐서 표시 */}
-                                        <div className="flex -space-x-2.5">
+                                        <div className="flex -space-x-3">
                                           {/* 최대 3명의 사용자만 표시 (겹치는 효과를 위해) */}
                                           {reaction.users
                                             .slice(0, 3)
@@ -1140,10 +1184,10 @@ export function CommunityPage({
                                           src={comment.userAvatar}
                                           alt={comment.userName}
                                           // [수정] 이미지: w-11 h-11, -my-4, -mr-2(오른쪽돌출)
-                                          className="w-9 h-9 rounded-full object-cover -my-4 -mr-0.5 shadow-sm"
+                                          className="w-9 h-9 rounded-full object-cover -my-4 -mr-0.5 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
                                         />
                                         {/* [수정] max-w-[180px], truncate 유지, flex-shrink 추가 */}
-                                        <p className="text-[15px] text-[#202020] font-medium leading-none max-w-[85%] truncate flex-shrink">
+                                        <p className="text-[15px] text-[#202020] font-medium leading-none max-w-[85%] truncate flex-shrink mr-2">
                                           {comment.text}
                                         </p>
                                       </div>
@@ -1290,7 +1334,7 @@ export function CommunityPage({
                                     transition={{
                                       duration: 0.2,
                                     }}
-                                    className="absolute inset-0 flex items-center justify-center bg-[#F5F5F5]/80 backdrop-blur-md text-gray-800 rounded-full"
+                                    className="absolute inset-0 flex items-center justify-center rounded-full"
                                   >
                                     <X size={20} />
                                   </motion.div>
@@ -1377,12 +1421,12 @@ export function CommunityPage({
                                     transition={{
                                       duration: 0.2,
                                     }}
-                                    className="absolute inset-y-1 inset-x-0 flex items-center bg-[#F5F5F5]/80 backdrop-blur-md rounded-full px-4"
+                                    className="absolute inset-y-1 inset-x-0 flex items-center bg-[#f0f0f0] border border-[#777777] backdrop-blur-md rounded-[16px] px-4"
                                   >
                                     <input
                                       type="text"
                                       placeholder="댓글을 작성해주세요"
-                                      className="w-full bg-transparent outline-none text-[#1A1A1A] placeholder:text-gray-400"
+                                      className="w-full bg-transparent outline-none text-[#2b2b2b] placeholder:text-[#aeaeae]"
                                       value={
                                         currentPostId ===
                                           post.id
@@ -1451,7 +1495,7 @@ export function CommunityPage({
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] bg-white rounded-2xl shadow-2xl z-50 overflow-hidden"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] bg-white rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50 overflow-hidden"
             >
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1496,7 +1540,7 @@ export function CommunityPage({
           >
             <motion.div
               layoutId={`post-${expandedPostId}`}
-              className="relative w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-2xl"
+              className="relative w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
               onClick={(e) => e.stopPropagation()}
             >
               <ImageWithFallback
@@ -1534,7 +1578,7 @@ export function CommunityPage({
               </button>
             </div>
             <button
-              className="absolute left-1/2 -translate-x-1/2 -top-[16px] w-14 h-14 bg-[#36D2C5] rounded-full flex items-center justify-center shadow-lg hover:bg-[#00C2B3] transition-colors"
+              className="absolute left-1/2 -translate-x-1/2 -top-[16px] w-14 h-14 bg-[#36D2C5] rounded-full flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:bg-[#00C2B3] transition-colors"
               onClick={onUploadClick}
             >
               <Plus size={28} className="text-white" />

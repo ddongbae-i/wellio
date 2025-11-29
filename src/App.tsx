@@ -16,7 +16,7 @@ import { OnboardingPage } from "./components/OnboardingPage"; // 👈 Onboarding
 import { ReviewWritePage } from "./components/ReviewWritePage"; // 👈 ReviewWritePage import
 import { HospitalReviewsPage } from "./components/HospitalReviewsPage"; // 👈 HospitalReviewsPage import
 import { CalendarPage } from "./components/CalendarPage"; // 👈 CalendarPage import
-import { Toaster } from "sonner@2.0.3"; // 👈 Toaster import
+import { Toaster } from "sonner"; // 👈 Toaster import
 
 type Page = "home" | "community" | "hospital" | "profile" | "hospital-detail" | "upload" | "medical-history" | "my-reviews" | "favorite-hospitals" | "notifications" | "write-review" | "hospital-reviews" | "calendar";
 
@@ -86,6 +86,41 @@ interface Review {
   visitType?: "첫방문" | "재방문";
 }
 
+// 👥 앱을 함께 사용하는 가족 구성원
+const USERS = {
+  wellie: {
+    name: "김웰리",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80"
+  },
+  dongseok: {
+    name: "김동석",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80"
+  },
+  seunghee: {
+    name: "박승희",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80"
+  }
+} as const;
+
+// 🌐 리뷰 작성자 (일반 유저들 - 가족이 아닌 다른 사람들)
+const REVIEW_AUTHORS = [
+  { name: "이서연", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" },
+  { name: "박지훈", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
+  { name: "최민지", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80" },
+  { name: "강태욱", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80" },
+  { name: "정하은", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80" },
+  { name: "윤서준", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&q=80" },
+  { name: "임지원", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80" },
+  { name: "홍준영", avatar: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=100&q=80" },
+  { name: "김나연", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&q=80" },
+  { name: "오현수", avatar: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&q=80" },
+  { name: "송유진", avatar: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=100&q=80" },
+  { name: "배준호", avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&q=80" },
+  { name: "서민수", avatar: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=100&q=80" },
+  { name: "한지민", avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=100&q=80" },
+  { name: "조성훈", avatar: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&q=80" }
+];
+
 export default function App() {
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -93,12 +128,13 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   // 로그인 플로우 상태: 'welcome' | 'social' | 'email'
   const [loginStep, setLoginStep] = useState<'welcome' | 'social' | 'email'>('welcome');
-  const [userName, setUserName] = useState("관리자");
+  const [userName, setUserName] = useState(USERS.wellie.name);
   // 사용자 프로필 이미지 관리 (없으면 기본 이미지)
-  const [userAvatar, setUserAvatar] = useState("https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80");
+  const [userAvatar, setUserAvatar] = useState(USERS.wellie.avatar);
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
-  
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+
   // 날짜 생성 헬퍼 함수 (현재 날짜 기준으로 랜덤하게 이전 날짜 생성)
   const getRandomPastDate = (maxDaysAgo: number = 365): Date => {
     const today = new Date();
@@ -107,36 +143,41 @@ export default function App() {
     date.setDate(date.getDate() - daysAgo);
     return date;
   };
-  
+
   const formatDateKR = (date: Date): string => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}.${month}.${day}`;
   };
-  
+
   const formatDateISO = (date: Date): string => {
     return date.toISOString();
   };
-  
+
   // 👇 네비게이션 히스토리 추가
   const [navigationHistory, setNavigationHistory] = useState<Page[]>(["home"]);
-  
+
   // 수정할 리뷰 저장
   const [editingReview, setEditingReview] = useState<Review | null>(null);
-  
+
   // 알림 페이지에서 돌아갈 페이지 추적
   const [previousPage, setPreviousPage] = useState<Page>("home");
-  
+
   // 👇 네비게이션 함수 추가
   const navigateTo = (page: Page) => {
     // 현재 페이지와 같은 페이지로 이동하려고 하면 무시
     if (currentPage === page) return;
-    
+
+    // 커뮤니티가 아닌 페이지로 이동할 때 selectedPostId 초기화
+    if (page !== "community") {
+      setSelectedPostId(null);
+    }
+
     setNavigationHistory(prev => [...prev, page]);
     setCurrentPage(page);
   };
-  
+
   const navigateBack = () => {
     if (navigationHistory.length > 1) {
       const newHistory = [...navigationHistory];
@@ -150,7 +191,7 @@ export default function App() {
       setCurrentPage("home");
     }
   };
-  
+
   // 찜한 병원 목록 관리
   const [favoriteHospitals, setFavoriteHospitals] = useState<Hospital[]>([
     {
@@ -205,13 +246,13 @@ export default function App() {
       reviews: 41,
     },
   ]);
-  
+
   // 작성한 리뷰 목록을 먼저 정의 (다른 state들이 이를 참조)
   const initialMyReviews = (() => {
     const review1Date = getRandomPastDate(80);
     const review2Date = getRandomPastDate(120);
     const review3Date = getRandomPastDate(150);
-    
+
     const reviews = [
       {
         id: 1001,
@@ -222,8 +263,8 @@ export default function App() {
         rating: 5,
         keywords: ["친절해요", "과잉진료가 없어요", "꼼꼼해요"],
         reviewText: "아빠 감기몸살로 내원했는데 원장님이 정말 친절하게 진료해주셨어요. 과잉진료 없이 필요한 것만 처방해주셔서 좋았습니다.",
-        userName: "관리자",
-        userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
+        userName: USERS.wellie.name,
+        userAvatar: USERS.wellie.avatar,
         createdAt: formatDateISO(review1Date),
         visitType: "재방문" as const,
         likes: 0,
@@ -239,8 +280,8 @@ export default function App() {
         rating: 5,
         keywords: ["쾌적해요", "시설이 깨끗해요", "친절해요"],
         reviewText: "피부과 시술 받았는데 시설도 깨끗하고 직원분들도 친절하세요. 최신 장비로 시술해서 만족스러웠습니다.",
-        userName: "관리자",
-        userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
+        userName: USERS.wellie.name,
+        userAvatar: USERS.wellie.avatar,
         createdAt: formatDateISO(review2Date),
         visitType: "첫방문" as const,
         likes: 0,
@@ -256,8 +297,8 @@ export default function App() {
         rating: 4,
         keywords: ["친절해요", "대기시간이 짧아요"],
         reviewText: "사랑니 발치했는데 원장님이 꼼꼼하게 설명해주시고 통증도 거의 없었어요. 대기시간도 짧아서 좋았습니다.",
-        userName: "관리자",
-        userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
+        userName: USERS.wellie.name,
+        userAvatar: USERS.wellie.avatar,
         createdAt: formatDateISO(review3Date),
         visitType: "첫방문" as const,
         likes: 0,
@@ -265,26 +306,26 @@ export default function App() {
         dateObj: review3Date,
       },
     ];
-    
-    return reviews.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime()).map(({dateObj, ...rest}) => rest);
+
+    return reviews.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime()).map(({ dateObj, ...rest }) => rest);
   })();
-  
+
   // 리뷰 작성한 병원 ID 목록 관리 - initialMyReviews 기반으로 생성
   const [reviewedHospitals, setReviewedHospitals] = useState<number[]>(
     initialMyReviews.map(review => review.id)
   );
-  
+
   // 진료내역 데이터 관리 - initialMyReviews 기반으로 생성
   const [medicalRecords, setMedicalRecords] = useState(() => {
     const record4Date = getRandomPastDate(30);  // 리뷰 미작성 진료내역
     const record5Date = getRandomPastDate(200); // 가족 진료내역
-    
+
     // initialMyReviews를 기반으로 진료내역 생성
     const reviewBasedRecords = initialMyReviews.map((review, index) => ({
       id: review.id,
       code: `${new Date(review.createdAt).getFullYear()}${String(new Date(review.createdAt).getMonth() + 1).padStart(2, '0')}${String(new Date(review.createdAt).getDate()).padStart(2, '0')}-${String(index + 1).padStart(6, '0')}`,
-      patientName: "관리자",
-      patientAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+      patientName: USERS.wellie.name,
+      patientAvatar: USERS.wellie.avatar,
       hospitalName: review.hospitalName,
       visitDate: review.visitDate,
       visitTime: ["09:30", "14:00", "16:30"][index % 3],
@@ -293,14 +334,14 @@ export default function App() {
       isMyAppointment: true,
       dateObj: new Date(review.createdAt),
     }));
-    
+
     // 추가 진료내역 (리뷰 미작성)
     const additionalRecords = [
       {
         id: 2001,
         code: `${record4Date.getFullYear()}${String(record4Date.getMonth() + 1).padStart(2, '0')}${String(record4Date.getDate()).padStart(2, '0')}-012345`,
-        patientName: "관리자",
-        patientAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+        patientName: USERS.wellie.name,
+        patientAvatar: USERS.wellie.avatar,
         hospitalName: "서울대학교병원",
         visitDate: formatDateKR(record4Date),
         visitTime: "11:00",
@@ -312,344 +353,101 @@ export default function App() {
       {
         id: 2002,
         code: "REC-2024-FAM001",
-        patientName: "김웰리",
-        patientAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+        patientName: USERS.dongseok.name,
+        patientAvatar: USERS.dongseok.avatar,
         hospitalName: "바른정형외과의원",
         visitDate: formatDateKR(record5Date),
         visitTime: "15:30",
         doctor: "최재활 원장",
-        memo: "엄마 물리치료 예약",
+        memo: "아빠 물리치료 예약",
         isMyAppointment: false,
         dateObj: record5Date,
       },
     ];
-    
+
     const allRecords = [...reviewBasedRecords, ...additionalRecords];
-    
+
     // 날짜 최신순으로 정렬
-    return allRecords.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime()).map(({dateObj, ...rest}) => rest);
+    return allRecords.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime()).map(({ dateObj, ...rest }) => rest);
   });
-  
+
   // 작성한 리뷰 목록 state - initialMyReviews로 초기화
   const [myReviews, setMyReviews] = useState<Review[]>(initialMyReviews);
 
   // 샘플 리뷰 데이터 (다른 사용자들의 리뷰) - state로 관리
   const [sampleReviews, setSampleReviews] = useState<Review[]>(() => {
-    // 병원별 랜덤 날짜 생성
-    const r1001Date = getRandomPastDate(60);
-    const r1002Date = getRandomPastDate(90);
-    const r1003Date = getRandomPastDate(110);
-    const r1004Date = getRandomPastDate(140);
-    const r1005Date = getRandomPastDate(160);
-    const r1006Date = getRandomPastDate(190);
-    const r1007Date = getRandomPastDate(30);
-    const r1008Date = getRandomPastDate(60);
-    const r1009Date = getRandomPastDate(90);
-    const r1010Date = getRandomPastDate(110);
-    const r1011Date = getRandomPastDate(140);
-    const r1012Date = getRandomPastDate(170);
-    const r1013Date = getRandomPastDate(25);
-    const r1014Date = getRandomPastDate(50);
-    const r1015Date = getRandomPastDate(75);
-    const r1016Date = getRandomPastDate(100);
-    const r1017Date = getRandomPastDate(130);
-    const r1018Date = getRandomPastDate(160);
-    
-    return [
-      // 병원 ID 1: 바른정형외과의원 (6개 리뷰)
-      {
-        id: 1001,
-        hospitalId: 1,
-        hospitalName: "바른정형외과의원",
-        hospitalImage: "https://example.com/hospital1.jpg",
-        visitDate: formatDateKR(r1001Date),
-        rating: 5,
-        keywords: ["친절해요", "꼼꼼해요", "시설이 깨끗해요"],
-        reviewText: "물리치료 받으러 갔는데 선생님들이 너무 친절하고 시설도 깨끗해요. 재활 운동 방법도 자세히 알려주셔서 좋았습니다.",
-        userName: "이지은",
-        userAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80",
-        createdAt: formatDateISO(r1001Date),
-        visitType: "첫방문",
-        likes: 12,
-        likedBy: ["김건강", "활력"],
-      },
-      {
-        id: 1002,
-        hospitalId: 1,
-        hospitalName: "바른정형외과의원",
-        hospitalImage: "https://example.com/hospital1.jpg",
-        visitDate: formatDateKR(r1002Date),
-        rating: 4,
-        keywords: ["회복이 빨라요", "과잉진료가 없어요"],
-        reviewText: "허리 디스크로 방문했는데 필요한 치료만 해주셔서 좋았어요. 과잉진료 없이 정직하게 진료해주십니다.",
-        userName: "박준서",
-        userAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80",
-        createdAt: formatDateISO(r1002Date),
-        visitType: "재방문",
-        likes: 8,
-        likedBy: ["김건강"],
-      },
-      {
-        id: 1003,
-        hospitalId: 1,
-        hospitalName: "바른정형외과의원",
-        hospitalImage: "https://example.com/hospital1.jpg",
-        visitDate: formatDateKR(r1003Date),
-        rating: 5,
-        keywords: ["대기시간이 짧아요", "시설이 깨끗해요"],
-        reviewText: "무릎 통증으로 방문했는데 대기 시간도 짧고 진료도 신속하게 받았어요. 시설이 최신식이라 좋았습니다.",
-        userName: "김도현",
-        userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
-        createdAt: formatDateISO(r1003Date),
-        visitType: "첫방문",
-        likes: 7,
-        likedBy: ["김건강"],
-      },
-      {
-        id: 1004,
-        hospitalId: 1,
-        hospitalName: "바른정형외과의원",
-        hospitalImage: "https://example.com/hospital1.jpg",
-        visitDate: formatDateKR(r1004Date),
-        rating: 5,
-        keywords: ["친절해요", "회복이 빨라요", "꼼꼼해요"],
-        reviewText: "교통사고 후유증 치료 받고 있는데 원장님이 정말 꼼꼼하게 봐주세요. 회복도 생각보다 빠르고 만족스럽습니다.",
-        userName: "최유진",
-        userAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80",
-        createdAt: formatDateISO(r1004Date),
-        visitType: "재방문",
-        likes: 14,
-        likedBy: ["김건강", "박활력"],
-      },
-      {
-        id: 1005,
-        hospitalId: 1,
-        hospitalName: "바른정형외과의원",
-        hospitalImage: "https://example.com/hospital1.jpg",
-        visitDate: formatDateKR(r1005Date),
-        rating: 4,
-        keywords: ["과잉진료가 없어요", "친절해요"],
-        reviewText: "어깨 통증 때문에 갔는데 필요한 검사만 권유하시고 과잉 진료가 전혀 없어서 좋았어요. 원장님도 친절하십니다.",
-        userName: "박서준",
-        userAvatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&q=80",
-        createdAt: formatDateISO(r1005Date),
-        visitType: "첫방문",
-        likes: 9,
-        likedBy: ["김건강"],
-      },
-      {
-        id: 1006,
-        hospitalId: 1,
-        hospitalName: "바른정형외과의원",
-        hospitalImage: "https://example.com/hospital1.jpg",
-        visitDate: formatDateKR(r1006Date),
-        rating: 5,
-        keywords: ["시설이 깨끗해요", "꼼꼼해요", "회복이 빨라요"],
-        reviewText: "발목 염좌 치료 받았는데 원장님이 정말 꼼꼼하게 봐주셔서 빠르게 회복했어요. 시설도 깨끗하고 좋습니다.",
-        userName: "정민지",
-        userAvatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&q=80",
-        createdAt: formatDateISO(r1006Date),
-        visitType: "재방문",
-        likes: 11,
-        likedBy: ["김건강"],
-      },
-      
-      // 병원 ID 2: 고운피부과 (6개 리뷰)
-      {
-        id: 1007,
-        hospitalId: 2,
-        hospitalName: "고운피부과",
-        hospitalImage: "https://example.com/hospital2.jpg",
-        visitDate: formatDateKR(r1007Date),
-        rating: 5,
-        keywords: ["쾌적해요", "시설이 깨끗해요", "친절해요"],
-        reviewText: "레이저 시술 받았는데 정말 만족스러워요! 병원도 깨끗하고 직원분들도 친절하세요.",
-        userName: "최서연",
-        userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
-        createdAt: formatDateISO(r1007Date),
-        visitType: "첫방문",
-        likes: 15,
-        likedBy: ["김건강", "박활력"],
-      },
-      {
-        id: 1008,
-        hospitalId: 2,
-        hospitalName: "고운피부과",
-        hospitalImage: "https://example.com/hospital2.jpg",
-        visitDate: formatDateKR(r1008Date),
-        rating: 5,
-        keywords: ["꼼꼼해요", "회복이 빨라요"],
-        reviewText: "여드름 흉터 치료 받고 있는데 원장님이 정말 꼼꼼하게 봐주세요. 효과도 빠르게 나타나서 만족합니다.",
-        userName: "김민준",
-        userAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80",
-        createdAt: formatDateISO(r1008Date),
-        visitType: "재방문",
-        likes: 10,
-        likedBy: ["김건강"],
-      },
-      {
-        id: 1009,
-        hospitalId: 2,
-        hospitalName: "고운피부과",
-        hospitalImage: "https://example.com/hospital2.jpg",
-        visitDate: formatDateKR(r1009Date),
-        rating: 5,
-        keywords: ["친절해요", "시설이 깨끗해요", "쾌적해요"],
-        reviewText: "피부과 처음 가봤는데 너무 친절하시고 시술 과정도 자세히 설명해주셔서 좋았어요. 병원 분위기도 쾌적합니다.",
-        userName: "이수아",
-        userAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80",
-        createdAt: formatDateISO(r1009Date),
-        visitType: "첫방문",
-        likes: 13,
-        likedBy: ["김건강"],
-      },
-      {
-        id: 1010,
-        hospitalId: 2,
-        hospitalName: "고운피부과",
-        hospitalImage: "https://example.com/hospital2.jpg",
-        visitDate: formatDateKR(r1010Date),
-        rating: 4,
-        keywords: ["꼼꼼해요", "과잉진료가 없어요"],
-        reviewText: "기미 치료 상담 받았는데 과잉 진료 없이 필요한 것만 권유해주셔서 신뢰가 갑니다. 꼼꼼하게 상담해주셨어요.",
-        userName: "박지혜",
-        userAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80",
-        createdAt: formatDateISO(r1010Date),
-        visitType: "첫방문",
-        likes: 8,
-        likedBy: ["김건강"],
-      },
-      {
-        id: 1011,
-        hospitalId: 2,
-        hospitalName: "고운피부과",
-        hospitalImage: "https://example.com/hospital2.jpg",
-        visitDate: formatDateKR(r1011Date),
-        rating: 5,
-        keywords: ["회복이 빨라요", "시설이 깨끗해요", "친절해요"],
-        reviewText: "보톡스 시술 받았는데 회복도 빠르고 효과도 좋아요! 시설도 최신식이고 간호사님들도 친절하십니다.",
-        userName: "강하늘",
-        userAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80",
-        createdAt: formatDateISO(r1011Date),
-        visitType: "재방문",
-        likes: 16,
-        likedBy: ["김건강", "박활력"],
-      },
-      {
-        id: 1012,
-        hospitalId: 2,
-        hospitalName: "고운피부과",
-        hospitalImage: "https://example.com/hospital2.jpg",
-        visitDate: formatDateKR(r1012Date),
-        rating: 5,
-        keywords: ["쾌적해요", "꼼꼼해요", "친절해요"],
-        reviewText: "여드름 치료 받고 있는데 원장님이 매번 꼼꼼하게 봐주세요. 병원 환경도 쾌적하고 추천합니다!",
-        userName: "윤서진",
-        userAvatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&q=80",
-        createdAt: formatDateISO(r1012Date),
-        visitType: "재방문",
-        likes: 12,
-        likedBy: ["김건강"],
-      },
-      
-      // 병원 ID 3: 오늘도강한내과의원 (6개 리뷰)
-      {
-        id: 1013,
-        hospitalId: 3,
-        hospitalName: "오늘도강한내과의원",
-        hospitalImage: "https://example.com/hospital3.jpg",
-        visitDate: formatDateKR(r1013Date),
-        rating: 5,
-        keywords: ["친절해요", "꼼꼼해요", "과잉진료가 없어요"],
-        reviewText: "정기검진 받으러 갔는데 원장님이 정말 친절하고 꼼꼼하게 진료해주세요. 필요한 검사만 권유하셔서 신뢰가 갑니다.",
-        userName: "정하윤",
-        userAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80",
-        createdAt: formatDateISO(r1013Date),
-        visitType: "재방문",
-        likes: 18,
-        likedBy: ["김건강", "박활력"],
-      },
-      {
-        id: 1014,
-        hospitalId: 3,
-        hospitalName: "오늘도강한내과의원",
-        hospitalImage: "https://example.com/hospital3.jpg",
-        visitDate: formatDateKR(r1014Date),
-        rating: 5,
-        keywords: ["친절해요", "대기시간이 짧아요"],
-        reviewText: "감기 때문에 급하게 방문했는데 대기 시간도 짧고 원장님도 친절하게 진료해주셨어요. 근처에 이런 병원이 있어 다행입니다.",
-        userName: "김태현",
-        userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
-        createdAt: formatDateISO(r1014Date),
-        visitType: "첫방문",
-        likes: 9,
-        likedBy: ["김건강"],
-      },
-      {
-        id: 1015,
-        hospitalId: 3,
-        hospitalName: "오늘도강한내과의원",
-        hospitalImage: "https://example.com/hospital3.jpg",
-        visitDate: formatDateKR(r1015Date),
-        rating: 4,
-        keywords: ["꼼꼼해요", "과잉진료가 없어요", "친절해요"],
-        reviewText: "건강검진 결과 상담 받았는데 원장님이 하나하나 자세히 설명해주셔서 좋았어요. 과잉 진료 없이 정직하게 진료해주십니다.",
-        userName: "송민아",
-        userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
-        createdAt: formatDateISO(r1015Date),
-        visitType: "재방문",
-        likes: 11,
-        likedBy: ["김건강"],
-      },
-      {
-        id: 1016,
-        hospitalId: 3,
-        hospitalName: "오늘도강한내과의원",
-        hospitalImage: "https://example.com/hospital3.jpg",
-        visitDate: formatDateKR(r1016Date),
-        rating: 5,
-        keywords: ["시설이 깨끗해요", "친절해요", "꼼꼼해요"],
-        reviewText: "복통으로 방문했는데 원장님이 꼼꼼하게 진찰해주시고 치료도 잘 해주셨어요. 시설도 깨끗하고 좋습니다.",
-        userName: "이재민",
-        userAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80",
-        createdAt: formatDateISO(r1016Date),
-        visitType: "첫방문",
-        likes: 14,
-        likedBy: ["김건강"],
-      },
-      {
-        id: 1017,
-        hospitalId: 3,
-        hospitalName: "오늘도강한내과의원",
-        hospitalImage: "https://example.com/hospital3.jpg",
-        visitDate: formatDateKR(r1017Date),
-        rating: 5,
-        keywords: ["대기시간이 짧아요", "친절해요", "과잉진료가 없어요"],
-        reviewText: "만성 질환 관리 받고 있는데 대기 시간도 짧고 원장님도 항상 친절하세요. 과잉 진료 없이 꼭 필요한 것만 처방해주셔서 좋아요.",
-        userName: "최은영",
-        userAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80",
-        createdAt: formatDateISO(r1017Date),
-        visitType: "재방문",
-        likes: 16,
-        likedBy: ["김건강", "박활력"],
-      },
-      {
-        id: 1018,
-        hospitalId: 3,
-        hospitalName: "오늘도강한내과의원",
-        hospitalImage: "https://example.com/hospital3.jpg",
-        visitDate: formatDateKR(r1018Date),
-        rating: 5,
-        keywords: ["친절해요", "꼼꼼해요", "시설이 깨끗해요"],
-        reviewText: "알레르기 검사 받으러 갔는데 원장님이 정말 친절하고 꼼꼼하게 설명해주셨어요. 병원도 깨끗하고 추천합니다!",
-        userName: "박현우",
-        userAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80",
-        createdAt: formatDateISO(r1018Date),
-        visitType: "첫방문",
-        likes: 13,
-        likedBy: ["김건강"],
-      },
+    // 랜덤 유저 선택 헬퍼
+    const getRandomReviewer = () => {
+      const randomIndex = Math.floor(Math.random() * REVIEW_AUTHORS.length);
+      return REVIEW_AUTHORS[randomIndex];
+    };
+
+    // 병원별 랜덤 날짜 생성 (30개)
+    const dates = Array.from({ length: 30 }, (_, i) => getRandomPastDate(360));
+
+    const reviews: Review[] = [];
+
+    // 리뷰 데이터 템플릿
+    const reviewTemplates = [
+      // 병원 ID 1: 바른정형외과의원 (10개 리뷰)
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 5, keywords: ["친절해요", "꼼꼼해요", "시설이 깨끗해요"], text: "물리치료 받으러 갔는데 선생님들이 너무 친절하고 시설도 깨끗해요. 재활 운동 방법도 자세히 알려주셔서 좋았습니다.", visitType: "첫방문" as const, likes: 12 },
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 4, keywords: ["회복이 빨라요", "과잉진료가 없어요"], text: "허리 디스크로 방문했는데 필요한 치료만 해주셔서 좋았어요. 과잉진료 없이 정직하게 진료해주십니다.", visitType: "재방문" as const, likes: 8 },
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 5, keywords: ["대기시간이 짧아요", "시설이 깨끗해요"], text: "무릎 통증으로 방문했는데 대기 시간도 짧고 진료도 신속하게 받았어요. 시설이 최신식이라 좋았습니다.", visitType: "첫방문" as const, likes: 7 },
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 5, keywords: ["친절해요", "회복이 빨라요", "꼼꼼해요"], text: "교통사고 후유증 치료 받고 있는데 원장님이 정말 꼼꼼하게 봐주세요. 회복도 생각보다 빠르고 만족스럽습니다.", visitType: "재방문" as const, likes: 14 },
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 4, keywords: ["과잉진료가 없어요", "친절해요"], text: "어깨 통증 때문에 갔는데 필요한 검사만 권유하시고 과잉 진료가 전혀 없어서 좋았어요. 원장님도 친절하십니다.", visitType: "첫방문" as const, likes: 9 },
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 5, keywords: ["시설이 깨끗해요", "꼼꼼해요", "회복이 빨라요"], text: "발목 염좌 치료 받았는데 원장님이 정말 꼼꼼하게 봐주셔서 빠르게 회복했어요. 시설도 깨끗하고 좋습니다.", visitType: "재방문" as const, likes: 11 },
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 5, keywords: ["친절해요", "대기시간이 짧아요"], text: "목 디스크로 방문했는데 대기 시간도 짧고 원장님이 친절하게 설명해주셨어요. 치료 계획도 명확하게 세워주셔서 좋았습니다.", visitType: "첫방문" as const, likes: 13 },
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 4, keywords: ["꼼꼼해요", "시설이 깨끗해요"], text: "손목 통증으로 내원했는데 꼼꼼하게 진료해주셔서 원인을 정확히 파악할 수 있었어요. 시설도 최신식입니다.", visitType: "재방문" as const, likes: 6 },
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 5, keywords: ["회복이 빨라요", "친절해요", "과잉진료가 없어요"], text: "척추측만증 치료 받고 있는데 회복도 빠르고 원장님이 정말 친절하세요. 과잉 진료 없이 정직하게 진료해주십니다.", visitType: "재방문" as const, likes: 15 },
+      { hospitalId: 1, hospitalName: "바른정형외과의원", rating: 5, keywords: ["친절해요", "시설이 깨끗해요", "꼼꼼해요"], text: "아버지 고관절 치료로 왔는데 원장님이 정말 꼼꼼하게 봐주셔서 감사합니다. 시설도 깨끗하고 추천합니다.", visitType: "첫방문" as const, likes: 10 },
+
+      // 병원 ID 2: 고운피부과 (10개 리뷰)
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 5, keywords: ["쾌적해요", "시설이 깨끗해요", "친절해요"], text: "레이저 시술 받았는데 정말 만족스러워요! 병원도 깨끗하고 직원분들도 친절하세요.", visitType: "첫방문" as const, likes: 15 },
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 5, keywords: ["꼼꼼해요", "회복이 빨라요"], text: "여드름 흉터 치료 받고 있는데 원장님이 정말 꼼꼼하게 봐주세요. 효과도 빠르게 나타나서 만족합니다.", visitType: "재방문" as const, likes: 10 },
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 5, keywords: ["친절해요", "시설이 깨끗해요", "쾌적해요"], text: "피부과 처음 가봤는데 너무 친절하시고 시술 과정도 자세히 설명해주셔서 좋았어요. 병원 분위기도 쾌적합니다.", visitType: "첫방문" as const, likes: 13 },
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 4, keywords: ["꼼꼼해요", "과잉진료가 없어요"], text: "기미 치료 상담 받았는데 과잉 진료 없이 필요한 것만 권유해주셔서 신뢰가 갑니다. 꼼꼼하게 상담해주셨어요.", visitType: "첫방문" as const, likes: 8 },
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 5, keywords: ["회복이 빨라요", "시설이 깨끗해요", "친절해요"], text: "보톡스 시술 받았는데 회복도 빠르고 효과도 좋아요! 시설도 최신식이고 간호사님들도 친절하십니다.", visitType: "재방문" as const, likes: 16 },
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 5, keywords: ["쾌적해요", "꼼꼼해요", "친절해요"], text: "여드름 치료 받고 있는데 원장님이 매번 꼼꼼하게 봐주세요. 병원 환경도 쾌적하고 추천합니다!", visitType: "재방문" as const, likes: 12 },
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 5, keywords: ["시설이 깨끗해요", "친절해요", "회복이 빨라요"], text: "필러 시술 받았는데 원장님이 정말 섬세하게 해주셔서 만족스러워요. 회복도 빠르고 효과도 자연스럽습니다.", visitType: "첫방문" as const, likes: 14 },
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 4, keywords: ["친절해요", "과잉진료가 없어요"], text: "피부 트러블로 방문했는데 과잉 진료 없이 필요한 치료만 해주셔서 좋았어요. 원장님도 친절하십니다.", visitType: "첫방문" as const, likes: 7 },
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 5, keywords: ["꼼꼼해요", "시설이 깨끗해요", "쾌적해요"], text: "색소 침착 치료 받고 있는데 원장님이 정말 꼼꼼하게 봐주세요. 시설도 최신식이고 병원 분위기도 좋습니다.", visitType: "재방문" as const, likes: 11 },
+      { hospitalId: 2, hospitalName: "고운피부과", rating: 5, keywords: ["친절해요", "회복이 빨라요", "쾌적해요"], text: "미백 레이저 받았는데 회복도 빠르고 효과도 좋아요! 직원분들도 다들 친절하시고 병원도 쾌적합니다.", visitType: "재방문" as const, likes: 13 },
+
+      // 병원 ID 3: 오늘도강한내과의원 (10개 리뷰)
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 5, keywords: ["친절해요", "꼼꼼해요", "과잉진료가 없어요"], text: "정기검진 받으러 갔는데 원장님이 정말 친절하고 꼼꼼하게 진료해주세요. 필요한 검사만 권유하셔서 신뢰가 갑니다.", visitType: "재방문" as const, likes: 18 },
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 5, keywords: ["친절해요", "대기시간이 짧아요"], text: "감기 때문에 급하게 방문했는데 대기 시간도 짧고 원장님도 친절하게 진료해주셨어요. 근처에 이런 병원이 있어 다행입니다.", visitType: "첫방문" as const, likes: 9 },
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 4, keywords: ["꼼꼼해요", "과잉진료가 없어요", "친절해요"], text: "건강검진 결과 상담 받았는데 원장님이 하나하나 자세히 설명해주셔서 좋았어요. 과잉 진료 없이 정직하게 진료해주십니다.", visitType: "재방문" as const, likes: 11 },
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 5, keywords: ["시설이 깨끗해요", "친절해요", "꼼꼼해요"], text: "복통으로 방문했는데 원장님이 꼼꼼하게 진찰해주시고 치료도 잘 해주셨어요. 시설도 깨끗하고 좋습니다.", visitType: "첫방문" as const, likes: 14 },
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 5, keywords: ["대기시간이 짧아요", "친절해요", "과잉진료가 없어요"], text: "만성 질환 관리 받고 있는데 대기 시간도 짧고 원장님도 항상 친절하세요. 과잉 진료 없이 꼭 필요한 것만 처방해주셔서 좋아요.", visitType: "재방문" as const, likes: 16 },
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 5, keywords: ["친절해요", "꼼꼼해요", "시설이 깨끗해요"], text: "알레르기 검사 받으러 갔는데 원장님이 정말 친절하고 꼼꼼하게 설명해주셨어요. 병원도 깨끗하고 추천합니다!", visitType: "첫방문" as const, likes: 13 },
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 4, keywords: ["친절해요", "과잉진료가 없어요"], text: "소화불량으로 방문했는데 원장님이 친절하게 진료해주셨어요. 과잉 처방 없이 필요한 약만 처방해주셔서 좋았습니다.", visitType: "첫방문" as const, likes: 8 },
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 5, keywords: ["꼼꼼해요", "시설이 깨끗해요", "대기시간이 짧아요"], text: "당뇨 관리 받고 있는데 원장님이 매번 꼼꼼하게 봐주세요. 대기 시간도 짧고 시설도 깨끗합니다.", visitType: "재방문" as const, likes: 12 },
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 5, keywords: ["친절해요", "회복이 빨라요", "꼼꼼해요"], text: "장염으로 방문했는데 원장님이 정말 꼼꼼하게 진료해주셔서 빠르게 회복했어요. 직원분들도 모두 친절하십니다.", visitType: "첫방문" as const, likes: 10 },
+      { hospitalId: 3, hospitalName: "오늘도강한내과의원", rating: 5, keywords: ["시설이 깨끗해요", "친절해요", "과잉진료가 없어요"], text: "고혈압 정기 검진 받는데 원장님이 항상 친절하고 꼭 필요한 검사만 권유하세요. 병원도 깨끗하고 만족합니다.", visitType: "재방문" as const, likes: 15 },
     ];
+
+    // 각 템플릿에 랜덤 유저와 날짜 할당
+    reviewTemplates.forEach((template, index) => {
+      const reviewer = getRandomReviewer();
+      reviews.push({
+        id: 1001 + index,
+        hospitalId: template.hospitalId,
+        hospitalName: template.hospitalName,
+        hospitalImage: `https://example.com/hospital${template.hospitalId}.jpg`,
+        visitDate: formatDateKR(dates[index]),
+        rating: template.rating,
+        keywords: template.keywords,
+        reviewText: template.text,
+        userName: reviewer.name,
+        userAvatar: reviewer.avatar,
+        createdAt: formatDateISO(dates[index]),
+        visitType: template.visitType,
+        likes: template.likes,
+        likedBy: [],
+      });
+    });
+
+    return reviews.slice(0, 30); // 정확히 30개만 반환
   });
 
   // 병원별 리뷰 개수를 계산하는 함수
@@ -658,27 +456,27 @@ export default function App() {
     const userCount = myReviews.filter(review => review.hospitalId === hospitalId).length;
     return sampleCount + userCount;
   };
-  
+
   // 병원별 평균 별점을 계산하는 함수
   const getHospitalAverageRating = (hospitalId: number): number => {
     const hospitalReviews = [
       ...sampleReviews.filter(review => review.hospitalId === hospitalId),
       ...myReviews.filter(review => review.hospitalId === hospitalId)
     ];
-    
+
     if (hospitalReviews.length === 0) return 0;
-    
+
     const totalRating = hospitalReviews.reduce((sum, review) => sum + review.rating, 0);
     return Math.round((totalRating / hospitalReviews.length) * 10) / 10; // 소수점 첫째자리까지
   };
-  
+
   // 병원별 키워드 통계를 계산하는 함수
   const getHospitalKeywordStats = (hospitalId: number): Array<{ keyword: string; count: number; percentage: number }> => {
     const hospitalReviews = [
       ...sampleReviews.filter(review => review.hospitalId === hospitalId),
       ...myReviews.filter(review => review.hospitalId === hospitalId)
     ];
-    
+
     // 모든 키워드 수집
     const keywordCount: { [key: string]: number } = {};
     hospitalReviews.forEach(review => {
@@ -686,10 +484,10 @@ export default function App() {
         keywordCount[keyword] = (keywordCount[keyword] || 0) + 1;
       });
     });
-    
+
     // 총 리뷰 개수
     const totalReviews = hospitalReviews.length;
-    
+
     // 키워드 통계 배열 생성 및 정렬 (개수 많은 순)
     const stats = Object.entries(keywordCount)
       .map(([keyword, count]) => ({
@@ -698,10 +496,10 @@ export default function App() {
         percentage: totalReviews > 0 ? Math.round((count / totalReviews) * 100) : 0
       }))
       .sort((a, b) => b.count - a.count);
-    
+
     return stats;
   };
-  
+
   // 리뷰 삭제 함수
   const handleDeleteReview = (reviewId: number) => {
     setMyReviews(myReviews.filter(review => review.id !== reviewId));
@@ -725,7 +523,7 @@ export default function App() {
         return review;
       })
     );
-    
+
     // myReviews에서 해당 리뷰를 찾아 업데이트
     setMyReviews(prevReviews =>
       prevReviews.map(review => {
@@ -743,7 +541,7 @@ export default function App() {
       })
     );
   };
-  
+
   // 진료내역에서 선택한 진료 기록 관리
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState<{
     id: number;
@@ -758,25 +556,18 @@ export default function App() {
       id: 1,
       image:
         "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&q=80",
-      badge: "🏆 주 1회 함께 걷기",
-      userAvatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
-      caption: "챌린지 첫 시작!",
-      userName: "관리자",
-      textOverlay: "오늘부터 시작하는 건강한 습관!",
-      createdAt: "2025-11-1",
+      badge: "🏃 아침 러닝",
+      userAvatar: USERS.dongseok.avatar,
+      caption: "챌린지 시작!",
+      userName: USERS.dongseok.name,
+      textOverlay: "오전 조깅으로 상쾌하게!",
+      createdAt: "2025-10-14",
       comments: [
         {
-          userName: "엄마",
-          userAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
+          userName: USERS.seunghee.name,
+          userAvatar: USERS.seunghee.avatar,
           text: "멋져요! 저도 함께할게요 💪",
           timestamp: "5분 전"
-        },
-        {
-          userName: "아빠",
-          userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
-          text: "화이팅하세요!",
-          timestamp: "2분 전"
         }
       ],
       reactions: [
@@ -784,21 +575,8 @@ export default function App() {
           emoji: "❤️",
           users: [
             {
-              userName: "엄마",
-              userAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80"
-            },
-            {
-              userName: "아빠",
-              userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80"
-            }
-          ]
-        },
-        {
-          emoji: "👍",
-          users: [
-            {
-              userName: "관리자",
-              userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80"
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar
             }
           ]
         }
@@ -808,299 +586,129 @@ export default function App() {
       id: 2,
       image:
         "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80",
-      badge: "💪 매일 운동하기",
-      userAvatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
-      caption: "오늘도 달렸어요!",
-      userName: "관리자",
-      location: "한강공원",
-      time: "오전 6:30",
-      weather: "맑음 18°C",
-      createdAt: "2025-11-2",
-      comments: [
-        {
-          userName: "엄마",
-          userAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
-          text: "역시 대단해요! 👏",
-          timestamp: "10분 전"
-        }
-      ],
-      reactions: [
-        {
-          emoji: "👏",
-          users: [
-            {
-              userName: "엄마",
-              userAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80"
-            },
-            {
-              userName: "아빠",
-              userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80"
-            }
-          ]
-        }
-      ]
+      badge: "🧘‍♀️ 요가",
+      userAvatar: USERS.seunghee.avatar,
+      caption: "요가 수업",
+      userName: USERS.seunghee.name,
+      textOverlay: "몸과 마음을 편안하게",
+      createdAt: "2025-10-15",
+      comments: [],
+      reactions: []
     },
     {
       id: 3,
       image:
-        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
-      badge: "🧘‍♀️ 매일 요가",
-      userAvatar:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
-      caption: "마음 챙기기",
-      userName: "엄마",
-      textOverlay: "하루를 평화롭게 시작하는 아침 요가",
-      health: "혈압 120/80",
-      createdAt: "2025-11-3",
-      comments: [
-        {
-          userName: "관리자",
-          userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
-          text: "평화로운 하루 되세요 🙏",
-          timestamp: "1시간 전"
-        },
-        {
-          userName: "아빠",
-          userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
-          text: "너무 좋아 보여요!",
-          timestamp: "30분 전"
-        }
-      ],
-      reactions: [
-        {
-          emoji: "😊",
-          users: [
-            {
-              userName: "관리자",
-              userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80"
-            }
-          ]
-        },
-        {
-          emoji: "❤️",
-          users: [
-            {
-              userName: "아빠",
-              userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80"
-            }
-          ]
-        }
-      ]
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+      badge: "💪 헬스",
+      userAvatar: USERS.dongseok.avatar,
+      caption: "웨이트 트레이닝",
+      userName: USERS.dongseok.name,
+      textOverlay: "챌린지 완료!",
+      createdAt: "2025-10-16",
+      comments: [],
+      reactions: []
     },
     {
       id: 4,
       image:
-        "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=800&q=80",
-      badge: "🥗 건강한 식단",
-      userAvatar:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
-      caption: "오늘의 건강 샐러드",
-      userName: "엄마",
-      textOverlay: "신선한 채소로 만든 사랑의 한 끼",
-      time: "오후 12:30",
-      createdAt: "2025-11-4",
-      comments: [
-        {
-          userName: "관리자",
-          userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
-          text: "너무 맛있어 보여요! 😋",
-          timestamp: "20분 전"
-        },
-        {
-          userName: "아빠",
-          userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
-          text: "오늘도 최고예요 👍",
-          timestamp: "10분 전"
-        }
-      ],
-      reactions: [
-        {
-          emoji: "👍",
-          users: [
-            {
-              userName: "관리자",
-              userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80"
-            },
-            {
-              userName: "아빠",
-              userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80"
-            }
-          ]
-        }
-      ]
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+      badge: "💪 운동 완료",
+      userAvatar: USERS.dongseok.avatar,
+      caption: "헬스장에서",
+      userName: USERS.dongseok.name,
+      textOverlay: "오늘도 열심히!",
+      createdAt: "2025-11-3",
+      comments: [],
+      reactions: []
     },
     {
       id: 5,
       image:
-        "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80",
-      badge: "🚶‍♀️ 매일 산책",
-      userAvatar:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
-      caption: "동네 한 바퀴",
-      userName: "엄마",
-      location: "근린공원",
-      weather: "맑음 20°C",
-      health: "걸음수 8,432보",
+        "https://images.unsplash.com/photo-1552196563-55cd4e45efb3?w=800&q=80",
+      badge: "🏃 러닝 완료",
+      userAvatar: USERS.dongseok.avatar,
+      caption: "공원에서 조깅",
+      userName: USERS.dongseok.name,
+      textOverlay: "5km 완주!",
       createdAt: "2025-11-7",
-      comments: [
-        {
-          userName: "아빠",
-          userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
-          text: "좋은 날씨네요! 🌤️",
-          timestamp: "25분 전"
-        }
-      ],
-      reactions: [
-        {
-          emoji: "😊",
-          users: [
-            {
-              userName: "관리자",
-              userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80"
-            },
-            {
-              userName: "아빠",
-              userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80"
-            }
-          ]
-        }
-      ]
+      comments: [],
+      reactions: []
     },
     {
       id: 6,
       image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
-      badge: "🏃‍♂️ 주 3회 러닝",
-      userAvatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
-      caption: "아침 러닝 완료!",
-      userName: "아빠",
-      textOverlay: "5km 달리기 성공",
-      location: "올림픽공원",
-      time: "오전 6:00",
-      weather: "맑음 15°C",
-      createdAt: "2025-11-10",
-      comments: [
-        {
-          userName: "엄마",
-          userAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
-          text: "수고했어요! 💪",
-          timestamp: "1시간 전"
-        },
-        {
-          userName: "관리자",
-          userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
-          text: "대단하세요!",
-          timestamp: "45분 전"
-        }
-      ],
-      reactions: [
-        {
-          emoji: "👏",
-          users: [
-            {
-              userName: "관리자",
-              userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80"
-            },
-            {
-              userName: "엄마",
-              userAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80"
-            }
-          ]
-        },
-        {
-          emoji: "❤️",
-          users: [
-            {
-              userName: "아빠",
-              userAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80"
-            }
-          ]
-        }
-      ]
+        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80",
+      badge: "🧘‍♀️ 요가 완료",
+      userAvatar: USERS.seunghee.avatar,
+      caption: "저녁 요가",
+      userName: USERS.seunghee.name,
+      textOverlay: "몸과 마음을 정리하는 시간",
+      createdAt: "2025-11-13",
+      comments: [],
+      reactions: []
     },
     {
       id: 7,
       image:
-        "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&q=80",
-      badge: "💊 건강검진",
-      userAvatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
-      caption: "정기 건강검진 다녀왔습니다",
-      userName: "아빠",
-      textOverlay: "건강이 최고!",
-      health: "혈압 118/75, 콜레스테롤 정상",
-      createdAt: "2025-11-13",
-      comments: [
-        {
-          userName: "엄마",
-          userAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
-          text: "다행이네요! 😊",
-          timestamp: "2시간 전"
-        },
-        {
-          userName: "관리자",
-          userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
-          text: "건강 관리 잘하셨네요!",
-          timestamp: "1시간 전"
-        }
-      ],
-      reactions: [
-        {
-          emoji: "👍",
-          users: [
-            {
-              userName: "엄마",
-              userAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80"
-            },
-            {
-              userName: "관리자",
-              userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80"
-            }
-          ]
-        }
-      ]
+        "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&q=80",
+      badge: "🏆 챌린지 시작",
+      userAvatar: USERS.wellie.avatar,
+      caption: "새로운 챌린지 시작!",
+      userName: USERS.wellie.name,
+      textOverlay: "주 3회 운동하기",
+      createdAt: "2025-11-16",
+      comments: [],
+      reactions: []
     },
     {
       id: 8,
       image:
-        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
-      badge: "🧘‍♀️ 매일 요가",
-      userAvatar:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
-      caption: "여행 중 아침 요가",
-      userName: "엄마",
-      textOverlay: "자연 속에서 하는 요가",
-      createdAt: "2025-11-18",
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+      badge: "🏋️ 웨이트 트레이닝",
+      userAvatar: USERS.dongseok.avatar,
+      caption: "챌린지 4일차",
+      userName: USERS.dongseok.name,
+      textOverlay: "스쿼트 100개!",
+      createdAt: "2025-11-19",
       comments: [],
       reactions: []
     },
     {
       id: 9,
       image:
-        "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=800&q=80",
-      badge: "🥗 건강한 식단",
-      userAvatar:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
-      caption: "새로운 챌린지 시작!",
-      userName: "엄마",
-      textOverlay: "30일 채소 챌린지",
-      createdAt: "2025-11-23",
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+      badge: "🏆 챌린지 완료",
+      userAvatar: USERS.dongseok.avatar,
+      caption: "챌린지 7일차 완료!",
+      userName: USERS.dongseok.name,
+      textOverlay: "마지막 날도 성공!",
+      createdAt: "2025-11-22",
       comments: [],
       reactions: []
     },
     {
       id: 10,
       image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
-      badge: "🏃‍♂️ 주 3회 러닝",
-      userAvatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
-      caption: "10월 산책 기록",
-      userName: "아빠",
-      textOverlay: "가을 산책",
-      createdAt: "2025-10-5",
+        "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
+      badge: "🥗 식단 챌린지",
+      userAvatar: USERS.wellie.avatar,
+      caption: "새로운 챌린지 시작!",
+      userName: USERS.wellie.name,
+      textOverlay: "건강한 식단 3일",
+      createdAt: "2025-11-23",
+      comments: [],
+      reactions: []
+    },
+    {
+      id: 11,
+      image:
+        "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=800&q=80",
+      badge: "🥗 건강한 식단",
+      userAvatar: USERS.wellie.avatar,
+      caption: "식단 챌린지 완료!",
+      userName: USERS.wellie.name,
+      textOverlay: "3일 완주했어요!",
+      createdAt: "2025-11-25",
       comments: [],
       reactions: []
     },
@@ -1119,12 +727,12 @@ export default function App() {
   const handleUpload = (newPost: Omit<Post, "id" | "userName" | "userAvatar">) => {
     const today = new Date();
     const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-    
+
     const post: Post = {
       ...newPost,
       id: Math.max(0, ...posts.map(p => p.id)) + 1,
       userName: userName,
-      userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
+      userAvatar: userAvatar,
       createdAt: newPost.createdAt || dateStr, // 날짜가 없으면 오늘 날짜 사용
     };
     setPosts([post, ...posts]); // 맨 앞에 추가
@@ -1173,8 +781,9 @@ export default function App() {
       return (
         <WelcomePage
           onGuestMode={() => {
-            // 관리자 계정으로 둘러보기 - 온보딩 시작
-            setUserName("관리자");
+            // 김웰리 계정으로 둘러보기 - 온보딩 시작
+            setUserName(USERS.wellie.name);
+            setUserAvatar(USERS.wellie.avatar);
             setIsLoggedIn(true);
             setShowOnboarding(true);
           }}
@@ -1185,7 +794,7 @@ export default function App() {
         />
       );
     }
-    
+
     // Step 2: SNS 로그인 페이지
     if (loginStep === 'social') {
       return (
@@ -1195,7 +804,7 @@ export default function App() {
         />
       );
     }
-    
+
     // Step 3: 이메일 로그인 페이지
     if (loginStep === 'email') {
       return <LoginPage onLogin={handleLogin} />;
@@ -1217,8 +826,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F7F7] flex justify-center">
-      <div className="w-full max-w-[500px] min-h-screen bg-white relative shadow-xl">
+    <div className="min-h-screen bg-[rgb(255,255,255)] flex justify-center">
+      <div className="w-full max-w-[500px] min-h-screen bg-white relative shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
         {currentPage === "home" && (
           <HomePage
             userName={userName}
@@ -1274,10 +883,10 @@ export default function App() {
                 .map(review => ({
                   id: `user-${review.id}`,
                   author: review.userName,
-                  date: new Date(review.createdAt).toLocaleDateString('ko-KR', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit' 
+                  date: new Date(review.createdAt).toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
                   }).replace(/\. /g, '.').replace(/\.$/, ''),
                   rating: review.rating,
                   tags: review.keywords,
@@ -1299,12 +908,17 @@ export default function App() {
               navigateTo("notifications");
             }}
             onDeletePost={handleDeletePost}
+            initialPostId={selectedPostId || undefined}
             posts={posts}
             currentUserName={userName}
             currentUserAvatar={userAvatar}
             // 👇 아래 두 줄 추가
             currentPage="community"
-            onPageChange={(page) => navigateTo(page as Page)}
+            onPageChange={(page) => {
+              // 페이지 변경 시 selectedPostId 초기화
+              setSelectedPostId(null);
+              navigateTo(page as Page);
+            }}
           />
         )}
         {/* 👇 3. '준비중' 텍스트 대신 ProfilePage 컴포넌트로 교체 */}
@@ -1397,12 +1011,12 @@ export default function App() {
                   prevReviews.map(review =>
                     review.id === editingReview.id
                       ? {
-                          ...review,
-                          rating: reviewData.rating,
-                          keywords: reviewData.keywords,
-                          reviewText: reviewData.reviewText,
-                          visitType: reviewData.visitType,
-                        }
+                        ...review,
+                        rating: reviewData.rating,
+                        keywords: reviewData.keywords,
+                        reviewText: reviewData.reviewText,
+                        visitType: reviewData.visitType,
+                      }
                       : review
                   )
                 );
@@ -1478,7 +1092,16 @@ export default function App() {
         )}
         {/* 👇 11. '캘린더' 페이지 추가 */}
         {currentPage === "calendar" && (
-          <CalendarPage onBack={navigateBack} posts={posts} />
+          <CalendarPage
+            onBack={navigateBack}
+            posts={posts}
+            onPostClick={(postId) => {
+              // 해당 포스트 ID 저장
+              setSelectedPostId(postId);
+              // 해당 포스트가 있는 커뮤니티 페이지로 이동
+              navigateTo("community");
+            }}
+          />
         )}
       </div>
       {/* 👇 Toaster 추가 - 화면 하단에 토스트 메시지 표시 */}

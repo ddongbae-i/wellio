@@ -59,7 +59,7 @@ export function HospitalCard({
         }
       }}
       // [스타일] 카드형 디자인 (그림자, 둥근 모서리, 좌우 여백)
-      className="flex flex-col bg-white pt-[22px] pb-[26px] px-5 rounded-[16px] mb-3 shadow-[0_2px_10px_rgba(0,0,0,0.03)] cursor-pointer hover:shadow-md transition-shadow"
+      className="flex flex-col bg-white pt-[22px] pb-[26px] px-5 rounded-[16px] mb-3 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] cursor-pointer hover:shadow-[0_4px_6px_0_rgba(201,208,216,0.25)] transition-shadow"
     >
       {/* 상단: 썸네일 + 텍스트 */}
       <div className="flex gap-4 items-start">
@@ -227,7 +227,7 @@ export default function HospitalSearchPage() {
         {/* 2. 검색창 (이미지 스타일 적용: 민트색 테두리) */}
         <div className="px-4 pb-2">
           <div className="flex items-center gap-3">
-            <div className="flex-1 flex items-center bg-white border-2 border-[#2DC7B7] rounded-[8px] px-3 py-2.5 shadow-sm">
+            <div className="flex-1 flex items-center bg-white border-2 border-[#2DC7B7] rounded-[8px] px-3 py-2.5 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
               <Search
                 size={20}
                 className="text-[#2DC7B7] mr-2"

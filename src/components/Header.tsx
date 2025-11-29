@@ -1,9 +1,10 @@
 import {
-  Bell,
-  ChevronLeft,
   Search,
   Settings,
 } from "lucide-react";
+
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
+import Bell from "../assets/images/icon_alarm.svg";
 
 interface HeaderProps {
   // --- 서브 페이지용 props ---
@@ -33,14 +34,14 @@ export function Header({
   // --- 'title' prop이 있으면 '서브 페이지 헤더' (내 정보) ---
   if (title) {
     return (
-      <header className="sticky top-0 left-0 right-0 z-40 px-4 xs:px-6 sm:px-8 py-4 flex w-full items-center justify-center mx-auto h-16 max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative">
+      <header className="sticky top-0 left-0 right-0 z-40 px-4 xs:px-6 sm:px-8 py-4 flex w-full items-center justify-center mx-auto h-[80px] max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative">
         {/* 왼쪽: 뒤로가기 */}
         {showBackButton && (
           <button
             onClick={handleBack}
             className="absolute left-4 xs:left-6 sm:left-8 p-1 w-6 h-6 flex items-center justify-cente"
           >
-            <ChevronLeft size={24} className="text-gray-700" />
+            <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
           </button>
         )}
         {/* 가운데: 타이틀 */}
@@ -115,7 +116,7 @@ export function Header({
         onClick={onNotificationClick}
         className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors flex-shrink-0"
       >
-        <Bell size={20} className="text-[#1A1A1A]" />
+        <img src={Bell} alt="알림" className="w-6 h-6" />
       </button>
     </header>
   );

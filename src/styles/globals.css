@@ -210,6 +210,16 @@ html {
   font-size: var(--font-size);
 }
 
+/* 모든 요소에 스크롤바 숨기기 */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
 /* 스크롤바 숨기기 */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */

@@ -1,7 +1,7 @@
 "use client";
 
-import { CalendarDays } from "lucide-react";
 import { useState } from "react";
+import CalendarDays from "../assets/images/icon_calendar.svg"
 
 export function CalendarCard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -87,20 +87,19 @@ export function CalendarCard() {
   const weekDays = getDaysInSelectedWeek(selectedDate);
 
   return (
-    // [수정] rounded-t-2xl, overflow-hidden, shadow-md 추가
-    // 반응형 패딩 추가
-    <div className="w-full bg-white rounded-t-2xl overflow-hidden shadow-[0_2px_2.5px_0_#C9D0D833]">
+    <div className="w-full bg-white overflow-hidden shadow-[0_2px_2.5px_0_#C9D0D833]">
       {/* 1. 달력 헤더 (년/월, 아이콘) */}
-      <div className="relative mb-4 px-5 pt-3">
+      <div className="relative mb-4 px-5 pt-4 flex items-center">
         {/* 가운데 정렬된 텍스트 */}
-        <h3 className="text-[19px] font-semibold text-[#202020] text-center">
+        <h3 className="absolute left-1/2 -translate-x-1/2 text-[19px] font-semibold text-[#202020]">
           {formatMonth(currentMonth)}
         </h3>
 
         {/* 오른쪽 정렬 아이콘 */}
-        <CalendarDays
-          size={20}
-          className="text-gray-500 absolute right-5 top-4"
+        <img
+          src={CalendarDays}
+          alt="캘린더_일정"
+          className="w-[24px] h-[24px] ml-auto"
         />
       </div>
       {/* 2. 요일 헤더 삭제됨 */}
@@ -110,13 +109,13 @@ export function CalendarCard() {
         {weekDays.map((day, index) => {
           const isSelected = day === selectedDay;
           const dayOfWeekIndex = index; // 0:월, 1:화, ..., 6:일
-          
+
           // 오늘 날짜 확인
           const today = new Date();
-          const isToday = day !== null && 
-                          day === today.getDate() && 
-                          currentMonth.getMonth() === today.getMonth() && 
-                          currentMonth.getFullYear() === today.getFullYear();
+          const isToday = day !== null &&
+            day === today.getDate() &&
+            currentMonth.getMonth() === today.getMonth() &&
+            currentMonth.getFullYear() === today.getFullYear();
 
           return (
             <div
@@ -127,17 +126,16 @@ export function CalendarCard() {
                 <button
                   onClick={() => handleDayClick(day)}
                   className={`w-full h-full rounded-[12px] flex flex-col justify-center items-center transition-all relative
-                    ${
-                      isSelected
-                        ? "bg-[#2ECACA]" // 선택된 날짜 배경
-                        : "hover:bg-[#f0f0f0]" // 선택 안된 날짜 호버
+                    ${isSelected
+                      ? "bg-[#2ECACA]" // 선택된 날짜 배경
+                      : "hover:bg-[#f0f0f0]" // 선택 안된 날짜 호버
                     }`}
                 >
                   {/* 오늘 날짜 빨간 점 */}
                   {isToday && (
                     <div className="absolute top-1 w-1.5 h-1.5 bg-[#2ECACA] rounded-full"></div>
                   )}
-                  
+
                   {isSelected ? (
                     // --- 1. 선택된 날 (요일 + 흰색 원형 숫자) ---
                     <>
@@ -152,20 +150,18 @@ export function CalendarCard() {
                     // --- 2. 선택되지 않은 날 (요일 + 숫자) ---
                     <>
                       <span
-                        className={`text-[17px] font-medium ${
-                          dayOfWeekIndex === 6
-                            ? "text-red-400"
-                            : "text-gray-500"
-                        }`}
+                        className={`text-[17px] font-medium ${dayOfWeekIndex === 6
+                          ? "text-red-400"
+                          : "text-[#2b2b2b]"
+                          }`}
                       >
                         {daysOfWeek[dayOfWeekIndex]}
                       </span>
                       <div
-                        className={`mt-1 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg text-sm md:text-base font-medium ${
-                          dayOfWeekIndex === 6
-                            ? "text-red-400"
-                            : "text-gray-700"
-                        }`}
+                        className={`mt-1 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg text-[17px] md:text-base font-medium ${dayOfWeekIndex === 6
+                          ? "text-red-400"
+                          : "text-[#2b2b2b]"
+                          }`}
                       >
                         {day}
                       </div>
@@ -179,7 +175,7 @@ export function CalendarCard() {
       </div>
 
       {/* 4. 하단 알림 텍스트 */}
-      <div className="mt-4 pt-4 border-t border-gray-100 px-5 pb-4 text-center">
+      <div className="mt-3 px-5 pb-5 text-center">
         {(() => {
           const schedule = scheduleData[selectedDay.toString()];
           if (schedule) {
@@ -187,9 +183,9 @@ export function CalendarCard() {
             const suffixIndex =
               selectedDay % messageSuffixes.length;
             return (
-              <p className="text-[15px] text-[#202020]">
+              <p className="text-[15px] text-[#202020] xs:text-[17px] xs:font-medium">
                 {schedule.message}{" "}
-                <span className="text-[#2ECACA] font-normal">
+                <span className="text-[#2ECACA] font-normal xs:text-[17px] xs:font-medium">
                   {schedule.highlight}
                 </span>
                 {messageSuffixes[suffixIndex]}
@@ -197,7 +193,7 @@ export function CalendarCard() {
             );
           } else {
             return (
-              <p className="text-[15px] text-[#202020]">
+              <p className="text-[15px] text-[#202020] xs:text-[17px] xs:font-medium">
                 일정이 없습니다
               </p>
             );

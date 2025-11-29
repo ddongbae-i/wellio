@@ -1,5 +1,4 @@
-import image_ad59ec3fafaba2eab87ac3f4761da31b497da3e7 from "figma:asset/ad59ec3fafaba2eab87ac3f4761da31b497da3e7.png";
-import image_b41bc2e4319a3db074275b4da6314c6ddf33f5db from "figma:asset/b41bc2e4319a3db074275b4da6314c6ddf33f5db.png";
+import mainImg from "../assets/images/main.png";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface WelcomePageProps {
@@ -23,7 +22,7 @@ export function WelcomePage({
       {/* 이미지 - 수정된 부분 */}
       <div className="flex-1 flex items-center justify-center md:h-400 my-10 sm:-ml-8 xs:-ml-6 -ml-5">
         <ImageWithFallback
-          src={image_ad59ec3fafaba2eab87ac3f4761da31b497da3e7}
+          src={mainImg}
           alt="doctor illustration"
           className="w-full h-auto object-cover"
         />

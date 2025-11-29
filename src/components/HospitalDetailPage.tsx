@@ -108,7 +108,7 @@ export function HospitalDetailPage({
       : [
           {
             id: 1,
-            author: "김민수",
+            author: "김웰리",
             date: "2025.05.22",
             rating: 5,
             tags: ["진료 만족해요", "친절해요"],
@@ -119,7 +119,7 @@ export function HospitalDetailPage({
           },
           {
             id: 2,
-            author: "박지영",
+            author: "김동석",
             date: "2025.01.29",
             rating: 5,
             tags: [
@@ -134,7 +134,7 @@ export function HospitalDetailPage({
           },
           {
             id: 3,
-            author: "이현우",
+            author: "박승희",
             date: "2024.12.10",
             rating: 4,
             tags: ["대기시간이 짧아요", "친절해요"],
@@ -302,7 +302,7 @@ export function HospitalDetailPage({
   return (
     <div className="relative min-h-screen bg-[#F7F7F7] flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-white px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 relative">
+      <header className="sticky top-0 z-20 px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center bg-[#f7f7f7]/80 backdrop-blur-xs relative h-[80px]">
         <button
           onClick={onBack}
           className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
@@ -316,7 +316,7 @@ export function HospitalDetailPage({
 
       <main className="flex-1 pb-32 overflow-y-auto">
         {/* Top Image Area */}
-        <div className="w-full h-[240px] md:h-[320px] overflow-hidden bg-gray-200">
+        <div className="w-full h-[240px] md:h-[320px] overflow-hidden bg-[#f7f7f7]">
           <ImageWithFallback
             src={hospital.imageUrl}
             alt={hospital.name}
@@ -326,7 +326,7 @@ export function HospitalDetailPage({
 
         {/* Hospital Main Info Card */}
         <div className="relative z-10 mx-4 sm:mx-6 md:mx-8 -mt-20">
-          <div className="bg-white rounded-[16px] shadow-lg px-5 pt-[22px] pb-[26px]">
+          <div className="bg-white rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] px-5 pt-[22px] pb-[26px]">
             {/* Title Row */}
             <div className="flex items-end gap-1 mb-1">
               <h2 className="text-[19px] font-semibold text-[#202020] leading[1.3">
@@ -363,7 +363,7 @@ export function HospitalDetailPage({
         </div>
 
         {/* Insurance Banner */}
-        <div className="mx-4 sm:mx-6 md:mx-8 mt-5 bg-[#E7F8F9] rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+        <div className="mx-4 sm:mx-6 md:mx-8 mt-5 bg-[#E7F8F9] rounded-2xl p-5 flex items-center gap-4 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
           {/* 아이콘 영역 */}
           <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
             <img
@@ -431,7 +431,7 @@ export function HospitalDetailPage({
           <h3 className="text-[19px] font-semibold text-[#202020] mb-2 ml-[6px]">
             병원 위치
           </h3>
-          <div className="bg-white rounded-[16px] shadow-sm overflow-hidden">
+          <div className="bg-white rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden">
             {/* 지도 영역 */}
             <div
               ref={mapRef}
@@ -469,7 +469,7 @@ export function HospitalDetailPage({
           </h3>
 
           {/* 요약 카드 */}
-          <div className="bg-white rounded-[16px] px-5 pt-[22px] pb-[26px] shadow-sm mb-3">
+          <div className="bg-white rounded-[16px] px-5 pt-[22px] pb-[26px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] mb-3">
             <div className="flex gap-4 mb-4">
               <div className="flex items-center justify-center min-w-[80px]">
                 <Star
@@ -531,7 +531,7 @@ export function HospitalDetailPage({
           </div>
 
           {/* 뷰 리스트 카드 */}
-          <div className="bg-white rounded-[16px] px-5 pt-[22px] pb-[26px] shadow-sm">
+          <div className="bg-white rounded-[16px] px-5 pt-[22px] pb-[26px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
             <div className="mb-3 relative">
               <button
                 className="flex items-center gap-1 border border-[#d9d9d9] rounded-full px-[16px] py-[6px] text-[15px] text-[#2b2b2b]"
@@ -541,7 +541,7 @@ export function HospitalDetailPage({
                 <ChevronDown size={14} />
               </button>
               {isFilterOpen && (
-                <div className="absolute top-full mt-2 left-0 bg-white border border-[d9d9d9] rounded-[12px] shadow-lg overflow-hidden z-10 w-24">
+                <div className="absolute top-full mt-2 left-0 bg-white border border-[d9d9d9] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 w-24">
                   <button
                     className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${
                       sortFilter === "popular"
@@ -660,7 +660,7 @@ export function HospitalDetailPage({
           <h3 className="text-[19px] font-semibold text-[#202020] mb-2 ml-[6px]">
             병원 접수 안내
           </h3>
-          <div className="bg-white rounded-[16px] px-5 pt-[22px] pb-[26px] shadow-sm ">
+          <div className="bg-white rounded-[16px] px-5 pt-[22px] pb-[26px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] ">
             <ul className="list-disc list-outside space-y-1 text-sm text-[#2b2b2b] leading-[1.4] list-none">
               <li>
                 [즉시 접수] 후 병원 방문 시 꼭 성함과 함께
@@ -680,7 +680,7 @@ export function HospitalDetailPage({
       </main>
 
       {/* Bottom Fixed Button */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 p-4 bg-white border-t border-gray-100 max-w-[500px] mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 z-20 p-4 bg-white shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] max-w-[500px] mx-auto">
         <div className="flex space-x-3">
           <Button
             variant="outline"

@@ -1,5 +1,6 @@
 import { Header } from "./Header";
 import { BottomNav } from "./BottomNav";
+import { motion } from "motion/react";
 
 interface ProfilePageProps {
   userName: string;
@@ -18,6 +19,28 @@ interface ProfilePageProps {
   onFavoriteHospitalsClick: () => void;
   myReviewsCount?: number;
 }
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: "easeOut"
+    }
+  }
+};
 
 export function ProfilePage({
   userName,
@@ -41,9 +64,14 @@ export function ProfilePage({
       />
 
       {/* 헤더 높이(h-16)만큼 pt-16 추가 */}
-      <main className="flex-grow bg-[#F7F7F7] pb-24">
+      <motion.main 
+        className="flex-grow bg-[#F7F7F7] pb-24"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+      >
         {/* User Info Section */}
-        <div className="py-5 px-5 relative">
+        <motion.div className="py-5 px-5 relative" variants={itemVariants}>
           {/* 프로필 정보 컨테이너 */}
           <div className="flex items-center">
             {/* 1. 프로필 이미지 영역 (100px로 수정됨) */}
@@ -59,7 +87,7 @@ export function ProfilePage({
                 />
               </div>
               {/* 수정 버튼 - 기능 없이 장식용 */}
-              <div className="absolute bottom-0 right-0 bg-white rounded-full p-2 border border-[#d9d9d9] shadow-sm">
+              <div className="absolute bottom-0 right-0 bg-white rounded-full p-2 border border-[#d9d9d9] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-4 w-4 text-[#555555]"
@@ -121,10 +149,10 @@ export function ProfilePage({
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Point Section */}
-        <div className="bg-white mx-5 p-5 rounded-[12px] shadow-sm flex items-center justify-between">
+        <motion.div className="bg-white mx-5 p-5 rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] flex items-center justify-between" variants={itemVariants}>
           <span className="text-[#555555] font-medium text-[17px]">
             보유포인트
           </span>
@@ -147,10 +175,10 @@ export function ProfilePage({
               />
             </svg>
           </div>
-        </div>
+        </motion.div>
 
         {/* Activity Buttons */}
-        <div className="flex bg-white mx-5 rounded-lg shadow-sm mt-3 overflow-hidden">
+        <motion.div className="flex bg-white mx-5 rounded-lg shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] mt-3 overflow-hidden" variants={itemVariants}>
           <button
             className="flex-1 flex items-center justify-center py-3 text-[#555555] font-medium text-[17px]"
             onClick={onMyReviewsClick}
@@ -192,10 +220,10 @@ export function ProfilePage({
             </svg>
             찜한 병원
           </button>
-        </div>
+        </motion.div>
 
         {/* Features Section */}
-        <div className="mt-5 bg-white py-6">
+        <motion.div className="mt-5 bg-white py-6" variants={itemVariants}>
           <div className="px-5 flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -254,10 +282,10 @@ export function ProfilePage({
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
 
         {/* Health Record Section */}
-        <div className="mt-3 bg-white py-6">
+        <motion.div className="mt-3 bg-white py-6" variants={itemVariants}>
           <div className="px-5 flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -318,10 +346,10 @@ export function ProfilePage({
               </svg>
             </li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Customer Service Section */}
-        <div className="mt-3 bg-white py-6">
+        <motion.div className="mt-3 bg-white py-6" variants={itemVariants}>
           <div className="px-5 flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -379,8 +407,8 @@ export function ProfilePage({
               </svg>
             </li>
           </ul>
-        </div>
-      </main>
+        </motion.div>
+      </motion.main>
 
       <BottomNav
         currentPage={currentPage}

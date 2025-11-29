@@ -2,6 +2,7 @@ import { ChevronLeft, Search } from "lucide-react";
 import { useState } from "react";
 import { HospitalCard } from "./HospitalCard"; // 수정된 HospitalCard 임포트
 import { Swiper, SwiperSlide } from "swiper/react";
+import { motion } from "motion/react";
 import "swiper/css";
 
 interface HospitalSearchPageProps {
@@ -125,10 +126,37 @@ export function HospitalSearchPage({
     return name.includes(query) || department.includes(query);
   });
 
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
     <div className="bg-[#f7f7f7] flex flex-col min-h-screen">
       {/* Header: sticky, z-10, bg-white, border-b 유지 */}
-      <header className="sticky top-0 z-10 bg-[#f7f7f7] px-4 xs:px-6 sm:px-8 pt-4 pb-2 space-y-4">
+      <motion.header 
+        className="sticky top-0 z-10 bg-[#f7f7f7]/80 backdrop-blur-xs relative px-4 xs:px-6 sm:px-8 pt-4 pb-2 space-y-4"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         {/* Title Bar */}
         <div className="flex items-center justify-center pb-2 relative">
           <button onClick={onBack} className="absolute left-0 w-10 p-2 -ml-2">
@@ -188,25 +216,31 @@ export function HospitalSearchPage({
             </SwiperSlide>
           ))}
         </Swiper>
-      </header>
+      </motion.header>
 
       {/* Hospital List: 내부 스크롤 방지 유지 */}
-      <div className="overflow-y-hidden pb-20 space-y-3 px-4 xs:px-6 sm:px-8">
+      <motion.div 
+        className="overflow-y-hidden pb-20 space-y-3 px-4 xs:px-6 sm:px-8"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+      >
         <div className="grid grid-cols-1">
-          {filteredHospitals.map((hospital) => (
-            <HospitalCard
-              key={hospital.id}
-              hospital={hospital}
-              onClick={() => onHospitalClick(hospital)}
-              favoriteHospitals={favoriteHospitals}
-              onToggleFavorite={onToggleFavorite}
-              reviewCount={getHospitalReviewCount?.(
-                hospital.id,
-              )}
-            />
+          {filteredHospitals.map((hospital, index) => (
+            <motion.div key={hospital.id} variants={itemVariants}>
+              <HospitalCard
+                hospital={hospital}
+                onClick={() => onHospitalClick(hospital)}
+                favoriteHospitals={favoriteHospitals}
+                onToggleFavorite={onToggleFavorite}
+                reviewCount={getHospitalReviewCount?.(
+                  hospital.id,
+                )}
+              />
+            </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

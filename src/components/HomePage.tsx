@@ -6,6 +6,7 @@ import { CTAButtons } from "./CTAButtons";
 import { BottomNav } from "./BottomNav";
 import { SecondaryMenu } from "./SecondaryMenu";
 import { HealthKnowledge } from "./HealthKnowledge";
+import { motion, type Variants } from "framer-motion";
 
 interface HomePageProps {
   userName: string;
@@ -19,14 +20,41 @@ interface HomePageProps {
       | "medical-history",
   ) => void;
   onHospitalClick?: (hospital: any) => void;
+  onCommunityClick?: (community: any) => void;
   getHospitalReviewCount?: (hospitalId: number) => number;
 }
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: "easeOut"
+    }
+  }
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12 }
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
+};
 
 export function HomePage({
   userName,
   currentPage,
   onPageChange,
   onHospitalClick,
+  onCommunityClick,
   getHospitalReviewCount,
 }: HomePageProps) {
   return (
@@ -40,34 +68,39 @@ export function HomePage({
       {/* [수정] pt-4 제거: UserGreeting의 배경 SVG가 
         화면 상단(헤더 뒤)까지 꽉 차도록 
       */}
-      <main className="bg-[#F7F7F7] pb-24">
-        <UserGreeting userName={userName} />
+      <motion.main 
+        className="bg-[#F7F7F7] pb-24"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+      >
+        <motion.div variants={itemVariants}>
+          <UserGreeting userName={userName} />
+        </motion.div>
 
-        <div className="relative -mt-10 z-10">
-          {" "}
+        <motion.div className="relative -mt-10 z-10" variants={itemVariants}>
           <CalendarCard />
-        </div>
+        </motion.div>
 
-        <div className="px-4 xs:px-6 sm:px-8 mt-5">
+        <motion.div className="px-5 xs:px-6 sm:px-8 mt-5" variants={itemVariants}>
           <CTAButtons
             onHospitalClick={() => onPageChange("hospital")}
             onCommunityClick={() => onPageChange("community")}
           />
-        </div>
+        </motion.div>
 
-        <div className="px-4 xs:px-6 sm:px-8 mt-3">
-          {" "}
+        <motion.div className="px-5 xs:px-6 sm:px-8 mt-3" variants={itemVariants}>
           <SecondaryMenu />
-        </div>
+        </motion.div>
 
-        <div className="px-4 xs:px-6 sm:px-8 mt-5">
+        <motion.div className="px-5 xs:px-6 sm:px-8 mt-5" variants={itemVariants}>
           <PromoBanner />
-        </div>
-        <div className="mt-8">
-          {" "}
+        </motion.div>
+        
+        <motion.div className="mt-8" variants={itemVariants}>
           <HealthKnowledge />
-        </div>
-      </main>
+        </motion.div>
+      </motion.main>
 
       <BottomNav
         currentPage={currentPage}

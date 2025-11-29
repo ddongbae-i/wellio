@@ -26,7 +26,7 @@ export function SocialLoginPage({
       {/* 중앙 콘텐츠 */}
       <div className="flex-1 flex flex-col items-center justify-center max-w-[80%]">
         {/* 아이콘 */}
-        <div className="w-[100px] h-[100px] bg-[#00bcd4] rounded-full flex items-center justify-center mb-8 border-4 border-white shadow-md">
+        <div className="w-[100px] h-[100px] bg-[#00bcd4] rounded-full flex items-center justify-center mb-8 border-4 border-white shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
           <span className="text-6xl">🦉</span>
         </div>
 
@@ -43,24 +43,24 @@ export function SocialLoginPage({
         {/* 소셜 버튼 그룹 */}
         <div className="flex justify-around w-full max-w-[300px] mb-5">
           {/* 카카오톡 */}
-          <button className="w-[50px] h-[50px] rounded-full bg-[#fee500] flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+          <button className="w-[50px] h-[50px] rounded-full bg-[#fee500] flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:scale-110 transition-transform">
             <span className="text-2xl">K</span>
           </button>
 
           {/* 네이버 */}
-          <button className="w-[50px] h-[50px] rounded-full bg-[#03c75a] flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+          <button className="w-[50px] h-[50px] rounded-full bg-[#03c75a] flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:scale-110 transition-transform">
             <span className="text-2xl text-white">N</span>
           </button>
 
           {/* 애플 */}
-          <button className="w-[50px] h-[50px] rounded-full bg-black flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+          <button className="w-[50px] h-[50px] rounded-full bg-black flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:scale-110 transition-transform">
             <span className="text-2xl text-white"></span>
           </button>
 
           {/* 이메일 */}
           <button
             onClick={onEmailLogin}
-            className="w-[50px] h-[50px] rounded-full bg-[#b0bec5] flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+            className="w-[50px] h-[50px] rounded-full bg-[#b0bec5] flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:scale-110 transition-transform"
           >
             <span className="text-2xl">✉️</span>
           </button>

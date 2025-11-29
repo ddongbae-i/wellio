@@ -17,11 +17,12 @@ interface Post {
 interface CalendarPageProps {
   onBack: () => void;
   posts: Post[]; // 커뮤니티 피드 데이터
+  onPostClick?: (postId: number) => void; // 피드 클릭 시 콜백
 }
 
 interface DayData {
   date: number;
-  images?: string[]; // 여러 개의 피드 이미지
+  posts?: Array<{ image: string; id: number }>; // 여러 개의 피드 (이미지 + ID)
   challengeStart?: boolean; // 챌린지 시작
   challengeEnd?: boolean; // 챌린지 끝
   inChallenge?: boolean; // 챌린지 기간 중
@@ -45,19 +46,19 @@ const generateMonthDays = (
   return days;
 };
 
-export function CalendarPage({ onBack, posts }: CalendarPageProps) {
+export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) {
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
   const swiperRef = useRef<SwiperCore | null>(null);
 
-  // 날짜별 피드 이미지 맵핑
+  // 날짜별 피드 맵핑 (이미지와 ID)
   const postsByDate = useMemo(() => {
-    const map: { [key: string]: string[] } = {};
+    const map: { [key: string]: Array<{ image: string; id: number }> } = {};
     posts.forEach((post) => {
       if (post.createdAt) {
         if (!map[post.createdAt]) {
           map[post.createdAt] = [];
         }
-        map[post.createdAt].push(post.image);
+        map[post.createdAt].push({ image: post.image, id: post.id });
       }
     });
     return map;
@@ -116,12 +117,12 @@ export function CalendarPage({ onBack, posts }: CalendarPageProps) {
     idx: number,
   ) => {
     const dateKey = `${year}-${month}-${day.date}`;
-    const feedImages = postsByDate[dateKey] || [];
+    const feedPosts = postsByDate[dateKey] || [];
     const challengeInfo = challengeData[dateKey] || {};
     
     const currentDay = {
       ...day,
-      images: feedImages,
+      posts: feedPosts,
       ...challengeInfo,
     };
 
@@ -156,27 +157,30 @@ export function CalendarPage({ onBack, posts }: CalendarPageProps) {
 
         {isChalllengeStart ? (
           // 챌린지 시작일: 아이콘 표시
-          <div className="w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center text-white shadow-md bg-[#36D2C5]">
+          <div className="w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center text-white shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] bg-[#36D2C5]">
             <Target size={20} className="relative z-10 text-white" />
             <span className="absolute bottom-0.5 text-[9px] font-bold z-10">
               {currentDay.date}
             </span>
           </div>
-        ) : currentDay.images && currentDay.images.length > 0 ? (
-          // 피드가 있는 날짜: 피드 이미지 작게 표시
-          <div className="w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center shadow-md">
+        ) : currentDay.posts && currentDay.posts.length > 0 ? (
+          // 피드가 있는 날짜: 피드 이미지 작게 표시 (클릭 가능)
+          <button
+            onClick={() => onPostClick?.(currentDay.posts![0].id)}
+            className="w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:scale-110 transition-transform"
+          >
             <ImageWithFallback
-              src={currentDay.images[0]}
+              src={currentDay.posts[0].image}
               alt=""
               className="absolute w-full h-full object-cover z-0"
             />
             {/* 이미지 위에 어두운 오버레이 */}
             <div className="absolute inset-0 bg-black opacity-30 z-0" />
             {/* 날짜 숫자 */}
-            <span className="relative z-10 text-white drop-shadow-md">
+            <span className="relative z-10 text-white">
               {currentDay.date}
             </span>
-          </div>
+          </button>
         ) : (
           // 일반 날짜
           <span className="relative z-10 text-gray-700">
@@ -188,7 +192,7 @@ export function CalendarPage({ onBack, posts }: CalendarPageProps) {
   };
 
   return (
-    <div className="h-screen w-full max-w-[500px] mx-auto bg-white flex flex-col relative shadow-xl">
+    <div className="h-screen w-full max-w-[500px] mx-auto bg-white flex flex-col relative shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
       <style>{`
         /* Swiper의 슬라이드가 내용물 크기를 갖도록 조정 */
         .swiper-wrapper {
@@ -200,7 +204,7 @@ export function CalendarPage({ onBack, posts }: CalendarPageProps) {
       `}</style>
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center shadow-sm relative">
+      <div className="sticky top-0 z-10 bg-white px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] relative">
         <button onClick={onBack} className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6">
           <ChevronLeft size={24} className="text-gray-800" />
         </button>

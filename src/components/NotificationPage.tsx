@@ -98,7 +98,7 @@ export function NotificationPage({
         type: "challenge",
         category: "챌린지",
         message:
-          "**김엘리**님 새로운 추천 챌린지가 있어요.\n눌러서 알아보세요.",
+          "**김웰리**님 새로운 추천 챌린지가 있어요.\n눌러서 알아보세요.",
         time: "12시간전",
         isRead: true,
       },
@@ -271,7 +271,7 @@ export function NotificationPage({
                     notification.isRead
                       ? "bg-white"
                       : "bg-[#E2F7F7]"
-                  } relative z-10 rounded-xl p-4 shadow-sm flex items-start gap-4 cursor-pointer transition-shadow hover:shadow-md`}
+                  } relative z-10 rounded-xl p-4 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] flex items-start gap-4 cursor-pointer transition-shadow hover:shadow-[0_4px_6px_0_rgba(201,208,216,0.25)]`}
                 >
                   {/* 아이콘 */}
                   <div
@@ -327,7 +327,7 @@ export function NotificationPage({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", duration: 0.5 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] bg-white rounded-2xl shadow-2xl z-50 overflow-hidden"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] bg-white rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50 overflow-hidden"
             >
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">

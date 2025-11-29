@@ -1,9 +1,6 @@
-// lucide-react에서 임시 아이콘을 가져옵니다.
-import {
-  Headset,
-  ClipboardList,
-  UserCheck,
-} from "lucide-react";
+import WellCoordinator from "../assets/images/icon_main1.svg";
+import OneClick from "../assets/images/icon_main2.svg";
+import CheckupRecords from "../assets/images/icon_main3.svg";
 
 export function SecondaryMenu() {
   return (
@@ -28,11 +25,11 @@ export function SecondaryMenu() {
             />
 
             {/* 실제 콘텐츠는 위에 얹기 위해 z-index */}
-            <Headset
-              size={32}
-              className="relative z-10 text-cyan-500 md:w-10 md:h-10"
-            />
-            <span className="relative z-10 mt-2 text-sm font-normal text-[#202020] xs:text-[17px] xs:font-medium">
+            <img
+              src={WellCoordinator}
+              alt="웰코디"
+              className="w-[50px] h-[50px] xs:w-[60px] xs:h-[60px]" />
+            <span className="relative z-10 mt-2 text-sm font-normal text-[#202020] xs:text-[17px] xs:font-medium ">
               웰코디
             </span>
           </button>
@@ -54,9 +51,10 @@ export function SecondaryMenu() {
                    opacity-100 group-hover:opacity-80 transition-opacity duration-200"
             />
 
-            <Headset
-              size={32}
-              className="relative z-10 text-cyan-500 md:w-10 md:h-10"
+            <img
+              src={OneClick}
+              alt="원클릭"
+              className="w-[50px] h-[50px] xs:w-[60px] xs:h-[60px]"
             />
             <span className="relative z-10 mt-2 text-sm font-normal text-[#202020] xs:text-[17px] xs:font-medium">
               원클릭보험
@@ -68,9 +66,10 @@ export function SecondaryMenu() {
 
       <button className="w-full aspect-square flex flex-col items-center justify-center bg-white rounded-2xl border border-[#d9d9d9] transition-colors">
         {/* TODO: 이 아이콘을 실제 SVG/이미지로 교체하세요 */}
-        <UserCheck
-          size={32}
-          className="text-[#202020] md:w-10 md:h-10"
+        <img
+          src={CheckupRecords}
+          alt="건강검진"
+          className="w-[50px] h-[50px] xs:w-[60px] xs:h-[60px]"
         />
         <span className="mt-2 text-sm font-normal text-[#202020] xs:text-[17px] xs:font-medium">
           건강검진

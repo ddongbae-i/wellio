@@ -63,6 +63,9 @@ export function HospitalReviewsPage({
     "popular" | "latest"
   >("popular");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  // 더보기 버튼 상태 (처음에 10개만 표시)
+  const [visibleCount, setVisibleCount] = useState(10);
 
   // 리뷰 정렬
   const sortedReviews = [...reviews].sort((a, b) => {
@@ -180,7 +183,7 @@ export function HospitalReviewsPage({
               <ChevronDown size={16} />
             </button>
             {isFilterOpen && (
-              <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10 w-24">
+              <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-lg shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 w-24">
                 <button
                   className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${
                     sortFilter === "popular"
@@ -227,82 +230,96 @@ export function HospitalReviewsPage({
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
-            {sortedReviews.map((review) => (
-              <div
-                key={review.id}
-                className="px-[30px] xs:px-8 sm:px-10 py-[28px]"
-              >
-                {/* 헤더: 별점, 유저정보, 좋아요 */}
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={14}
-                        className={`${
-                          i < review.rating
-                            ? "text-[#FFB800] fill-[#FFB800]"
-                            : "fill-[#e8e8e8]"
-                        }`}
-                      />
-                    ))}
-                    <span className="text-[12px] text-[#777777] ml-1">
-                      {maskName(review.author)} | {review.date}{" "}
-                      | {review.visitType || "첫방문"}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() =>
-                      onToggleLike?.(
-                        review.originalId ||
-                          (typeof review.id === "number"
-                            ? review.id
-                            : parseInt(
-                                String(review.id).replace(
-                                  /^(sample-|user-)/,
-                                  "",
-                                ),
-                              )),
-                      )
-                    }
-                    className={`flex items-center gap-1 text-xs transition-colors active:scale-100 ${
-                      review.liked
-                        ? "text-[#36D2C5]"
-                        : "text-[#aeaeae]"
-                    }`}
-                  >
-                    <ThumbsUp
-                      size={16}
-                      className={
-                        review.liked ? "border-[#2ECACA]" : ""
-                      }
-                    />
-                    <span>{review.likes}</span>
-                  </button>
-                </div>
-
-                {/* 태그 */}
-                {review.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {review.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[12px] text-[#239C9C] border border-[#2ECACA] px-2 py-0.5 rounded-full"
-                      >
-                        {tag}
+          <>
+            <div className="divide-y divide-gray-100">
+              {sortedReviews.slice(0, visibleCount).map((review) => (
+                <div
+                  key={review.id}
+                  className="px-[30px] xs:px-8 sm:px-10 py-[28px]"
+                >
+                  {/* 헤더: 별점, 유저정보, 좋아요 */}
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={14}
+                          className={`${
+                            i < review.rating
+                              ? "text-[#FFB800] fill-[#FFB800]"
+                              : "fill-[#e8e8e8 stroke-none"
+                          }`}
+                        />
+                      ))}
+                      <span className="text-[12px] text-[#777777] ml-1">
+                        {maskName(review.author)} | {review.date}{" "}
+                        | {review.visitType || "첫방문"}
                       </span>
-                    ))}
+                    </div>
+                    <button
+                      onClick={() =>
+                        onToggleLike?.(
+                          review.originalId ||
+                            (typeof review.id === "number"
+                              ? review.id
+                              : parseInt(
+                                  String(review.id).replace(
+                                    /^(sample-|user-)/,
+                                    "",
+                                  ),
+                                )),
+                        )
+                      }
+                      className={`flex items-center gap-1 text-xs transition-colors active:scale-100 ${
+                        review.liked
+                          ? "text-[#36D2C5]"
+                          : "text-[#aeaeae]"
+                      }`}
+                    >
+                      <ThumbsUp
+                        size={16}
+                        className={
+                          review.liked ? "border-[#2ECACA]" : ""
+                        }
+                      />
+                      <span>{review.likes}</span>
+                    </button>
                   </div>
-                )}
 
-                {/* 내용 */}
-                <p className="text-[15px] text-gray-700 leading-relaxed whitespace-pre-line">
-                  {review.content}
-                </p>
+                  {/* 태그 */}
+                  {review.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {review.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[12px] text-[#239C9C] border border-[#2ECACA] px-2 py-0.5 rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 내용 */}
+                  <p className="text-[15px] text-gray-700 leading-relaxed whitespace-pre-line">
+                    {review.content}
+                  </p>
+                </div>
+              ))}
+            </div>
+            
+            {/* 더보기 버튼 */}
+            {visibleCount < sortedReviews.length && (
+              <div className="px-4 xs:px-6 sm:px-8 py-6">
+                <button
+                  onClick={() => setVisibleCount(prev => Math.min(prev + 10, sortedReviews.length))}
+                  className="w-full py-3 border border-gray-300 rounded-lg text-[15px] font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  더보기 ({visibleCount} / {sortedReviews.length})
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </main>
     </div>

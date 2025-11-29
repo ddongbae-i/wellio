@@ -11,6 +11,7 @@ import { useState } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Button } from "./ui/button"; // Button 컴포넌트를 사용하기 위해 추가
 import { Swiper, SwiperSlide } from "swiper/react";
+import { motion } from "motion/react";
 import "swiper/css";
 
 interface MedicalHistoryPageProps {
@@ -242,10 +243,37 @@ export function MedicalHistoryPage({
           );
         });
 
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
     <div className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto min-h-screen">
       {/* 🌟 수정된 부분: Header와 Tabs/Filters를 감싸는 하나의 Sticky Container */}
-      <div className="sticky top-0 z-30 bg-[#f7f7f7]">
+      <motion.div 
+        className="sticky top-0 z-30 bg-[#f7f7f7]"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         {/* Header (sticky 속성 제거) */}
         <header className="px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full relative">
           <button
@@ -351,7 +379,7 @@ export function MedicalHistoryPage({
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
       {/* 🌟 수정된 부분 끝 */}
 
       {/* Content */}
@@ -369,7 +397,7 @@ export function MedicalHistoryPage({
               return (
                 <div
                   key={record.id}
-                  className="bg-white rounded-xl shadow-sm space-y-3 pt-[22px] px-[20px] pb-[26px]"
+                  className="bg-white rounded-xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] space-y-3 pt-[22px] px-[20px] pb-[26px]"
                 >
                   {/* 1. 진료코드 + 프로필+이름 */}
                   <div className="flex items-center justify-between mb-3">
@@ -473,7 +501,7 @@ export function MedicalHistoryPage({
               <div
                 key={visit.id}
                 // 카드 스타일: 시안과 같이 배경 흰색, 둥근 모서리, 그림자/테두리 없음
-                className="bg-white rounded-xl pt-[22px] px-[20px] pb-[26px] shadow-none space-y-2.5"
+                className="bg-white rounded-xl pt-[22px] px-[20px] pb-[26px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] space-y-2.5"
               >
                 {/* 1. 병원/약국 이름 */}
                 <div className="text-[19px] font-semibold text-[#2b2b2b] mt-2">

@@ -15,7 +15,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     e.preventDefault();
     // Simple validation
     if (email && password) {
-      onLogin("김건강");
+      onLogin("김웰리");
     }
   };
 
@@ -77,7 +77,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+        <div className="bg-white rounded-3xl p-8 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Input */}
             <div className="space-y-2">

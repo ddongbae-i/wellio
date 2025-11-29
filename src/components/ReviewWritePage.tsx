@@ -3,7 +3,8 @@
 import { ChevronLeft, Star } from "lucide-react";
 import { useState } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
+import { motion } from "motion/react";
 
 interface ReviewWritePageProps {
   onBack: () => void;
@@ -120,7 +121,12 @@ export function ReviewWritePage({
   const isEditMode = !!editingReview;
 
   return (
-    <div className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto min-h-screen">
+    <motion.div 
+      className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto min-h-screen"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       {/* Header */}
       <header className="sticky top-0 z-30 px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 w-full bg-[#f7f7f7] relative">
         <button
@@ -142,7 +148,7 @@ export function ReviewWritePage({
       {/* Content */}
       <div className="pb-32 px-4 xs:px-6 sm:px-8 pt-5 space-y-3">
         {/* 병원 정보 카드 */}
-        <div className="flex items-center bg-white p-4 rounded-[16px] shadow-sm px-5 py-4">
+        <div className="flex items-center bg-white p-4 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] px-5 py-4">
           <div className="w-[48px] h-[48px] rounded-[8px] overflow-hidden border border-[#f0f0f0] flex-shrink-0 mr-4">
             <ImageWithFallback
               src={
@@ -164,7 +170,7 @@ export function ReviewWritePage({
         </div>
 
         {/* 별점 선택 영역 */}
-        <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-sm text-center">
+        <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] text-center">
           <h3 className="text-[#202020] mb-3 text-[17px] font-medium">
             별점을 선택해 주세요.
           </h3>
@@ -191,7 +197,7 @@ export function ReviewWritePage({
         </div>
 
         {/* 키워드 선택 영역 */}
-        <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-sm">
+        <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-[#1A1A1A]">키워드 선택</h3>
             <span
@@ -232,7 +238,7 @@ export function ReviewWritePage({
             }}
             placeholder="선택하신 키워드를 바탕으로 후기를 작성해주세요."
             className="w-full h-[150px] px-5 pt-[22px] pb-[26px] rounded-[16px] resize-none text-sm 
-               focus:outline-none focus:border-[#36D2C5] transition-colors bg-white shadow-lg"
+               focus:outline-none focus:border-[#36D2C5] transition-colors bg-white shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
           />
 
           {/* 글자수 카운트 → 내부 오른쪽 아래 배치 */}
@@ -257,6 +263,6 @@ export function ReviewWritePage({
           {isEditMode ? "수정 완료" : "작성 완료"}
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
