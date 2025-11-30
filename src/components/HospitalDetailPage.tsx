@@ -542,7 +542,7 @@ export function HospitalDetailPage({
                 <img src={ChevronDown} alt="내림" className="w-5 h-5" />
               </button>
               {isFilterOpen && (
-                <div className="absolute top-full mt-2 left-[4px] bg-white border border-[d9d9d9] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 flex flex-col">
+                <div className="absolute top-full mt-2 left-[8px] bg-white border border-[d9d9d9] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 flex flex-col">
                   <button
                     className={` px-5 pt-3 pb-1 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "popular"
                       ? "font-medium text-[#2b2b2b]"

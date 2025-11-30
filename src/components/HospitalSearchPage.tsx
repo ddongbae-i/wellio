@@ -114,11 +114,11 @@ export function HospitalSearchPage({
         </motion.header>
 
         {/* Filter Tags - 헤더 밖, 하지만 sticky 영역 안 */}
-        <div className="filter-swiper-wrapper pb-5 mt-4">
+        <div className="filter-swiper-wrapper pb-3 mt-4">
           <Swiper
             slidesPerView="auto"
             spaceBetween={8}
-            className="w-full !pb-3"
+            className="w-full"
           >
             {filters.map((filter) => (
               <SwiperSlide
@@ -142,7 +142,7 @@ export function HospitalSearchPage({
       </div>
       {/* Hospital List */}
       <motion.div
-        className="overflow-y-hidden pb-10 space-y-3 px-5 xs:px-6 sm:px-8"
+        className="overflow-y-hidden pt-2 pb-10 space-y-3 px-5 xs:px-6 sm:px-8"
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
