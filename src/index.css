@@ -4585,3 +4585,19 @@ html {
   margin-right: 32px; /* 모바일 기준 */
 }
 }
+
+.custom-bullet li {
+  position: relative;
+  padding-left: 8px; /* 불릿과 텍스트 간격 */
+}
+
+.custom-bullet li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 3px;       /* 원 크기 */
+  height: 3px;
+  background: #2b2b2b; /* 원 색상 */
+  border-radius: 50%;
+}

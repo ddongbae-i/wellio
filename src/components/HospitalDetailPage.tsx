@@ -7,7 +7,6 @@ import {
   Star,
   ThumbsUp,
   CheckCircle2,
-  Bot,
   ChevronDown,
   TrendingUp,
 } from "lucide-react";
@@ -20,6 +19,8 @@ import { Button } from "./ui/button";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import Doctor1 from "../assets/images/doctor1.png";
 import Doctor2 from "../assets/images/doctor2.png";
+import OneclickBanner from "../assets/images/oneclick_banner.png";
+import Bot from "../assets/images/welli.svg";
 
 const KAKAO_MAP_API_KEY = "ee7ef6c37b67c27768d7dcb2f13f0a83";
 
@@ -287,10 +288,36 @@ export function HospitalDetailPage({
     "노인진료과",
   ];
 
+  const reviewStats: {
+    keyword: string;
+    count: number;
+    percentage: number;
+  }[] =
+    keywordStats.length > 0
+      ? keywordStats.slice(0, 3)
+      : [
+        {
+          keyword: "과잉진료가 없어요",
+          count: 0,
+          percentage: 96,
+        },
+        {
+          keyword: "친절해요",
+          count: 0,
+          percentage: 92,
+        },
+        {
+          keyword: "재진료 희망해요",
+          count: 0,
+          percentage: 77,
+        },
+      ];
+
+
   return (
     <div className="relative min-h-screen bg-[#F7F7F7] flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-20 px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center bg-[#f7f7f7]/80 backdrop-blur-xs relative h-[80px]">
+      <header className="sticky top-0 z-20 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center bg-[#f7f7f7]/80 backdrop-blur-xs relative h-[80px]">
         <button
           onClick={onBack}
           className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
@@ -313,7 +340,7 @@ export function HospitalDetailPage({
         </div>
 
         {/* Hospital Main Info Card */}
-        <div className="relative z-10 mx-4 sm:mx-6 md:mx-8 -mt-20">
+        <div className="relative z-10 mx-5 sm:mx-6 md:mx-8 -mt-20">
           <div className="bg-white rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] px-5 pt-[22px] pb-[26px]">
             {/* Title Row */}
             <div className="flex items-end gap-1 mb-1">
@@ -351,11 +378,11 @@ export function HospitalDetailPage({
         </div>
 
         {/* Insurance Banner */}
-        <div className="mx-4 sm:mx-6 md:mx-8 mt-5 bg-[#E7F8F9] rounded-2xl p-5 flex items-center gap-4 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
+        <div className="mx-5 sm:mx-6 md:mx-8 mt-5 bg-[#E7F8F9] rounded-[16px] p-4 flex items-center justify-center gap-2 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] h-[76px]">
           {/* 아이콘 영역 */}
-          <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
+          <div className="w-[66px] h-[66px] flex items-center justify-center flex-shrink-0">
             <img
-              src="/images/insurance-icon.png" // 원하는 아이콘 이미지 경로
+              src={OneclickBanner}
               alt="보험 아이콘"
               className="w-full h-full object-contain"
             />
@@ -397,7 +424,7 @@ export function HospitalDetailPage({
             </h3>
           </div>
           <div>
-            <Swiper slidesPerView="auto" spaceBetween={12} className="!px-4 xs:!px-6 sm:!px-8">
+            <Swiper slidesPerView="auto" spaceBetween={12} className="!px-5 xs:!px-6 sm:!px-8">
               {doctors.map((doctor) => (
                 <SwiperSlide key={doctor.id} style={{ width: "263px" }}>
                   <DoctorCard doctor={doctor} />
@@ -408,7 +435,7 @@ export function HospitalDetailPage({
         </div>
 
         {/* 3. 병원 위치 */}
-        <div className="mt-8 px-4 xs:px-6 sm:px-8">
+        <div className="mt-4 px-5 xs:px-6 sm:px-8">
           <h3 className="text-[19px] font-semibold text-[#202020] mb-2 ml-[6px]">
             병원 위치
           </h3>
@@ -462,7 +489,7 @@ export function HospitalDetailPage({
                     {averageRating}
                   </span>
                   <span className="text-[15px] text-[#555555]">
-                    ({reviewCount})
+                    (223)
                   </span>
                 </div>
               </div>
@@ -473,7 +500,7 @@ export function HospitalDetailPage({
               </div>
 
               <div className="flex-1 space-y-1">
-                {keywordStats.slice(0, 3).map((item) => (
+                {reviewStats.map((item) => (
                   <div key={item.keyword}>
                     <span className="text-[15px] text-[#2b2b2b] font-medium">
                       {item.keyword}
@@ -492,9 +519,9 @@ export function HospitalDetailPage({
               </div>
             </div>
 
-            <div className="bg-[#FFF8F8] rounded-xl px-3 py-2 flex flex-col items-center text-center gap-2">
-              <div className="flex items-center gap-2 text-[#0A2E2E] text-[12px] font-medium leading-[1.3]">
-                <Bot size={20} />
+            <div className="bg-[#FFF8F8] rounded-[12px] px-2 py-3 flex flex-col items-center text-center gap-2">
+              <div className="flex items-center gap-2 text-[#0A2E2E] text-[14px] font-normal leading-[1.3]">
+                <img src={Bot} alt="웰리" className="w-[26px] h-[26px]" />
                 <span>AI 웰리 요약</span>
               </div>
               <p className="text-[15px] font-medium text-[#0A2E2E] leading-[1.3]">
@@ -522,11 +549,11 @@ export function HospitalDetailPage({
                 <ChevronDown size={14} />
               </button>
               {isFilterOpen && (
-                <div className="absolute top-full mt-2 left-0 bg-white border border-[d9d9d9] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 w-24">
+                <div className="absolute top-full mt-2 left-[4px] bg-white border border-[d9d9d9] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 flex flex-col">
                   <button
-                    className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "popular"
+                    className={` px-5 pt-3 pb-1 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "popular"
                       ? "font-medium text-[#2b2b2b]"
-                      : ""
+                      : "font-normal text-[#aeaeae]"
                       }`}
                     onClick={() => {
                       setSortFilter("popular");
@@ -536,9 +563,9 @@ export function HospitalDetailPage({
                     인기순
                   </button>
                   <button
-                    className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "latest"
-                      ? "font-bold text-[#aeaeae]"
-                      : ""
+                    className={` px-5 pt-1 pb-3 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "latest"
+                      ? "font-medium text-[#2b2b2b]"
+                      : "font-normal text-[#aeaeae]"
                       }`}
                     onClick={() => {
                       setSortFilter("latest");
@@ -590,7 +617,7 @@ export function HospitalDetailPage({
                         )
                       }
                       className={`flex items-center gap-1 text-xs transition-colors active:scale-100 ${review.liked
-                        ? "text-[#36D2C5]"
+                        ? "text-[#2ECACA]"
                         : "text-[#aeaeae]"
                         }`}
                     >
@@ -624,48 +651,39 @@ export function HospitalDetailPage({
 
             <Button
               variant="outline"
-              className="w-full mt-6 h-12 text-[#2b2b2b] border-[#e8e8e8] rounded-xl bg-white hover:bg-gray-50"
+              className="w-full mt-6 h-12 text-[#2b2b2b] border-[#e8e8e8] rounded-[12px] bg-white hover:bg-gray-50"
               onClick={onReviewsClick}
             >
-              {reviewCount - 3}개 리뷰 더보기
+              220개 리뷰 더보기
             </Button>
           </div>
         </div>
 
         {/* 5. 병원 접수 안내 */}
-        <div className="mt-4 px-4 xs:px-6 sm:px-8">
+        <div className="mt-4 px-5 xs:px-6 sm:px-8 mb-[40px]">
           <h3 className="text-[19px] font-semibold text-[#202020] mb-2 ml-[6px]">
             병원 접수 안내
           </h3>
           <div className="bg-white rounded-[16px] px-5 pt-[22px] pb-[26px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] ">
-            <ul className="list-disc list-outside space-y-1 text-sm text-[#2b2b2b] leading-[1.4] list-none">
-              <li>
-                [즉시 접수] 후 병원 방문 시 꼭 성함과 함께
-                접수처에 말씀해 주세요.
-              </li>
-              <li>
-                접수 후 30분 이내로 미방문 시 자동으로 접수가
-                취소됩니다. 주의 부탁드립니다.
-              </li>
-              <li>
-                현장 접수 하시는 분들로 인하여 대기 현황 및 접수
-                순서는 다를 수 있으니 양해 부탁드립니다.
-              </li>
+            <ul className="custom-bullet space-y-2 text-sm text-[#2b2b2b] leading-[1.4]">
+              <li>[즉시 접수] 후 병원 방문 시 꼭 성함과 함께 접수처에 말씀해 주세요.</li>
+              <li>접수 후 30분 이내로 미방문 시 자동으로 접수가 취소되니 주의 부탁드립니다.</li>
+              <li>현장 접수 하시는 분들로 인하여 대기 현황 및 접수 순서는 다를 수 있으니 양해 부탁드립니다.</li>
             </ul>
           </div>
         </div>
       </main>
 
       {/* Bottom Fixed Button */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 p-4 bg-white shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] max-w-[500px] mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 z-20 px-[28px] pt-5 bg-white shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] max-w-[500px] mx-auto h-[126px]">
         <div className="flex space-x-3">
           <Button
             variant="outline"
-            className="flex-1 h-14 text-lg font-bold border-2 border-[#36D2C5] text-[#36D2C5] bg-white hover:bg-gray-50 rounded-xl"
+            className="flex-1 h-[60px] text-[17px] font-medium border-2 border-[#2ECACA] text-[#239C9C] bg-white hover:bg-gray-50 rounded-[12px]"
           >
             예약하기
           </Button>
-          <Button className="flex-1 h-14 text-lg font-bold bg-[#36D2C5] hover:bg-[#00C2B3] text-white rounded-xl">
+          <Button className="flex-1 h-[60px] text-[17px] font-medium bg-[#2ECACA] hover:bg-[#00C2B3] text-white rounded-[12px]">
             즉시 접수
           </Button>
         </div>

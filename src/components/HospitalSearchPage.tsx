@@ -1,10 +1,10 @@
-import { Search } from "lucide-react";
 import { useState } from "react";
 import { HospitalCard } from "./HospitalCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, type Variants } from "motion/react";
 import "swiper/css";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
+import Search from "../assets/images/icon_search_color.svg";
 
 import { hospitalList } from "./hospitalInfo";
 import type { Hospital } from "./hospitalInfo";
@@ -98,7 +98,7 @@ export function HospitalSearchPage({
           {/* Search */}
           <div className="flex items-center gap-3">
             <div className={`flex-1 rounded-[12px] px-5 py-2 flex items-center gap-2 transition-all border-[1.6px] h-10 bg-white ${isSearchFocused ? "border-[#2ECACA]" : "border-[#2ECACA]"}`}>
-              <Search size={20} className="text-[#2ECACA]" />
+              <img src={Search} alt="검색" className="w-6 h-6" />
               <input
                 type="text"
                 placeholder="진료과, 병원이름을 검색해보세요"

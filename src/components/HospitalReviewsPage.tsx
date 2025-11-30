@@ -63,7 +63,7 @@ export function HospitalReviewsPage({
     "popular" | "latest"
   >("popular");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  
+
   // 더보기 버튼 상태 (처음에 10개만 표시)
   const [visibleCount, setVisibleCount] = useState(10);
 
@@ -82,30 +82,30 @@ export function HospitalReviewsPage({
   const reviewStats =
     keywordStats.length > 0
       ? keywordStats.slice(0, 3).map((stat) => ({
-          label: stat.keyword,
-          percent: stat.percentage,
-        }))
+        label: stat.keyword,
+        percent: stat.percentage,
+      }))
       : [
-          { label: "과잉진료가 없어요", percent: 96 },
-          { label: "친절해요", percent: 92 },
-          { label: "재진료 희망해요", percent: 77 },
-        ];
+        { label: "과잉진료가 없어요", percent: 96 },
+        { label: "친절해요", percent: 92 },
+        { label: "재진료 희망해요", percent: 77 },
+      ];
 
   // 평균 별점 계산
   const averageRating =
     reviews.length > 0
       ? (
-          reviews.reduce(
-            (sum, review) => sum + review.rating,
-            0,
-          ) / reviews.length
-        ).toFixed(1)
+        reviews.reduce(
+          (sum, review) => sum + review.rating,
+          0,
+        ) / reviews.length
+      ).toFixed(1)
       : "4.8";
 
   return (
     <div className="relative min-h-screen bg-white flex flex-col max-w-[500px] mx-auto">
       {/* 1. 헤더 */}
-      <header className="sticky top-0 z-20 bg-white px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 relative">
+      <header className="sticky top-0 z-20 bg-white px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 relative">
         <button
           onClick={onBack}
           className="absolute left-4 xs:left-6 sm:left-8 w-10 h-10 flex items-center justify-start -ml-2"
@@ -185,11 +185,10 @@ export function HospitalReviewsPage({
             {isFilterOpen && (
               <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-lg shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 w-24">
                 <button
-                  className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${
-                    sortFilter === "popular"
+                  className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "popular"
                       ? "font-bold text-[#36D2C5]"
                       : ""
-                  }`}
+                    }`}
                   onClick={() => {
                     setSortFilter("popular");
                     setIsFilterOpen(false);
@@ -198,11 +197,10 @@ export function HospitalReviewsPage({
                   인기순
                 </button>
                 <button
-                  className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${
-                    sortFilter === "latest"
+                  className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "latest"
                       ? "font-bold text-[#36D2C5]"
                       : ""
-                  }`}
+                    }`}
                   onClick={() => {
                     setSortFilter("latest");
                     setIsFilterOpen(false);
@@ -244,11 +242,10 @@ export function HospitalReviewsPage({
                         <Star
                           key={i}
                           size={14}
-                          className={`${
-                            i < review.rating
+                          className={`${i < review.rating
                               ? "text-[#FFB800] fill-[#FFB800]"
                               : "fill-[#e8e8e8 stroke-none"
-                          }`}
+                            }`}
                         />
                       ))}
                       <span className="text-[12px] text-[#777777] ml-1">
@@ -260,21 +257,20 @@ export function HospitalReviewsPage({
                       onClick={() =>
                         onToggleLike?.(
                           review.originalId ||
-                            (typeof review.id === "number"
-                              ? review.id
-                              : parseInt(
-                                  String(review.id).replace(
-                                    /^(sample-|user-)/,
-                                    "",
-                                  ),
-                                )),
+                          (typeof review.id === "number"
+                            ? review.id
+                            : parseInt(
+                              String(review.id).replace(
+                                /^(sample-|user-)/,
+                                "",
+                              ),
+                            )),
                         )
                       }
-                      className={`flex items-center gap-1 text-xs transition-colors active:scale-100 ${
-                        review.liked
+                      className={`flex items-center gap-1 text-xs transition-colors active:scale-100 ${review.liked
                           ? "text-[#36D2C5]"
                           : "text-[#aeaeae]"
-                      }`}
+                        }`}
                     >
                       <ThumbsUp
                         size={16}
@@ -307,7 +303,7 @@ export function HospitalReviewsPage({
                 </div>
               ))}
             </div>
-            
+
             {/* 더보기 버튼 */}
             {visibleCount < sortedReviews.length && (
               <div className="px-4 xs:px-6 sm:px-8 py-6">
