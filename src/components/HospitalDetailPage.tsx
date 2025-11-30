@@ -7,7 +7,6 @@ import {
   Star,
   ThumbsUp,
   CheckCircle2,
-  ChevronDown,
   TrendingUp,
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
@@ -21,6 +20,7 @@ import Doctor1 from "../assets/images/doctor1.png";
 import Doctor2 from "../assets/images/doctor2.png";
 import OneclickBanner from "../assets/images/oneclick_banner.png";
 import Bot from "../assets/images/welli.svg";
+import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
 
 const KAKAO_MAP_API_KEY = "ee7ef6c37b67c27768d7dcb2f13f0a83";
 
@@ -288,30 +288,23 @@ export function HospitalDetailPage({
     "노인진료과",
   ];
 
-  const reviewStats: {
-    keyword: string;
-    count: number;
-    percentage: number;
-  }[] =
-    keywordStats.length > 0
-      ? keywordStats.slice(0, 3)
-      : [
-        {
-          keyword: "과잉진료가 없어요",
-          count: 0,
-          percentage: 96,
-        },
-        {
-          keyword: "친절해요",
-          count: 0,
-          percentage: 92,
-        },
-        {
-          keyword: "재진료 희망해요",
-          count: 0,
-          percentage: 77,
-        },
-      ];
+  const reviewStats = [
+    {
+      keyword: "과잉진료가 없어요",
+      count: 0,
+      percentage: 96,
+    },
+    {
+      keyword: "친절해요",
+      count: 0,
+      percentage: 92,
+    },
+    {
+      keyword: "재진료 희망해요",
+      count: 0,
+      percentage: 77,
+    },
+  ];
 
 
   return (
@@ -324,7 +317,7 @@ export function HospitalDetailPage({
         >
           <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>
-        <h1 className="text-[19px] font-semibold text-[#1A1A1A]">
+        <h1 className="text-[19px] font-semibold text-[#202020]">
           {hospital.name}
         </h1>
       </header>
@@ -546,7 +539,7 @@ export function HospitalDetailPage({
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
               >
                 {sortFilter === "popular" ? "인기순" : "최신순"}{" "}
-                <ChevronDown size={14} />
+                <img src={ChevronDown} alt="내림" className="w-5 h-5" />
               </button>
               {isFilterOpen && (
                 <div className="absolute top-full mt-2 left-[4px] bg-white border border-[d9d9d9] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 flex flex-col">
@@ -590,10 +583,11 @@ export function HospitalDetailPage({
                         <Star
                           key={i}
                           size={14}
-                          className={`${i < review.rating
-                            ? "text-[#FFB800] fill-[#FFB800]"
-                            : "text-gray-200"
-                            }`}
+                          className={
+                            i < review.rating
+                              ? "text-[#FFB800] fill-[#FFB800]"
+                              : "fill-[#e8e8e8] stroke-none"
+                          }
                         />
                       ))}
                       <span className="text-[12px] text-[#777777] ml-1">
@@ -631,7 +625,7 @@ export function HospitalDetailPage({
                     </button>
                   </div>
 
-                  <div className="flex flex-wrap gap-1.5 mb-3">
+                  <div className="flex flex-wrap gap-1 mb-3">
                     {review.tags.map((tag, idx) => (
                       <span
                         key={idx}

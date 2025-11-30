@@ -1,15 +1,14 @@
 "use client";
 
 import {
-  ArrowLeft,
   Star,
   ThumbsUp,
-  Bot,
-  ChevronDown,
-  ChevronLeft,
 } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { useEffect, useState } from "react";
+import Bot from "../assets/images/welli.svg";
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
+import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
 
 // 이름 마스킹 함수 (뒤 2자를 **로 처리)
 const maskName = (name: string): string => {
@@ -51,17 +50,19 @@ export function HospitalReviewsPage({
   reviews = [],
   keywordStats = [],
   onToggleLike,
-  currentUserName,
 }: HospitalReviewsPageProps) {
-  // 페이지 진입 시 최상단으로 스크롤
+  // 👉 실제 서버에 있는 총 리뷰 수 (디자인용 숫자)
+  const TOTAL_REVIEW_COUNT = 223;
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+
   // 필터 상태 관리 ('popular' | 'latest')
-  const [sortFilter, setSortFilter] = useState<
-    "popular" | "latest"
-  >("popular");
+  const [sortFilter, setSortFilter] = useState<"popular" | "latest">(
+    "popular",
+  );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // 더보기 버튼 상태 (처음에 10개만 표시)
@@ -78,48 +79,51 @@ export function HospitalReviewsPage({
     }
   });
 
-  // 리뷰 키워드 통계 데이터 (keywordStats가 비어있으면 기본값 사용)
-  const reviewStats =
-    keywordStats.length > 0
-      ? keywordStats.slice(0, 3).map((stat) => ({
-        label: stat.keyword,
-        percent: stat.percentage,
-      }))
-      : [
-        { label: "과잉진료가 없어요", percent: 96 },
-        { label: "친절해요", percent: 92 },
-        { label: "재진료 희망해요", percent: 77 },
-      ];
-
-  // 평균 별점 계산
+  // 평균 별점 계산 (디테일 페이지와 동일한 느낌으로 사용)
   const averageRating =
     reviews.length > 0
       ? (
-        reviews.reduce(
-          (sum, review) => sum + review.rating,
-          0,
-        ) / reviews.length
+        reviews.reduce((sum, review) => sum + review.rating, 0) /
+        reviews.length
       ).toFixed(1)
       : "4.8";
+
+  const reviewStats = [
+    {
+      keyword: "과잉진료가 없어요",
+      count: 0,
+      percentage: 96,
+    },
+    {
+      keyword: "친절해요",
+      count: 0,
+      percentage: 92,
+    },
+    {
+      keyword: "재진료 희망해요",
+      count: 0,
+      percentage: 77,
+    },
+  ];
 
   return (
     <div className="relative min-h-screen bg-white flex flex-col max-w-[500px] mx-auto">
       {/* 1. 헤더 */}
-      <header className="sticky top-0 z-20 bg-white px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 relative">
+      <header className="sticky top-0 z-20 bg-white px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
         <button
           onClick={onBack}
           className="absolute left-4 xs:left-6 sm:left-8 w-10 h-10 flex items-center justify-start -ml-2"
         >
-          <ChevronLeft size={24} className="text-[#1A1A1A]" />
+          <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>
-        <h1 className="text-[19px] font-semibold text-[#1A1A1A]">
+        <h1 className="text-[19px] font-semibold text-[#202020]">
           {hospitalName}
         </h1>
       </header>
 
       <main className="flex-1 overflow-y-auto pb-6">
-        {/* 2. 상단 요약 섹션 */}
-        <div className="px-4 xs:px-6 sm:px-8 pt-6 pb-8 border-b border-gray-100">
+        {/* 2. 상단 요약 섹션 (디테일 페이지 요약 카드 안쪽 디자인 복붙) */}
+        <div className="px-5 xs:px-6 sm:px-8 pt-[22px] pb-[26px] border-b-[4px] border-[#f7f7f7]">
           <div className="flex gap-4 mb-4">
             <div className="flex items-center justify-center min-w-[80px]">
               <Star
@@ -131,7 +135,7 @@ export function HospitalReviewsPage({
                   {averageRating}
                 </span>
                 <span className="text-[15px] text-[#555555]">
-                  ({reviews.length})
+                  (223)
                 </span>
               </div>
             </div>
@@ -142,7 +146,7 @@ export function HospitalReviewsPage({
             </div>
 
             <div className="flex-1 space-y-1">
-              {keywordStats.slice(0, 3).map((item) => (
+              {reviewStats.map((item) => (
                 <div key={item.keyword}>
                   <span className="text-[15px] text-[#2b2b2b] font-medium">
                     {item.keyword}
@@ -161,9 +165,9 @@ export function HospitalReviewsPage({
             </div>
           </div>
 
-          <div className="bg-[#FFF8F8] rounded-xl px-3 py-2 flex flex-col items-center text-center gap-2">
-            <div className="flex items-center gap-2 text-[#0A2E2E] text-[12px] font-medium leading-[1.3]">
-              <Bot size={20} />
+          <div className="bg-[#FFF8F8] rounded-[12px] px-2 py-3 flex flex-col items-center text-center gap-2">
+            <div className="flex items-center gap-2 text-[#0A2E2E] text-[14px] font-normal leading-[1.3]">
+              <img src={Bot} alt="웰리" className="w-[26px] h-[26px]" />
               <span>AI 웰리 요약</span>
             </div>
             <p className="text-[15px] font-medium text-[#0A2E2E] leading-[1.3]">
@@ -172,64 +176,67 @@ export function HospitalReviewsPage({
           </div>
         </div>
 
-        {/* 3. 필터 및 총 개수 */}
-        <div className="px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-between bg-white">
-          <div className="relative">
-            <button
-              className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-full text-sm font-medium text-gray-700"
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-            >
-              {sortFilter === "popular" ? "인기순" : "최신순"}{" "}
-              <ChevronDown size={16} />
-            </button>
-            {isFilterOpen && (
-              <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-lg shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 w-24">
-                <button
-                  className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "popular"
-                      ? "font-bold text-[#36D2C5]"
-                      : ""
-                    }`}
-                  onClick={() => {
-                    setSortFilter("popular");
-                    setIsFilterOpen(false);
-                  }}
-                >
-                  인기순
-                </button>
-                <button
-                  className={`w-full px-5 pt-3 pb-2 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "latest"
-                      ? "font-bold text-[#36D2C5]"
-                      : ""
-                    }`}
-                  onClick={() => {
-                    setSortFilter("latest");
-                    setIsFilterOpen(false);
-                  }}
-                >
-                  최신순
-                </button>
-              </div>
-            )}
+        {/* 3. 필터 + 총 개수 영역 (버튼 디자인/위치 디테일 페이지와 동일) */}
+        <div className="px-5 xs:px-6 sm:px-8 pt-[28px] bg-white">
+          <div className="flex items-center justify-between">
+            <div className="relative">
+              <button
+                className="flex items-center gap-1 border border-[#d9d9d9] rounded-full px-[16px] py-[6px] text-[15px] text-[#2b2b2b]"
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+              >
+                {sortFilter === "popular" ? "인기순" : "최신순"}{" "}
+                <img src={ChevronDown} alt="내림" className="w-5 h-5" />
+              </button>
+              {isFilterOpen && (
+                <div className="absolute top-full mt-2 left-[8px] bg-white border border-[d9d9d9] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden z-10 flex flex-col">
+                  <button
+                    className={`px-5 pt-3 pb-1 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "popular"
+                      ? "font-medium text-[#2b2b2b]"
+                      : "font-normal text-[#aeaeae]"
+                      }`}
+                    onClick={() => {
+                      setSortFilter("popular");
+                      setIsFilterOpen(false);
+                    }}
+                  >
+                    인기순
+                  </button>
+                  <button
+                    className={`px-5 pt-1 pb-3 text-[15px] text-center hover:bg-gray-50 ${sortFilter === "latest"
+                      ? "font-medium text-[#2b2b2b]"
+                      : "font-normal text-[#aeaeae]"
+                      }`}
+                    onClick={() => {
+                      setSortFilter("latest");
+                      setIsFilterOpen(false);
+                    }}
+                  >
+                    최신순
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <span className="text-sm text-[#2b2b2b]">
+              총 233개
+            </span>
           </div>
-          <span className="text-sm text-gray-500 font-medium">
-            총 {reviews.length}개
-          </span>
         </div>
 
         {/* 4. 리뷰 리스트 */}
         {reviews.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Star size={48} className="text-gray-300 mb-4" />
-            <p className="text-gray-500">
+          <div className="flex flex-col items-center justify-center py-[28px] text-center">
+            <Star size={48} className="text-[#e8e8e8] mb-4" />
+            <p className="text-[#777777] text-[17px]">
               아직 작성된 리뷰가 없습니다
             </p>
-            <p className="text-gray-400 text-sm mt-2">
+            <p className="text-[#777777] text-[17px] mt-2">
               첫 번째 리뷰를 남겨보세요!
             </p>
           </div>
         ) : (
           <>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-[#f0f0f0]">
               {sortedReviews.slice(0, visibleCount).map((review) => (
                 <div
                   key={review.id}
@@ -242,15 +249,16 @@ export function HospitalReviewsPage({
                         <Star
                           key={i}
                           size={14}
-                          className={`${i < review.rating
+                          className={
+                            i < review.rating
                               ? "text-[#FFB800] fill-[#FFB800]"
-                              : "fill-[#e8e8e8 stroke-none"
-                            }`}
+                              : "fill-[#e8e8e8] stroke-none"
+                          }
                         />
                       ))}
                       <span className="text-[12px] text-[#777777] ml-1">
-                        {maskName(review.author)} | {review.date}{" "}
-                        | {review.visitType || "첫방문"}
+                        {maskName(review.author)} | {review.date} |{" "}
+                        {review.visitType || "첫방문"}
                       </span>
                     </div>
                     <button
@@ -268,8 +276,8 @@ export function HospitalReviewsPage({
                         )
                       }
                       className={`flex items-center gap-1 text-xs transition-colors active:scale-100 ${review.liked
-                          ? "text-[#36D2C5]"
-                          : "text-[#aeaeae]"
+                        ? "text-[#36D2C5]"
+                        : "text-[#aeaeae]"
                         }`}
                     >
                       <ThumbsUp
@@ -284,7 +292,7 @@ export function HospitalReviewsPage({
 
                   {/* 태그 */}
                   {review.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-3">
+                    <div className="flex flex-wrap gap-1 mb-3">
                       {review.tags.map((tag) => (
                         <span
                           key={tag}
@@ -308,10 +316,14 @@ export function HospitalReviewsPage({
             {visibleCount < sortedReviews.length && (
               <div className="px-4 xs:px-6 sm:px-8 py-6">
                 <button
-                  onClick={() => setVisibleCount(prev => Math.min(prev + 10, sortedReviews.length))}
-                  className="w-full py-3 border border-gray-300 rounded-lg text-[15px] font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  onClick={() =>
+                    setVisibleCount((prev) =>
+                      Math.min(prev + 10, sortedReviews.length), // 10 → 20 → 30에서 멈춤
+                    )
+                  }
+                  className="w-full mt-6 h-12 text-[#2b2b2b] border border-[#e8e8e8] rounded-[12px] bg-white hover:bg-gray-50"
                 >
-                  더보기 ({visibleCount} / {sortedReviews.length})
+                  더보기 ({visibleCount} / {TOTAL_REVIEW_COUNT})
                 </button>
               </div>
             )}
