@@ -1,6 +1,15 @@
 import { Header } from "./Header";
 import { BottomNav } from "./BottomNav";
 import { motion } from "motion/react";
+import Photo from "../assets/images/my_na.png";
+import FamPlus from "../assets/images/icon_my_fam.svg";
+import Review from "../assets/images/icon_my_review.svg";
+import WhishList from "../assets/images/icon_my_wish.svg";
+import My1 from "../assets/images/icon_my_1.svg";
+import My2 from "../assets/images/icon_my_2.svg";
+import My3 from "../assets/images/icon_my_3.svg";
+import Edit from "../assets/images/icon_list_memo.svg";
+import MyChevronRight from "../assets/images/icon_my_chevron_right.svg";
 
 interface ProfilePageProps {
   userName: string;
@@ -32,8 +41,8 @@ const staggerContainer = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       duration: 0.4,
@@ -64,8 +73,8 @@ export function ProfilePage({
       />
 
       {/* 헤더 높이(h-16)만큼 pt-16 추가 */}
-      <motion.main 
-        className="flex-grow bg-[#F7F7F7] pb-24"
+      <motion.main
+        className="flex-grow bg-[#F7F7F7] pb-[60px]"
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
@@ -79,29 +88,15 @@ export function ProfilePage({
               <div className="w-full h-full rounded-full overflow-hidden">
                 <img
                   src={
-                    userAvatar ||
-                    "https://via.placeholder.com/100x100"
+                    Photo
                   }
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />
               </div>
               {/* 수정 버튼 - 기능 없이 장식용 */}
-              <div className="absolute bottom-0 right-0 bg-white rounded-full p-2 border border-[#d9d9d9] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-[#555555]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  />
-                </svg>
+              <div className="absolute bottom-0 right-0 bg-white rounded-full border border-[#d9d9d9] w-[30px] h-[30px] flex items-center justify-center">
+                <img src={Edit} alt="편집" className="w-5 h-5" />
               </div>
             </div>
 
@@ -112,47 +107,26 @@ export function ProfilePage({
                 <span className="text-[24px] font-semibold tracking-tight">
                   {userName}
                 </span>
-                <span className="text-[24px] text-[#777777] font-semibold">
+                <span className="text-[24px] text-[#777777] font-semibold ml-[2px]">
                   님
                 </span>
               </h2>
 
               {/* 가족관리 링크 (민트색 하트 아이콘) */}
               <button className="group flex items-center text-gray-600">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-5 h-5 text-[#2ECACA] mr-1.5"
-                >
-                  <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-                </svg>
+                <img src={FamPlus} alt="가족관리" className="w-5 h-5 mr-1" />
 
-                <span className="text-[17px] font-medium text-[#555555]">
+                <span className="text-[17px] font-medium text-[#555555] mr-1">
                   가족관리
                 </span>
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 ml-1 text-[#777777]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                <img src={MyChevronRight} alt="바로가기" className="w-5 h-5" />
               </button>
             </div>
           </div>
         </motion.div>
 
         {/* Point Section */}
-        <motion.div className="bg-white mx-5 p-5 rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] flex items-center justify-between" variants={itemVariants}>
+        <motion.div className="bg-white mx-5 px-5 py-[22px] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] flex items-center justify-between" variants={itemVariants}>
           <span className="text-[#555555] font-medium text-[17px]">
             보유포인트
           </span>
@@ -160,64 +134,28 @@ export function ProfilePage({
             <span className="text-[17px] font-medium text-[#202020]">
               2,025P
             </span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-[#777777]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
+            <img src={MyChevronRight} alt="바로가기" className="w-6 h-6" />
           </div>
         </motion.div>
 
         {/* Activity Buttons */}
-        <motion.div className="flex bg-white mx-5 rounded-lg shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] mt-3 overflow-hidden" variants={itemVariants}>
+        <motion.div className="flex bg-white mx-5 rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] mt-3 overflow-hidden" variants={itemVariants}>
           <button
-            className="flex-1 flex items-center justify-center py-3 text-[#555555] font-medium text-[17px]"
+            className="flex-1 flex items-center justify-center py-3 text-[#555555] font-medium text-[17px] cursor-pointer"
             onClick={onMyReviewsClick}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-500 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
+
+            <img src={Review} alt="나의 후기" className="w-5 h-5 mr-[6px]" />
             나의 후기
           </button>
           <span className="text-[#d9d9d9] mx-1 font-medium flex items-center justify-center">
             |
           </span>{" "}
           <button
-            className="flex-1 flex items-center justify-center py-3 text-[#555555] font-medium text-[17px]"
+            className="flex-1 flex items-center justify-center py-3 text-[#555555] font-medium text-[17px] cursor-pointer"
             onClick={onFavoriteHospitalsClick}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-red-500 mr-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M3.172 5.071c-1.472 1.472-1.472 3.869 0 5.341L10 17.341l6.828-6.929c1.472-1.472 1.472-3.869 0-5.341-1.472-1.472-3.869-1.472-5.341 0L10 6.071l-1.487-1.487c-1.472-1.472-3.869-1.472-5.341 0z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <img src={WhishList} alt="찜한 병원" className="w-5 h-5 mr-[6px]" />
             찜한 병원
           </button>
         </motion.div>
@@ -225,20 +163,7 @@ export function ProfilePage({
         {/* Features Section */}
         <motion.div className="mt-5 bg-white py-6" variants={itemVariants}>
           <div className="px-5 flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-yellow-500 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.663 17h4.673M12 3v1c-.512 0-1.026.061-1.536.177M12 3c1.921-.308 3.568.175 4.093 1.391C16.634 5.762 16 7 16 7H8s-.634-1.238-.157-2.609C8.432 3.175 10.079 2.692 12 3zM12 14v5m-3 0h6m-1-4l.117-.008A2 2 0 0013.997 16H16l1-1h1.5l.5-1.5H21a1 1 0 001-1V9a1 1 0 00-1-1h-.5L20 6.5l-.5-1.5H18a1 1 0 00-1-1H7a1 1 0 00-1 1H5l-.5 1.5L4 8H3a1 1 0 00-1 1v4a1 1 0 001 1h.5l.5 1.5H6l1 1h2a2 2 0 001.883 2L12 19h-1z"
-              />
-            </svg>
+            <img src={My1} alt="이런 기능도 있어요" className="w-[30px] h-[30px] mr-2" />
             <h3 className="text-[19px] font-semibold text-[#202020]">
               이런 기능도 있어요
             </h3>
@@ -251,11 +176,10 @@ export function ProfilePage({
             ].map((feature, index) => (
               <li
                 key={index}
-                className={`px-[30px] py-3 flex items-center justify-between last:border-b-0 ${
-                  feature === "가까운 병원 찾기"
-                    ? "cursor-pointer hover:bg-gray-50 transition-colors"
-                    : ""
-                }`}
+                className={`px-[30px] py-3 flex items-center justify-between last:border-b-0 ${feature === "가까운 병원 찾기"
+                  ? "cursor-pointer hover:bg-gray-50 transition-colors"
+                  : ""
+                  }`}
                 onClick={() => {
                   if (feature === "가까운 병원 찾기") {
                     onPageChange("hospital");
@@ -265,20 +189,7 @@ export function ProfilePage({
                 <span className="text-[#555555]">
                   {feature}
                 </span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-[#777777]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                <img src={MyChevronRight} alt="바로가기" className="w-5 h-5 text-[#777777]" />
               </li>
             ))}
           </ul>
@@ -287,20 +198,7 @@ export function ProfilePage({
         {/* Health Record Section */}
         <motion.div className="mt-3 bg-white py-6" variants={itemVariants}>
           <div className="px-5 flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-gray-500 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-              />
-            </svg>
+            <img src={My2} alt="건강 내역" className="w-[30px] h-[30px] mr-2" />
             <h3 className="text-[19px] font-semibold text-[#202020]">
               건강 내역
             </h3>
@@ -311,60 +209,21 @@ export function ProfilePage({
               onClick={() => onPageChange("medical-history")}
             >
               <span className="text-[#555555]">진료 이력</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-[#777777]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <img src={MyChevronRight} alt="바로가기" className="w-5 h-5" />
             </li>
             <li className="px-[30px] py-3 flex items-center justify-between border-b border-gray-100 last:border-b-0">
               <span className="text-[#555555]">
                 건강검진 내역
               </span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-[#777777]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <img src={MyChevronRight} alt="바로가기" className="w-5 h-5" />
             </li>
           </ul>
         </motion.div>
 
         {/* Customer Service Section */}
-        <motion.div className="mt-3 bg-white py-6" variants={itemVariants}>
+        <motion.div className="mt-3 bg-white pt-6 pb-10" variants={itemVariants}>
           <div className="px-5 flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-blue-500 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.128a1 1 0 00-.5 1.21l3.603 6.305a1 1 0 001.21.5l1.128-2.257a1 1 0 011.21-.502l4.493 1.498A1 1 0 0121 15.72V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-              />
-            </svg>
+            <img src={My3} alt="고객센터" className="w-[30px] h-[30px] mr-2" />
             <h3 className="text-[19px] font-semibold text-[#202020]">
               고객센터
             </h3>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import CalendarDays from "../assets/images/icon_calendar.svg"
+import CalendarDays from "../assets/images/icon_calendar.svg";
+
+type DayKey = "월" | "화" | "수" | "목" | "금" | "토" | "일";
 
 export function CalendarCard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -9,51 +11,47 @@ export function CalendarCard() {
   const currentMonth = selectedDate;
   const selectedDay = selectedDate.getDate();
 
-  const daysOfWeek = ["월", "화", "수", "목", "금", "토", "일"];
+  // 월~일
+  const daysOfWeek: DayKey[] = ["월", "화", "수", "목", "금", "토", "일"];
 
-  // 날짜별 일정 데이터
-  const scheduleData: {
-    [key: string]: { message: string; highlight: string };
-  } = {
-    "25": { message: "김웰리님 오늘", highlight: "오후 9시" },
-    "26": {
-      message: "김웰리님 내일",
-      highlight: "오전 8시 30분",
-    },
-    "27": { message: "김웰리님", highlight: "오후 2시" },
-    "28": { message: "김웰리님", highlight: "오후 7시 30분" },
-    "29": { message: "김웰리님", highlight: "오전 11시" },
-    "30": {
-      message: "김웰리님 이번 주말",
-      highlight: "오후 4시",
-    },
-    "1": { message: "김웰리님 다음 달", highlight: "오전 9시" },
+  // ✅ 요일별 일정 데이터 (샘플)
+  const scheduleData: Record<DayKey, { message: string; highlight: string }> = {
+    월: { message: "김웰리님", highlight: "오후 9시" },
+    화: { message: "김동석님", highlight: "오전 9시 30분" },
+    수: { message: "김웰리님", highlight: "오전 9시" },
+    목: { message: "박승희님", highlight: "오후 3시" },
+    금: { message: "김웰리님", highlight: "오전 11시" },
+    토: { message: "김웰리님", highlight: "오전 10시" },
+    일: { message: "박승희님", highlight: "오전 13시" },
   };
 
   // 메시지 접미사 배리에이션
   const messageSuffixes = [
-    "에 투여가 예정되어있습니다",
-    "에 병원 예약이 있습니다",
-    "에 복약 알림이 있습니다",
+    "에 약 복용 시간입니다",
     "에 건강검진 예약이 있습니다",
     "에 약 복용 시간입니다",
     "에 진료 예약이 있습니다",
-    "에 건강 상담 예약이 있습니다",
+    "에 약 복용 시간입니다",
+    "에 진료 예약이 있습니다",
+    "에 약 복용 시간입니다",
   ];
 
+  // 선택된 날짜가 포함된 주의 날짜들 (월~일)
   const getDaysInSelectedWeek = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
 
     const dateObj = new Date(year, month, day);
-    let dayOfWeek = dateObj.getDay();
+    let dayOfWeek = dateObj.getDay(); // 0(일) ~ 6(토)
 
+    // 월요일 시작으로 보정
     if (dayOfWeek === 0) dayOfWeek = 6;
     else dayOfWeek -= 1;
 
     const monday = new Date(year, month, day - dayOfWeek);
-    const week = [];
+    const week: (number | null)[] = [];
+
     for (let i = 0; i < 7; i++) {
       const dayInWeek = new Date(
         monday.getFullYear(),
@@ -86,6 +84,13 @@ export function CalendarCard() {
 
   const weekDays = getDaysInSelectedWeek(selectedDate);
 
+  // ✅ 선택된 날짜의 요일("월"~"일") 구하기
+  const getSelectedDayKey = (date: Date): DayKey => {
+    const jsDay = date.getDay(); // 0:일 ~ 6:토
+    const index = jsDay === 0 ? 6 : jsDay - 1; // 0:월 ~ 6:일 로 보정
+    return daysOfWeek[index];
+  };
+
   return (
     <div className="w-full bg-white overflow-hidden shadow-[0_2px_2.5px_0_#C9D0D833]">
       {/* 1. 달력 헤더 (년/월, 아이콘) */}
@@ -102,7 +107,6 @@ export function CalendarCard() {
           className="w-[24px] h-[24px] ml-auto"
         />
       </div>
-      {/* 2. 요일 헤더 삭제됨 */}
 
       {/* 3. 날짜 그리드 */}
       <div className="grid grid-cols-7 gap-y-1 text-center px-5">
@@ -112,7 +116,8 @@ export function CalendarCard() {
 
           // 오늘 날짜 확인
           const today = new Date();
-          const isToday = day !== null &&
+          const isToday =
+            day !== null &&
             day === today.getDate() &&
             currentMonth.getMonth() === today.getMonth() &&
             currentMonth.getFullYear() === today.getFullYear();
@@ -131,13 +136,13 @@ export function CalendarCard() {
                       : "hover:bg-[#f0f0f0]" // 선택 안된 날짜 호버
                     }`}
                 >
-                  {/* 오늘 날짜 빨간 점 */}
+                  {/* 오늘 날짜 점 표시 */}
                   {isToday && (
                     <div className="absolute top-1 w-1.5 h-1.5 bg-[#2ECACA] rounded-full"></div>
                   )}
 
                   {isSelected ? (
-                    // --- 1. 선택된 날 (요일 + 흰색 원형 숫자) ---
+                    // --- 선택된 날 (요일 + 흰색 박스 숫자) ---
                     <>
                       <span className="text-[17px] font-medium text-white">
                         {daysOfWeek[dayOfWeekIndex]}
@@ -147,7 +152,7 @@ export function CalendarCard() {
                       </div>
                     </>
                   ) : (
-                    // --- 2. 선택되지 않은 날 (요일 + 숫자) ---
+                    // --- 선택되지 않은 날 ---
                     <>
                       <span
                         className={`text-[17px] font-medium ${dayOfWeekIndex === 6
@@ -174,18 +179,21 @@ export function CalendarCard() {
         })}
       </div>
 
-      {/* 4. 하단 알림 텍스트 */}
+      {/* 4. 하단 알림 텍스트 (요일 기반) */}
       <div className="mt-3 px-5 pb-5 text-center">
         {(() => {
-          const schedule = scheduleData[selectedDay.toString()];
+          const dayKey = getSelectedDayKey(selectedDate); // "월" ~ "일"
+          const schedule = scheduleData[dayKey];
+
           if (schedule) {
-            // 날짜를 기반으로 접미사 선택 (일관성 있게)
+            // 요일 기반으로 suffix index도 맞춰줌
             const suffixIndex =
-              selectedDay % messageSuffixes.length;
+              daysOfWeek.indexOf(dayKey) % messageSuffixes.length;
+
             return (
-              <p className="text-[15px] text-[#202020] xs:text-[17px] xs:font-medium">
+              <p className="text-[15px] text-[#202020] xs:text-[17px] ">
                 {schedule.message}{" "}
-                <span className="text-[#2ECACA] font-normal xs:text-[17px] xs:font-medium">
+                <span className="text-[#2ECACA] font-normal xs:text-[17px] ">
                   {schedule.highlight}
                 </span>
                 {messageSuffixes[suffixIndex]}

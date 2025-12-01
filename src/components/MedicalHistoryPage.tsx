@@ -1,9 +1,6 @@
 // src/components/MedicalHistoryPage.tsx
 
 import {
-  ChevronLeft,
-  ChevronDown,
-  Edit,
   Plus,
 } from "lucide-react";
 import { useState } from "react";
@@ -16,6 +13,9 @@ import "swiper/css";
 import { hospitalMap } from "./hospitalInfo"; // 같은 폴더
 import type { PatientId } from "./userProfiles";
 import { patientMap } from "./userProfiles";
+import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
+import Edit from "../assets/images/icon_list_memo.svg";
 
 interface MedicalHistoryPageProps {
   onBack: () => void;
@@ -118,7 +118,7 @@ const mockMedicalVisits: MedicalVisit[] = [
   {
     id: 4,
     type: "hospital",
-    name: "희망찬정신건강의학과 의원",
+    name: "희망찬정신건강의학과의원",
     visitDate: "2025.07.05",
     dayOfWeek: "토",
   },
@@ -128,6 +128,22 @@ const mockMedicalVisits: MedicalVisit[] = [
     name: "서초드림약국",
     visitDate: "2025.07.05",
     dayOfWeek: "월",
+  },
+
+  {
+    id: 6,
+    type: "hospital",
+    name: "오늘도강한내과의원",
+    visitDate: "2025.06.27",
+    dayOfWeek: "금",
+  },
+
+  {
+    id: 3,
+    type: "hospital",
+    name: "희망찬정신건강의학과의원",
+    visitDate: "2025.05.31",
+    dayOfWeek: "토",
   },
 ];
 
@@ -237,7 +253,7 @@ export function MedicalHistoryPage({
             onClick={onBack}
             className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
           >
-            <ChevronLeft size={24} className="text-[#1A1A1A]" />
+            <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
           </button>
           <span className="text-[19px] font-semibold text-[#1A1A1A]">
             진료내역
@@ -250,8 +266,8 @@ export function MedicalHistoryPage({
             <button
               onClick={() => setActiveTab("treatment")}
               className={`flex-1 py-4 text-center transition-colors ${activeTab === "treatment"
-                  ? "text-[#135252] border-b-2 border-[#135252]"
-                  : "text-[#aeaeae]"
+                ? "text-[#135252] border-b-2 border-[#135252] font-semibold"
+                : "text-[#aeaeae] font-medium"
                 }`}
             >
               진료 내역
@@ -259,8 +275,8 @@ export function MedicalHistoryPage({
             <button
               onClick={() => setActiveTab("medical")}
               className={`flex-1 py-4 text-center transition-colors ${activeTab === "medical"
-                  ? "text-[#135252] border-b-2 border-[#135252]"
-                  : "text-[#aeaeae]"
+                ? "text-[#135252] border-b-2 border-[#135252] "
+                : "text-[#aeaeae] font-medium"
                 }`}
             >
               의료 내역
@@ -270,20 +286,18 @@ export function MedicalHistoryPage({
           {/* Filter Tags: 기간검색 + 프로필 Swiper */}
           {activeTab === "treatment" && (
             <div className="flex gap-2 px-4 xs:px-6 sm:px-8 pt-5 pb-3">
+
               {/* 기간검색 버튼 */}
               <button
                 onClick={() => setSelectedFilter("period")}
                 className="px-3 py-2 rounded-full whitespace-nowrap text-sm transition-colors border flex items-center gap-1 bg-[#e8e8e8] border-[#e8e8e8] text-[#2b2b2b] flex-shrink-0"
               >
                 <span>기간검색</span>
-                <ChevronDown
-                  size={16}
-                  className="text-[#555555]"
-                />
+                <img src={ChevronDown} alt="뒤로가기" className="w-5 h-5" />
               </button>
 
-              {/* 프로필 Swiper */}
-              <div className="flex-1 overflow-hidden">
+              {/* 프로필 Swiper — 오른쪽 여백 제거 */}
+              <div className="flex-1 overflow-hidden -mr-4">
                 <Swiper
                   slidesPerView="auto"
                   spaceBetween={8}
@@ -296,20 +310,17 @@ export function MedicalHistoryPage({
                     >
                       <button
                         onClick={() =>
-                          !filter.isAddButton &&
-                          setSelectedFilter(filter.id)
+                          !filter.isAddButton && setSelectedFilter(filter.id)
                         }
-                        className={`px-3 py-2 rounded-full whitespace-nowrap text-sm transition-colors border flex items-center gap-2 ${selectedFilter === filter.id
-                            ? "bg-[#BCEEEE] border-[#BCEEEE] text-[#2b2b2b] font-medium"
+                        className={`pl-2 pr-3 py-[6px] rounded-full whitespace-nowrap text-sm transition-colors border flex items-center gap-1 
+                ${selectedFilter === filter.id
+                            ? "bg-[#E2F7F7] border-[#BCEEEE] text-[#2b2b2b] font-medium "
                             : "border-[#aeaeae] text-[#777] font-normal"
                           }`}
                       >
                         {filter.isAddButton ? (
                           <>
-                            <Plus
-                              size={16}
-                              className="text-[#777]"
-                            />
+                            <Plus size={16} className="text-[#777]" />
                             <span>{filter.label}</span>
                           </>
                         ) : (
@@ -317,7 +328,7 @@ export function MedicalHistoryPage({
                             <ImageWithFallback
                               src={filter.avatar}
                               alt={filter.label}
-                              className="w-5 h-5 rounded-full"
+                              className="w-6 h-6 rounded-full border border-[#f0f0f0]"
                             />
                             <span>{filter.label}</span>
                           </>
@@ -327,13 +338,15 @@ export function MedicalHistoryPage({
                   ))}
                 </Swiper>
               </div>
+
             </div>
           )}
+
         </div>
       </motion.div>
 
       {/* Content */}
-      <div className="px-4 xs:px-6 sm:px-8 pb-20 bg-[#F7F7F7] flex-1">
+      <div className="px-4 xs:px-6 sm:px-8 pb-10 bg-[#F7F7F7] flex-1">
         {activeTab === "treatment" ? (
           // 🔹 진료내역
           <div className="space-y-3">
@@ -411,10 +424,7 @@ export function MedicalHistoryPage({
                   {/* 5. 한줄메모 */}
                   {isMyAppointment && (
                     <div className="bg-[#f7f7f7] rounded-[8px] p-3 text-[15px] text-[#555555] flex items-start gap-1">
-                      <Edit
-                        size={16}
-                        className="text-[#777777] mt-0.5 flex-shrink-0"
-                      />
+                      <img src={Edit} alt="메모" className="w-5 h-5" />
                       <div
                         contentEditable
                         suppressContentEditableWarning
@@ -445,8 +455,8 @@ export function MedicalHistoryPage({
                           }
                         }}
                         className={`flex-1 py-3 h-[48px] text-[14px] font-medium border-1 hover:bg-gray-50 transition-colors ${hasReview
-                            ? "border-[#e8e8e8] text-[#777777] bg-[#ffffff]"
-                            : "border-[#2ECACA] text-[#239C9C] bg-[#ffffff]"
+                          ? "border-[#e8e8e8] text-[#777777] bg-[#ffffff]"
+                          : "border-[#2ECACA] text-[#239C9C] bg-[#ffffff]"
                           }`}
                       >
                         {hasReview ? "작성한 리뷰" : "리뷰쓰기"}
@@ -466,9 +476,9 @@ export function MedicalHistoryPage({
             {mockMedicalVisits.map((visit) => (
               <div
                 key={visit.id}
-                className="bg-white rounded-xl pt-[22px] px-[20px] pb-[26px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] space-y-2.5"
+                className="bg-white rounded-[16px] pt-[22px] px-[20px] pb-[26px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
               >
-                <div className="text-[19px] font-semibold text-[#2b2b2b] mt-2">
+                <div className="text-[19px] font-semibold text-[#2b2b2b] mb-2">
                   {visit.name}
                 </div>
                 <div className="flex items-center gap-4 text-[15px] text-[#777777]">
@@ -481,7 +491,7 @@ export function MedicalHistoryPage({
                 {visit.type === "pharmacy" && (
                   <Button
                     variant="outline"
-                    className="w-full py-3 h-[48px] text-sm font-semibold border-1 border-[#e8e8e8] text-[#2b2b2b] bg-white hover:bg-gray-50 transition-colors mt-3"
+                    className="w-full py-3 h-[48px] text-sm border-1 border-[#e8e8e8] text-[#2b2b2b] bg-white hover:bg-gray-50 transition-colors mt-3"
                   >
                     내가 받은 약 보기
                   </Button>
