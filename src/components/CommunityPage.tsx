@@ -16,19 +16,25 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, AnimatePresence } from "motion/react";
 import confetti from "canvas-confetti";
 import "swiper/css";
 import Bell from "../assets/images/icon_alarm.svg";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
+import { patientMap, type PatientId } from "./userProfiles";
+
+// 👇 이모지 SVG (경로/파일명은 네 프로젝트에 맞게 수정)
+import EmojiHeart from "../assets/emojis/emoji_heart.svg";
+import EmojiSmile from "../assets/emojis/emoji_smile.svg";
+import EmojiThumb from "../assets/emojis/emoji_thumb.svg";
+import EmojiParty from "../assets/emojis/emoji_party.svg";
 
 interface CommunityPageProps {
   onBack: () => void;
   onUploadClick: () => void;
   onNotificationClick?: () => void;
   onDeletePost?: (postId: number) => void;
-  initialPostId?: number; // 캘린더에서 클릭한 포스트 ID
+  initialPostId?: number;
   posts: Array<{
     id: number;
     image: string;
@@ -48,20 +54,19 @@ interface CommunityPageProps {
       timestamp: string;
     }>;
     reactions?: Array<{
-      emoji: string;
+      emoji: string; // 이 값은 "heart" / "smile" / "thumb" / "party" 같은 id 로 맞춰주는 게 좋음
       users: Array<{
         userName: string;
         userAvatar: string;
       }>;
     }>;
   }>;
-  currentUserName: string;
-  currentUserAvatar?: string;
+  currentUserId: PatientId;
   currentPage?: string;
   onPageChange?: (page: any) => void;
 }
 
-// 가족 구성원 목데이터
+// 가족 구성원 목데이터 (표시용)
 const familyMembers = [
   { id: "all", name: "우리가족", avatar: "" },
   {
@@ -84,7 +89,19 @@ const familyMembers = [
   },
 ];
 
-// === [NEW] 드롭다운 컴포넌트 분리 (재사용성 및 가독성 향상) ===
+type EmojiItem = {
+  id: string; // "heart" / "smile" / "thumb" / "party"
+  icon: string; // svg path
+  confetti?: boolean;
+};
+
+const emojiItems: EmojiItem[] = [
+  { id: "heart", icon: EmojiHeart },
+  { id: "smile", icon: EmojiSmile },
+  { id: "thumb", icon: EmojiThumb },
+  { id: "party", icon: EmojiParty, confetti: true },
+];
+
 const FamilyDropdown = ({
   showFamilyDropdown,
   setShowFamilyDropdown,
@@ -103,11 +120,10 @@ const FamilyDropdown = ({
   <AnimatePresence>
     {showFamilyDropdown && (
       <motion.div
-        initial={{ opacity: 0, y: -10 }} // 애니메이션: 위에서 아래로 슬라이드
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
-        // absolute 위치, 버튼 아래에 붙고, 그림자/둥근 모서리 유지
         className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-fit bg-white rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50 overflow-hidden border border-gray-100"
       >
         <div className="p-2 min-w-[140px]">
@@ -160,7 +176,6 @@ const FamilyDropdown = ({
     )}
   </AnimatePresence>
 );
-// ========================================================
 
 export function CommunityPage({
   onBack,
@@ -169,37 +184,32 @@ export function CommunityPage({
   onDeletePost,
   initialPostId,
   posts,
-  currentUserName,
-  currentUserAvatar,
+  currentUserId,
   currentPage,
   onPageChange,
 }: CommunityPageProps) {
-  const [selectedGroup, setSelectedGroup] = useState("우리가족");
   const [selectedFamilyMember, setSelectedFamilyMember] =
     useState<string | null>(null);
   const [showFamilyDropdown, setShowFamilyDropdown] = useState(false);
   const [isGridView, setIsGridView] = useState(false);
   const [isReactionView, setIsReactionView] = useState(false);
 
-  const [reactionFilter, setReactionFilter] = useState("ALL");
+  const [reactionFilter, setReactionFilter] = useState<string>("ALL");
 
   const [selectedPostForReaction, setSelectedPostForReaction] =
     useState<number | null>(null);
   const [newComment, setNewComment] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [currentPostId, setCurrentPostId] = useState<number | null>(
-    null,
-  );
+  const [currentPostId, setCurrentPostId] =
+    useState<number | null>(null);
   const [emojiAnimation, setEmojiAnimation] = useState<{
     emoji: string;
     active: boolean;
   } | null>(null);
 
-  // 이미지 확대 보기(라이트박스) 상태
   const [expandedPostId, setExpandedPostId] = useState<number | null>(
     null,
   );
-  // 애니메이션이 끝날 때까지 z-index를 유지하기 위한 상태
   const [lastExpandedId, setLastExpandedId] = useState<number | null>(
     null,
   );
@@ -215,20 +225,18 @@ export function CommunityPage({
     null,
   );
 
-  const [isScrolling, setIsScrolling] = useState(false);
-  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const postRefs = useRef<{ [key: number]: HTMLDivElement | null }>(
     {},
   );
 
-  // 키보드 감지를 위한 state 추가
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
+  const currentUserProfile = patientMap[currentUserId];
   const currentUser = {
-    userName: currentUserName,
+    userName: currentUserProfile.name,
     userAvatar:
-      currentUserAvatar ||
+      currentUserProfile.avatar ||
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
   };
 
@@ -243,7 +251,7 @@ export function CommunityPage({
 
   const [addedReactions, setAddedReactions] = useState<{
     [postId: number]: Array<{
-      emoji: string;
+      emoji: string; // emojiItems 의 id
       users: Array<{
         userName: string;
         userAvatar: string;
@@ -251,13 +259,10 @@ export function CommunityPage({
     }>;
   }>({});
 
-  const emojis = ["❤️", "😊", "👍", "🎉"];
-
-  // 이모지 애니메이션 상태
   const [floatingEmojis, setFloatingEmojis] = useState<
     Array<{
       id: number;
-      emoji: string;
+      icon: string;
       x: number;
       size: number;
       wobble: number;
@@ -265,45 +270,38 @@ export function CommunityPage({
     }>
   >([]);
 
-  // === [NEW] 댓글 글자수 제한 함수 ===
   function getMaxCommentLength(value: string) {
     const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(value);
-    // 한글 포함 → 28자, 그 외(영어/숫자/기호 등) → 33자
     return hasKorean ? 28 : 33;
   }
 
-  // === [NEW] 애니메이션 실행 로직 분리 ===
-  const triggerReactionAnimation = (emoji: string) => {
-    // 폭죽 이모지일 때는 confetti만 발생하고 이모지는 안 떠오름
-    if (emoji === "🎉") {
+  const triggerReactionAnimation = (emoji: EmojiItem) => {
+    if (emoji.confetti) {
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
       });
-      return; // 폭죽은 이모지 떠오르는 애니메이션 없음
+      return;
     }
 
-    // 다른 이모지들은 떠오르는 애니메이션 생성
-    const count = Math.floor(Math.random() * 9) + 4; // 4~12개
+    const count = Math.floor(Math.random() * 9) + 4;
     const newEmojis = Array.from({ length: count }, (_, i) => ({
       id: Date.now() + i,
-      emoji: emoji,
-      x: (Math.random() - 0.5) * 480, // -240px ~ 240px
-      size: Math.random() * 90 + 30, // 30~120px
-      wobble: (Math.random() - 0.5) * 60, // -30px ~ 30px
-      delay: Math.random() * 2, // 0~2초 딜레이
+      icon: emoji.icon,
+      x: (Math.random() - 0.5) * 480,
+      size: Math.random() * 90 + 30,
+      wobble: (Math.random() - 0.5) * 60,
+      delay: Math.random() * 2,
     }));
     setFloatingEmojis((prev) => [...prev, ...newEmojis]);
 
-    // 5초 후 제거
     setTimeout(() => {
       setFloatingEmojis((prev) =>
         prev.filter((e) => !newEmojis.some((ne) => ne.id === e.id)),
       );
     }, 5000);
   };
-  // ======================================
 
   const handleAddComment = (postId: number) => {
     if (!newComment.trim()) return;
@@ -327,18 +325,16 @@ export function CommunityPage({
     }));
 
     setNewComment("");
-
-    // 댓글 작성 후 해당 게시물의 세부 화면으로 이동
     setSelectedPostForReaction(postId);
   };
 
-  const handleEmojiReaction = (emoji: string, postId: number) => {
-    setEmojiAnimation({ emoji, active: true });
+  const handleEmojiReaction = (emoji: EmojiItem, postId: number) => {
+    setEmojiAnimation({ emoji: emoji.id, active: true });
 
     setAddedReactions((prev) => {
       const existingReactions = prev[postId] || [];
       const existingReactionIndex = existingReactions.findIndex(
-        (r) => r.emoji === emoji,
+        (r) => r.emoji === emoji.id,
       );
 
       if (existingReactionIndex >= 0) {
@@ -367,7 +363,7 @@ export function CommunityPage({
           [postId]: [
             ...existingReactions,
             {
-              emoji,
+              emoji: emoji.id,
               users: [currentUser],
             },
           ],
@@ -379,11 +375,6 @@ export function CommunityPage({
       setEmojiAnimation(null);
     }, 2000);
   };
-
-  const generateRandomPosition = () => ({
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-  });
 
   const getAllComments = (
     postId: number,
@@ -425,17 +416,20 @@ export function CommunityPage({
     }));
   };
 
+  const getEmojiIconById = (id: string) =>
+    emojiItems.find((e) => e.id === id)?.icon || EmojiHeart;
+
+  const getEmojiItemById = (id: string) =>
+    emojiItems.find((e) => e.id === id) || emojiItems[0];
+
   const getFilteredReactionPosts = () => {
-    // 이미지가 있는 포스트만 필터링
     const myReactedPosts = posts.filter((post) => {
       if (!post.image) return false;
 
-      // 1. 내가 작성한 댓글 확인
       const hasMyComment = addedComments[post.id]?.some(
         (comment) => comment.userName === currentUser.userName,
       );
 
-      // 2. 내가 새로 추가한 리액션 확인 (addedReactions)
       const hasMyAddedReaction = addedReactions[post.id]?.some(
         (reaction) =>
           reaction.users.some(
@@ -443,7 +437,6 @@ export function CommunityPage({
           ),
       );
 
-      // 3. 목 데이터의 원래 리액션 확인 (post.reactions)
       const hasMyOriginalReaction = post.reactions?.some((reaction) =>
         reaction.users.some(
           (user) => user.userName === currentUser.userName,
@@ -453,11 +446,11 @@ export function CommunityPage({
       const hasMyReaction =
         hasMyComment || hasMyAddedReaction || hasMyOriginalReaction;
 
-      // 4. 특정 인물이 선택된 경우 교집합 필터링
       if (selectedFamilyMember) {
-        const isMe = selectedFamilyMember === currentUserName;
+        const isMe =
+          selectedFamilyMember === currentUser.userName;
         if (isMe) {
-          return hasMyReaction && post.userName === currentUserName;
+          return hasMyReaction && post.userName === currentUser.userName;
         } else {
           const nameMapping: { [key: string]: string } = {
             엄마: "박승희",
@@ -476,7 +469,6 @@ export function CommunityPage({
       return myReactedPosts;
     }
 
-    // 특정 이모지로 필터링
     return myReactedPosts.filter((post) => {
       const hasAddedReaction = addedReactions[post.id]?.some(
         (reaction) =>
@@ -498,12 +490,10 @@ export function CommunityPage({
     });
   };
 
-  // 내가 사용한 리액션 이모지 목록 추출
   const getMyUsedEmojis = () => {
     const usedEmojis = new Set<string>();
 
     posts.forEach((post) => {
-      // 원래 있던 리액션
       post.reactions?.forEach((reaction) => {
         if (
           reaction.users.some(
@@ -514,7 +504,6 @@ export function CommunityPage({
         }
       });
 
-      // 새로 추가한 리액션
       addedReactions[post.id]?.forEach((reaction) => {
         if (
           reaction.users.some(
@@ -542,7 +531,6 @@ export function CommunityPage({
     setPostToDelete(null);
   };
 
-  // 라이트박스 닫기 핸들러
   const handleCloseLightbox = () => {
     setLastExpandedId(expandedPostId);
     setExpandedPostId(null);
@@ -550,9 +538,10 @@ export function CommunityPage({
 
   const filteredPosts = posts.filter((post) => {
     if (selectedFamilyMember) {
-      const isMe = selectedFamilyMember === currentUserName;
+      const isMe =
+        selectedFamilyMember === currentUser.userName;
       if (isMe) {
-        if (post.userName !== currentUserName) {
+        if (post.userName !== currentUser.userName) {
           return false;
         }
       } else {
@@ -586,14 +575,12 @@ export function CommunityPage({
 
   const expandedPost = posts.find((p) => p.id === expandedPostId);
 
-  // 초기 로드 시 첫 번째 피드의 ID를 currentPostId로 설정
   useEffect(() => {
     if (filteredPosts.length > 0 && !currentPostId) {
       setCurrentPostId(filteredPosts[0].id);
     }
   }, [filteredPosts, currentPostId]);
 
-  // 캘린더에서 클릭한 포스트로 스크롤
   useEffect(() => {
     if (
       initialPostId &&
@@ -617,7 +604,7 @@ export function CommunityPage({
     }
   }, [initialPostId, isGridView, isReactionView]);
 
-  // 모바일 키보드 감지
+  // 모바일 키보드 감지 + 키보드 때 스냅 제거
   useEffect(() => {
     if (typeof window === "undefined" || !window.visualViewport)
       return;
@@ -723,7 +710,6 @@ export function CommunityPage({
               />
             </button>
 
-            {/* Grid View - 드롭다운 Anchor */}
             <div className="relative z-50">
               <button
                 className="flex items-center gap-1"
@@ -736,7 +722,7 @@ export function CommunityPage({
                     ? familyMembers.find(
                       (m) =>
                         (m.id === "me"
-                          ? currentUserName
+                          ? currentUser.userName
                           : m.name) === selectedFamilyMember,
                     )?.name || "모아보기"
                     : "모아보기"}
@@ -752,7 +738,7 @@ export function CommunityPage({
                 familyMembers={familyMembers}
                 selectedFamilyMember={selectedFamilyMember}
                 setSelectedFamilyMember={setSelectedFamilyMember}
-                currentUserName={currentUserName}
+                currentUserName={currentUser.userName}
               />
             </div>
 
@@ -776,7 +762,6 @@ export function CommunityPage({
               />
             </button>
 
-            {/* Default View - 드롭다운 Anchor */}
             <div className="relative z-50">
               <button
                 className="flex items-center gap-1"
@@ -789,7 +774,7 @@ export function CommunityPage({
                     ? familyMembers.find(
                       (m) =>
                         (m.id === "me"
-                          ? currentUserName
+                          ? currentUser.userName
                           : m.name) === selectedFamilyMember,
                     )?.name || "우리가족"
                     : "우리가족"}
@@ -805,7 +790,7 @@ export function CommunityPage({
                 familyMembers={familyMembers}
                 selectedFamilyMember={selectedFamilyMember}
                 setSelectedFamilyMember={setSelectedFamilyMember}
-                currentUserName={currentUserName}
+                currentUserName={currentUser.userName}
               />
             </div>
 
@@ -830,7 +815,7 @@ export function CommunityPage({
         )}
       </header>
 
-      {/* Content Area - Header(110px)와 BottomNav(80px)를 제외한 높이 계산 */}
+      {/* Content Area */}
       <div
         className="w-full overflow-hidden"
         style={{
@@ -854,16 +839,20 @@ export function CommunityPage({
                 ALL
               </button>
 
-              {emojis.map((emoji) => (
+              {emojiItems.map((emoji) => (
                 <button
-                  key={emoji}
-                  onClick={() => setReactionFilter(emoji)}
-                  className={`flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center text-2xl transition-all border-2 ${reactionFilter === emoji
+                  key={emoji.id}
+                  onClick={() => setReactionFilter(emoji.id)}
+                  className={`flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center transition-all border-2 ${reactionFilter === emoji.id
                       ? "bg-[#FFF8F8] border-[#36D2C5]"
                       : "bg-[#F0F0F0] border-transparent"
                     }`}
                 >
-                  {emoji}
+                  <img
+                    src={emoji.icon}
+                    alt={emoji.id}
+                    className="w-7 h-7 object-contain"
+                  />
                 </button>
               ))}
             </div>
@@ -878,7 +867,7 @@ export function CommunityPage({
                   <p className="text-gray-500">
                     {reactionFilter === "ALL"
                       ? "아직 리액션한 게시물이 없습니다"
-                      : `${reactionFilter} 반응을 남긴 게시물이 없습니다`}
+                      : `해당 리액션을 남긴 게시물이 없습니다`}
                   </p>
                   <p className="text-gray-400 text-sm mt-2">
                     댓글이나 이모지를 남겨보세요!
@@ -912,7 +901,11 @@ export function CommunityPage({
                       />
                       {reactionFilter !== "ALL" && (
                         <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
-                          {reactionFilter}
+                          <img
+                            src={getEmojiIconById(reactionFilter)}
+                            alt={reactionFilter}
+                            className="w-4 h-4 object-contain"
+                          />
                         </div>
                       )}
                     </motion.div>
@@ -960,30 +953,29 @@ export function CommunityPage({
             className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide ${!isKeyboardVisible ? "snap-y snap-mandatory" : ""
               }`}
           >
-            {filteredPosts.map((post, index) => {
+            {filteredPosts.map((post) => {
               const isDeleting = postToDelete === post.id;
               return (
                 <div
                   ref={(el) => {
                     postRefs.current[post.id] = el;
                   }}
-                  className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 justify-center
-                  ${!isKeyboardVisible
-                      ? "snap-start snap-always"
-                      : ""
-                    }
-                  ${isKeyboardVisible
-                      ? "pt-12 overflow-y-auto"
-                      : ""
+                  className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 ${!isKeyboardVisible ? "snap-start snap-always" : ""
                     }`}
                   key={post.id}
                   style={{
-                    height: "calc(100vh - 160px)", // 헤더(110px) + nav(80px)
-                    minHeight: "calc(100vh - 160px)",
+                    // 👉 키보드 올라왔을 때는 강제 height 를 풀어서 이미지가 눌리지 않고,
+                    // 그냥 위로 밀리면서 전체가 스크롤 되게 함
+                    height: isKeyboardVisible
+                      ? "auto"
+                      : "calc(100vh - 160px)",
+                    minHeight: isKeyboardVisible
+                      ? "auto"
+                      : "calc(100vh - 160px)",
                   }}
                 >
-                  <div>
-                    <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
+                  <div className="w-full">
+                    <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-w-[335px]">
                       {post.userName === currentUser.userName &&
                         isDragging && (
                           <div className="absolute inset-y-0 -right-8 w-24 flex items-center justify-start z-0 pr-4">
@@ -994,10 +986,9 @@ export function CommunityPage({
                           </div>
                         )}
                       <motion.div
-                        className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] touch-none"
+                        className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] touch-none bg-gray-100"
                         drag={
-                          !isScrolling &&
-                            post.userName === currentUser.userName
+                          post.userName === currentUser.userName
                             ? "x"
                             : false
                         }
@@ -1035,8 +1026,10 @@ export function CommunityPage({
                         <ImageWithFallback
                           src={post.image}
                           alt="Community post"
-                          className="w-full h-full object-cover bg-gray-100 pointer-events-none"
+                          className="w-full h-full object-cover pointer-events-none"
                         />
+
+                        {/* ====== 오버레이 (리액션/댓글 보기) ====== */}
                         {selectedPostForReaction === post.id && (
                           <div
                             className="absolute inset-0 bg-black/70 z-10 flex flex-col cursor-pointer"
@@ -1045,7 +1038,6 @@ export function CommunityPage({
                               setSelectedPostForReaction(null);
                             }}
                           >
-                            {/* 리액션 묶음 표시 */}
                             {getAllReactions(
                               post.id,
                               post.reactions,
@@ -1057,61 +1049,64 @@ export function CommunityPage({
                                   ).map((reaction) => (
                                     <div
                                       key={reaction.emoji}
-                                      className="rounded-full pl-2 pr-3 py-1.5 flex items-center gap-2"
+                                      className="rounded-full pl-2 pr-3 py-1.5 flex items-center gap-2 bg-white/85 backdrop-blur-sm"
                                       onClick={(e) => {
                                         e.stopPropagation();
+                                        const item =
+                                          getEmojiItemById(
+                                            reaction.emoji,
+                                          );
                                         triggerReactionAnimation(
-                                          reaction.emoji,
+                                          item,
                                         );
                                       }}
                                     >
-                                      <span className="text-base">
-                                        {reaction.emoji}
-                                      </span>
+                                      <img
+                                        src={getEmojiIconById(
+                                          reaction.emoji,
+                                        )}
+                                        alt={reaction.emoji}
+                                        className="w-5 h-5 object-contain"
+                                      />
 
                                       <div className="flex -space-x-3">
                                         {reaction.users
                                           .slice(0, 3)
-                                          .map(
-                                            (user, userIdx) => (
-                                              <ImageWithFallback
-                                                key={`${reaction.emoji}-${user.userName}-${userIdx}`}
-                                                src={
-                                                  user.userAvatar
-                                                }
-                                                alt={user.userName}
-                                                className={`w-6 h-6 rounded-full object-cover border border-[#f0f0f0] transition-all duration-300 ${userIdx === 0
-                                                    ? "ml-0"
-                                                    : ""
-                                                  }`}
-                                                style={{
-                                                  zIndex:
-                                                    reaction.users
-                                                      .length -
-                                                    userIdx,
-                                                }}
-                                              />
-                                            ),
-                                          )}
+                                          .map((user, userIdx) => (
+                                            <ImageWithFallback
+                                              key={`${reaction.emoji}-${user.userName}-${userIdx}`}
+                                              src={
+                                                user.userAvatar
+                                              }
+                                              alt={user.userName}
+                                              className={`w-6 h-6 rounded-full object-cover border border-[#f0f0f0] transition-all duration-300 ${userIdx === 0
+                                                  ? "ml-0"
+                                                  : ""
+                                                }`}
+                                              style={{
+                                                zIndex:
+                                                  reaction.users
+                                                    .length - userIdx,
+                                              }}
+                                            />
+                                          ))}
 
-                                        {reaction.users.length >
-                                          3 && (
-                                            <div
-                                              className="w-7 h-7 rounded-full bg-gray-500/80 backdrop-blur-sm flex items-center justify-center text-white text-xs font-semibold border-2 border-white relative"
-                                              style={{ zIndex: 0 }}
-                                            >
-                                              +
-                                              {reaction.users.length -
-                                                3}
-                                            </div>
-                                          )}
+                                        {reaction.users.length > 3 && (
+                                          <div
+                                            className="w-7 h-7 rounded-full bg-gray-500/80 backdrop-blur-sm flex items-center justify-center text-white text-xs font-semibold border-2 border-white relative"
+                                            style={{ zIndex: 0 }}
+                                          >
+                                            +
+                                            {reaction.users.length -
+                                              3}
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   ))}
                                 </div>
                               )}
 
-                            {/* Pressed 상태의 프로필 캡슐 */}
                             {(post.textOverlay ||
                               post.userName) && (
                                 <div className="absolute bottom-5 left-5 flex items-center gap-3 z-20 max-w-[90%]">
@@ -1119,9 +1114,9 @@ export function CommunityPage({
                                     <ImageWithFallback
                                       src={post.userAvatar}
                                       alt={post.userName}
-                                      className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0] -my-4 -ml-2"
+                                      className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0]"
                                     />
-                                    <p className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink">
+                                    <p className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate">
                                       {post.textOverlay ||
                                         post.userName}
                                     </p>
@@ -1140,14 +1135,14 @@ export function CommunityPage({
                                   ).map((comment, idx) => (
                                     <div
                                       key={`comment-${post.id}-${idx}-${comment.userName}-${comment.timestamp}`}
-                                      className="inline-flex flex-row-reverse items-center bg-white/75 backdrop-blur-sm rounded-full pl-4 pr-2 py-2"
+                                      className="inline-flex flex-row-reverse items-center bg-white/80 backdrop-blur-sm rounded-full pl-4 pr-2 py-2"
                                     >
                                       <ImageWithFallback
                                         src={comment.userAvatar}
                                         alt={comment.userName}
-                                        className="w-10 h-10 rounded-full object-cover -my-4 -mr-2 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+                                        className="w-10 h-10 rounded-full object-cover shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
                                       />
-                                      <p className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink mr-1">
+                                      <p className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[220px] truncate mr-1">
                                         {comment.text}
                                       </p>
                                     </div>
@@ -1157,6 +1152,7 @@ export function CommunityPage({
                           </div>
                         )}
 
+                        {/* ====== 기본 상태 오버레이 ====== */}
                         {selectedPostForReaction !== post.id && (
                           <>
                             <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
@@ -1215,20 +1211,19 @@ export function CommunityPage({
                                 </div>
                               )}
 
-                            {/* 하단 프로필 캡슐 및 댓글 카운트 */}
                             <div className="absolute bottom-5 left-5 flex items-center gap-2 z-10 max-w-[90%]">
                               <div className="inline-flex items-center bg-white/70 backdrop-blur-sm rounded-full pl-1 pr-4 py-2 gap-2">
                                 <ImageWithFallback
                                   src={
                                     post.userName ===
-                                      currentUserName
-                                      ? currentUserAvatar
+                                      currentUser.userName
+                                      ? currentUser.userAvatar
                                       : post.userAvatar
                                   }
                                   alt={post.userName}
-                                  className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0] -my-4 -ml-2 "
+                                  className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0]"
                                 />
-                                <span className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink">
+                                <span className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate">
                                   {post.textOverlay ||
                                     post.userName}
                                 </span>
@@ -1246,7 +1241,7 @@ export function CommunityPage({
                                   post.id,
                                   post.comments,
                                 ).length > 0 && (
-                                    <span className="absolute top-[1px] right-[1px] w-[10px] h-[10px] bg-[#FF3333] rounded-full"></span>
+                                    <span className="absolute top-[1px] right-[1px] w-[10px] h-[10px] bg-[#FF3333] rounded-full" />
                                   )}
                               </div>
                             </div>
@@ -1263,7 +1258,9 @@ export function CommunityPage({
                               onClick={() => {
                                 setCurrentPostId(post.id);
                                 setShowEmojiPicker(
-                                  !showEmojiPicker,
+                                  currentPostId === post.id
+                                    ? !showEmojiPicker
+                                    : true,
                                 );
                               }}
                             >
@@ -1290,7 +1287,7 @@ export function CommunityPage({
                                     transition={{
                                       duration: 0.2,
                                     }}
-                                    className="absolute inset-0 flex items-center justify-center rounded-full"
+                                    className="absolute inset-0 flex items-center justify-center rounded-full bg-[#F5F5F5]/80"
                                   >
                                     <X size={20} />
                                   </motion.div>
@@ -1345,9 +1342,9 @@ export function CommunityPage({
                                     }}
                                     className="absolute inset-0 flex items-center gap-2 overflow-x-auto no-scrollbar"
                                   >
-                                    {emojis.map((emoji) => (
+                                    {emojiItems.map((emoji) => (
                                       <button
-                                        key={emoji}
+                                        key={emoji.id}
                                         onClick={() => {
                                           handleEmojiReaction(
                                             emoji,
@@ -1357,9 +1354,13 @@ export function CommunityPage({
                                             emoji,
                                           );
                                         }}
-                                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-2xl bg-[#F5F5F5]/80 backdrop-blur-md rounded-full transition-colors"
+                                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-[#F5F5F5]/80 backdrop-blur-md rounded-full transition-colors"
                                       >
-                                        {emoji}
+                                        <img
+                                          src={emoji.icon}
+                                          alt={emoji.id}
+                                          className="w-6 h-6 object-contain"
+                                        />
                                       </button>
                                     ))}
                                   </motion.div>
@@ -1388,8 +1389,7 @@ export function CommunityPage({
                                       placeholder="댓글을 작성해주세요"
                                       className="w-full bg-transparent outline-none text-[#2b2b2b] placeholder:text-[#aeaeae]"
                                       value={
-                                        currentPostId ===
-                                          post.id
+                                        currentPostId === post.id
                                           ? newComment
                                           : ""
                                       }
@@ -1407,8 +1407,7 @@ export function CommunityPage({
                                             value,
                                           );
                                         const trimmed =
-                                          value.length <=
-                                            maxLen
+                                          value.length <= maxLen
                                             ? value
                                             : value.slice(
                                               0,
@@ -1502,7 +1501,7 @@ export function CommunityPage({
         )}
       </AnimatePresence>
 
-      {/* 이미지 확대 보기 모달 (Lightbox) */}
+      {/* Lightbox */}
       <AnimatePresence>
         {expandedPostId && expandedPost && (
           <motion.div
@@ -1527,7 +1526,7 @@ export function CommunityPage({
         )}
       </AnimatePresence>
 
-      {/* 커뮤니티 전용 하단 네비게이션 (80px) */}
+      {/* 하단 네비 */}
       {!isGridView && !isReactionView && (
         <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[500px] mx-auto bg-white">
           <div className="relative px-4 pt-2 pb-4 shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] h-[80px]">
@@ -1593,12 +1592,17 @@ export function CommunityPage({
             }}
             className="fixed pointer-events-none z-[100]"
             style={{
-              fontSize: `${item.size}px`,
+              width: item.size,
+              height: item.size,
               left: "50%",
               bottom: 80,
             }}
           >
-            {item.emoji}
+            <img
+              src={item.icon}
+              alt=""
+              className="w-full h-full object-contain"
+            />
           </motion.div>
         ))}
       </AnimatePresence>
