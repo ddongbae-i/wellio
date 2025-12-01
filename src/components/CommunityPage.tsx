@@ -181,6 +181,26 @@ export function CommunityPage({
   // 키보드 & 뷰포트 높이
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
+  useEffect(() => {
+    const initialHeight = window.innerHeight;
+
+    const handleResize = () => {
+      const newHeight = window.innerHeight;
+      const diff = initialHeight - newHeight;
+
+      // 대략 150px 이상 줄어들면 키보드 떴다고 판단
+      if (diff > 150) {
+        setIsKeyboardVisible(true);
+      } else if (diff < 50) {
+        // 거의 원래 높이로 돌아오면 키보드 내려간 걸로 판단
+        setIsKeyboardVisible(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
 
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [baseScreenHeight, setBaseScreenHeight] = useState<number | null>(null);
@@ -228,7 +248,7 @@ export function CommunityPage({
     }>;
   }>({});
 
-  const emojis = ["❤️", "😊", "👍", "🎉"];
+  const emojis = ["❤️", "🔥", "👍", "🎉"];
 
   // 이모지 떠오르는 애니메이션
   const [floatingEmojis, setFloatingEmojis] = useState<

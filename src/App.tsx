@@ -930,7 +930,7 @@ export default function App() {
         {
           userName: USERS.seunghee.name,
           userAvatar: USERS.seunghee.avatar,
-          text: "멋져요! 저도 함께할게요 💪",
+          text: "1등 가보자!",
           timestamp: "5분 전",
         },
       ],
@@ -957,20 +957,16 @@ export default function App() {
       comments: [],
       reactions: [
         {
-          emoji: "👍",
+          emoji: "🔥",
           users: [
+            {
+              userName: USERS.wellie.name,
+              userAvatar: USERS.wellie.avatar,
+
+            },
             {
               userName: USERS.seunghee.name,
               userAvatar: USERS.seunghee.avatar,
-            },
-          ],
-        },
-        {
-          emoji: "❤️",
-          users: [
-            {
-              userName: USERS.dongseok.name,
-              userAvatar: USERS.dongseok.avatar,
             },
           ],
         },
@@ -985,7 +981,15 @@ export default function App() {
       textOverlay: "오늘도 혈당방어 성공!",
       createdAt: "2025-10-13",
       comments: [],
-      reactions: [],
+      reactions: [{
+        emoji: "👍",
+        users: [
+          {
+            userName: USERS.seunghee.name,
+            userAvatar: USERS.seunghee.avatar,
+          },
+        ],
+      },],
     },
     {
       id: 4,
@@ -997,7 +1001,17 @@ export default function App() {
       textOverlay: "오늘도 친구놈 버리고 오운완!",
       createdAt: "2025-10-10",
       comments: [],
-      reactions: [],
+      reactions: [
+        {
+          emoji: "👍",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+        },
+      ],
     },
     {
       id: 5,
@@ -1007,8 +1021,23 @@ export default function App() {
       userName: USERS.seunghee.name,
       textOverlay: "우리 가족 깍두기 준비 완료^^",
       createdAt: "2025-10-08",
-      comments: [],
-      reactions: [],
+      comments: [
+        {
+          userName: USERS.wellie.name,
+          userAvatar: USERS.wellie.avatar,
+          text: "참석 희망합니다 🖐️",
+          timestamp: "5분 전",
+        },
+      ],
+      reactions: [{
+        emoji: "❤️",
+        users: [
+          {
+            userName: USERS.wellie.name,
+            userAvatar: USERS.wellie.avatar,
+          },
+        ],
+      },],
     },
     {
       id: 6,
@@ -1020,7 +1049,26 @@ export default function App() {
       textOverlay: "딸은 출석 완료입니다",
       createdAt: "2025-10-05",
       comments: [],
-      reactions: [],
+      reactions: [
+        {
+          emoji: "👍",
+          users: [
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
+            },
+          ],
+        },
+        {
+          emoji: "🔥",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+        },
+      ],
     },
     {
       id: 7,
@@ -1031,8 +1079,21 @@ export default function App() {
       userName: USERS.seunghee.name,
       textOverlay: "가을이 오나보다 🍂",
       createdAt: "2025-10-05",
-      comments: [],
-      reactions: [],
+      comments: [{
+        userName: USERS.wellie.name,
+        userAvatar: USERS.wellie.avatar,
+        text: "아빠 배아프겠는데 ㅎㅎ",
+        timestamp: "25.10.05",
+      },],
+      reactions: [{
+        emoji: "❤️",
+        users: [
+          {
+            userName: USERS.wellie.name,
+            userAvatar: USERS.wellie.avatar,
+          },
+        ],
+      },],
     },
     {
       id: 8,
@@ -1043,8 +1104,23 @@ export default function App() {
       userName: USERS.wellie.name,
       textOverlay: "대만에서도 관리중",
       createdAt: "2025-09-30",
-      comments: [],
-      reactions: [],
+      comments: [
+        {
+          userName: USERS.seunghee.name,
+          userAvatar: USERS.seunghee.avatar,
+          text: "올때 누가크래커 ^^",
+          timestamp: "2025-09-30",
+        },
+      ],
+      reactions: [{
+        emoji: "❤️",
+        users: [
+          {
+            userName: USERS.dongseok.name,
+            userAvatar: USERS.dongseok.avatar,
+          },
+        ],
+      },],
     },
     {
       id: 9,
