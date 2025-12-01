@@ -955,7 +955,26 @@ export default function App() {
       textOverlay: "님의 혈압관리를 응원해 주세요!",
       createdAt: "2025-10-15",
       comments: [],
-      reactions: [],
+      reactions: [
+        {
+          emoji: "👍",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+        },
+        {
+          emoji: "❤️",
+          users: [
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
+            },
+          ],
+        },
+      ],
     },
     {
       id: 3,
@@ -1127,6 +1146,8 @@ export default function App() {
               userAvatar: USERS.seunghee.avatar,
             },
           ],
+        },
+        {
           emoji: "❤️",
           users: [
             {
@@ -1136,8 +1157,8 @@ export default function App() {
           ],
         },
       ],
-    }
-        {
+    },
+    {
       id: 13,
       image: COMMUNITY_IMAGES.IMG13,
       badge: "🥗 건강한 식단",
