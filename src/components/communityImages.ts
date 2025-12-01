@@ -21,6 +21,7 @@ import img17 from "../assets/images/img17.png";
 import img18 from "../assets/images/img18.png";
 import img19 from "../assets/images/img19.png";
 import img20 from "../assets/images/img20.png";
+import img21 from "../assets/images/img21.png";
 
 // 2) 키로 쓰고 싶을 때
 export const COMMUNITY_IMAGES = {
@@ -44,6 +45,7 @@ export const COMMUNITY_IMAGES = {
   IMG18: img18,
   IMG19: img19,
   IMG20: img20,
+  IMG21: img21,
 } as const;
 
 export type CommunityImageKey = keyof typeof COMMUNITY_IMAGES;

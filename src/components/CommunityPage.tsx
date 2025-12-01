@@ -180,6 +180,8 @@ export function CommunityPage({
 
   // 키보드 & 뷰포트 높이
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [baseScreenHeight, setBaseScreenHeight] = useState<number | null>(null);
 
@@ -524,32 +526,33 @@ export function CommunityPage({
 
   // 모바일 키보드 및 viewport 높이 감지
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    setBaseScreenHeight(window.innerHeight);
-
-    const handleResize = () => {
-      if (!window.visualViewport) return;
-      const vh = window.visualViewport.height;
-      setViewportHeight(vh);
-
-      const isKeyboard = vh < window.innerHeight * 0.75;
-      setIsKeyboardVisible(isKeyboard);
-    };
+    if (typeof window === "undefined" || !window.visualViewport) return;
 
     const viewport = window.visualViewport;
-    if (viewport) {
-      setViewportHeight(viewport.height);
-      viewport.addEventListener("resize", handleResize);
-      viewport.addEventListener("scroll", handleResize);
-    }
+    const initialHeight = viewport.height; // 앱 처음 켰을 때의 높이(키보드 없음)
+
+    setBaseScreenHeight(initialHeight);
+    setViewportHeight(initialHeight);
+
+    const handleResize = () => {
+      const vh = viewport.height;
+      setViewportHeight(vh);
+
+      // 처음 높이에서 얼마나 줄었는지로 키보드 여부 판단
+      const diff = initialHeight - vh;
+      setIsKeyboardVisible(diff > 150); // 150px 이상 줄어들면 키보드 떴다고 봄
+    };
+
+    viewport.addEventListener("resize", handleResize);
+    viewport.addEventListener("scroll", handleResize);
 
     return () => {
-      if (!viewport) return;
       viewport.removeEventListener("resize", handleResize);
       viewport.removeEventListener("scroll", handleResize);
     };
   }, []);
+
+
 
   const effectiveViewportHeight =
     viewportHeight ?? baseScreenHeight ?? 800;
@@ -893,7 +896,7 @@ export function CommunityPage({
                   }}
                 >
                   <div>
-                    <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
+                    <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400]">
                       {post.userName === currentUser.userName &&
                         isDragging && (
                           <div className="absolute inset-y-0 -right-8 w-24 flex items-center justify-start z-0 pr-4">
