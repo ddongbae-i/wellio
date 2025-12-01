@@ -1,10 +1,6 @@
 "use client";
 
 import {
-  ChevronDown,
-  Search,
-  LayoutGrid,
-  Calendar,
   Plus,
   MapPin,
   Cloud,
@@ -21,6 +17,10 @@ import confetti from "canvas-confetti";
 import "swiper/css";
 import Bell from "../assets/images/icon_alarm.svg";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
+import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
+import Search from "../assets/images/icon_search.svg";
+import LayoutGrid from "../assets/images/Icon_View.svg";
+import Calendar from "../assets/images/icon_calendar.svg";
 import { patientMap, type PatientId } from "./userProfiles";
 
 interface CommunityPageProps {
@@ -592,7 +592,11 @@ export function CommunityPage({
                 : "border-transparent"
                 }`}
             >
-              <Search size={20} className="text-gray-400" />
+              <img
+                src={Search}
+                alt="검색"
+                className="w-6 h-6"
+              />
               <input
                 type="text"
                 placeholder="게시글, 키워드를 검색해보세요"
@@ -627,7 +631,7 @@ export function CommunityPage({
                 className="w-6 h-6"
               />
             </button>
-            <span className="text-lg font-bold text-[#1A1A1A]">
+            <span className="text-[19px] font-semibold text-[#202020]">
               리액션 모아보기
             </span>
           </div>
@@ -652,7 +656,7 @@ export function CommunityPage({
                   setShowFamilyDropdown(!showFamilyDropdown)
                 }
               >
-                <span className="text-lg font-bold text-[#1A1A1A]">
+                <span className="text-[19px] font-semibold text-[#202020]">
                   {selectedFamilyMember
                     ? familyMembers.find(
                       (m) =>
@@ -662,9 +666,10 @@ export function CommunityPage({
                     )?.name || "모아보기"
                     : "모아보기"}
                 </span>
-                <ChevronDown
-                  size={20}
-                  className="text-gray-600"
+                <img
+                  src={ChevronDown}
+                  alt="뒤로가기"
+                  className="w-6 h-6"
                 />
               </button>
               <FamilyDropdown
@@ -714,9 +719,10 @@ export function CommunityPage({
                     )?.name || "우리가족"
                     : "우리가족"}
                 </span>
-                <ChevronDown
-                  size={20}
-                  className="text-gray-600"
+                <img
+                  src={ChevronDown}
+                  alt="드롭다운"
+                  className="w-6 h-6"
                 />
               </button>
               <FamilyDropdown
@@ -736,7 +742,11 @@ export function CommunityPage({
                   setIsSearchFocused(true);
                 }}
               >
-                <Search size={20} className="text-[#1A1A1A]" />
+                <img
+                  src={Search}
+                  alt="드롭다운"
+                  className="w-6 h-6"
+                />
               </button>
               <button
                 className="w-6 h-6 flex items-center justify-center"
