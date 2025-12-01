@@ -897,13 +897,13 @@ export function CommunityPage({
                       : ""
                     }
                   ${isKeyboardVisible
-                      ? "pt-12 overflow-y-auto"
+                      ? "pt-12 "
                       : ""
                     }`}
                   key={post.id}
                   style={{
-                    height: cardHeight,
-                    minHeight: cardHeight,
+                    height: feedHeight,
+                    minHeight: feedHeight,
                   }}
                 >
                   <div>
