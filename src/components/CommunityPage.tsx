@@ -180,8 +180,7 @@ export function CommunityPage({
 
   // 키보드 & 뷰포트 높이
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
-  const [baseScreenHeight, setBaseScreenHeight] = useState<number | null>(null);
+  const [screenHeight, setScreenHeight] = useState<number | null>(null);
 
   // === 유저 프로필 (없으면 김웰리로 기본값) ===
   const currentUserProfile =
@@ -522,24 +521,23 @@ export function CommunityPage({
     }
   }, [initialPostId, isGridView, isReactionView]);
 
-  // 모바일 키보드 및 viewport 높이 감지
+  // 모바일 키보드 감지 (레이아웃 높이는 처음 값 기준으로 고정)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    setBaseScreenHeight(window.innerHeight);
+    const initial = window.innerHeight;   // 앱 처음 켰을 때 높이
+    setScreenHeight(initial);
+
+    const viewport = window.visualViewport;
 
     const handleResize = () => {
-      if (!window.visualViewport) return;
-      const vh = window.visualViewport.height;
-      setViewportHeight(vh);
-
-      const isKeyboard = vh < window.innerHeight * 0.75;
+      if (!viewport) return;
+      // viewport 높이가 처음 높이의 75%보다 작아지면 키보드가 떴다고 판단
+      const isKeyboard = viewport.height < initial * 0.75;
       setIsKeyboardVisible(isKeyboard);
     };
 
-    const viewport = window.visualViewport;
     if (viewport) {
-      setViewportHeight(viewport.height);
       viewport.addEventListener("resize", handleResize);
       viewport.addEventListener("scroll", handleResize);
     }
@@ -551,22 +549,25 @@ export function CommunityPage({
     };
   }, []);
 
-  const effectiveViewportHeight =
-    viewportHeight ?? baseScreenHeight ?? 800;
+
+
+  // 처음 화면 높이 (없으면 800 fallback)
+  const baseHeight = screenHeight ?? 800;
 
   const HEADER_HEIGHT = 110; // 헤더 + 위 여유
   const GNB_HEIGHT = 80;
 
-  // 콘텐츠 영역 높이
-  const contentHeightWithoutKeyboard =
-    effectiveViewportHeight - HEADER_HEIGHT - GNB_HEIGHT; // 기본: 헤더 + GNB 제외
-  const contentHeightWithKeyboard =
-    effectiveViewportHeight - HEADER_HEIGHT; // 키보드 뜨면 GNB 없음
+  // 콘텐츠 영역 높이 (키보드 떠도 처음 높이 기준은 유지)
+  const contentHeight =
+    isGridView || isReactionView
+      ? baseHeight - HEADER_HEIGHT          // 그리드/리액션: GNB 없음
+      : isKeyboardVisible
+        ? baseHeight - HEADER_HEIGHT        // 키보드 있을 때도 레이아웃은 그대로, GNB만 숨김
+        : baseHeight - HEADER_HEIGHT - GNB_HEIGHT; // 기본: 헤더 + GNB 제외
 
-  // ✅ 카드 한 묶음 높이: 컨텐츠 높이랑 거의 맞춰서
-  const cardHeight = isKeyboardVisible
-    ? contentHeightWithKeyboard
-    : contentHeightWithoutKeyboard;
+  // 카드 한 묶음 높이: 항상 일정(키보드 여부 상관 X)
+  // 160이 너무 크거나 작으면 숫자만 살짝 조절해서 본인 폰에 맞춰봐
+  const cardHeight = baseHeight - 160;
 
 
   return (
@@ -752,12 +753,7 @@ export function CommunityPage({
       <div
         className="w-full overflow-hidden"
         style={{
-          height:
-            isGridView || isReactionView
-              ? contentHeightWithKeyboard // 그리드/리액션 뷰는 GNB 없음
-              : isKeyboardVisible
-                ? contentHeightWithKeyboard // 키보드 있을 때: 헤더만 제외
-                : contentHeightWithoutKeyboard, // 기본: 헤더 + GNB 제외
+          height: contentHeight,
         }}
       >
         {isReactionView ? (
