@@ -1,10 +1,9 @@
-import {
-  Search,
-  Settings,
-} from "lucide-react";
 
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import Bell from "../assets/images/icon_alarm.svg";
+import Settings from "../assets/images/icon_set.svg";
+import Search from "../assets/images/icon_search.svg";
+
 
 interface HeaderProps {
   title?: string;
@@ -35,30 +34,35 @@ export function Header({
   // --- 'title' prop이 있으면 '서브 페이지 헤더' (내 정보) ---
   if (title) {
     return (
-      <header className="sticky top-0 left-0 right-0 z-40 px-4 xs:px-6 sm:px-8 py-4 flex w-full items-center justify-center mx-auto h-[80px] max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative">
+      <header className="sticky top-0 left-0 right-0 z-40 px-5 xs:px-6 sm:px-8 py-4 flex w-full items-center justify-center mx-auto h-[80px] max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative">
         {/* 왼쪽: 뒤로가기 */}
         {showBackButton && (
           <button
             onClick={handleBack}
-            className="absolute left-4 xs:left-6 sm:left-8 p-1 w-6 h-6 flex items-center justify-cente"
+            className="absolute left-5 xs:left-6 sm:left-8 p-1 flex items-center justify-center"
           >
-            <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
+            <img
+              src={ChevronLeft}
+              alt="뒤로가기"
+              className="w-6 h-6 min-w-6 min-h-6 max-w-6 max-h-6 flex-shrink-0"
+            />
           </button>
         )}
+
         {/* 가운데: 타이틀 */}
         <h1 className="text-[19px] font-semibold text-[#202020]">
           {title}
         </h1>
         {/* 오른쪽: 아이콘 */}
-        <div className="absolute right-4 xs:right-6 sm:right-8 flex items-center gap-3">
+        <div className="absolute right-5 xs:right-6 sm:right-8 flex items-center gap-3">
           {showSearchButton && (
             <button className="p-1">
-              <Search size={24} className="text-gray-700" />
+              <img src={Search} alt="검색" className="w-6 h-6" />
             </button>
           )}
           {showSettingsButton && (
             <button className="p-1">
-              <Settings size={24} className="text-gray-700" />
+              <img src={Settings} alt="설정" className="w-6 h-6" />
             </button>
           )}
         </div>

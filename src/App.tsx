@@ -17,6 +17,8 @@ import { ReviewWritePage } from "./components/ReviewWritePage"; // 👈 ReviewWr
 import { HospitalReviewsPage } from "./components/HospitalReviewsPage"; // 👈 HospitalReviewsPage import
 import { CalendarPage } from "./components/CalendarPage"; // 👈 CalendarPage import
 import { Toaster } from "sonner"; // 👈 Toaster import
+import { hospitalMap } from "./components/hospitalInfo";
+
 
 type Page =
   | "home"
@@ -206,49 +208,6 @@ const REVIEW_AUTHORS = [
   },
 ];
 
-// ✅ 진료내역 기본 mock 데이터 (메모 포함 원본 3개)
-const MOCK_MEDICAL_RECORDS = [
-  {
-    id: 1,
-    code: "20250811-012345",
-    patientName: USERS.dongseok.name,
-    patientAvatar: USERS.dongseok.avatar,
-    hospitalName: "매일건강의원",
-    visitDate: "2025.08.11",
-    visitTime: "14:00",
-    doctor: "이준호",
-    memo: "아빠 감기몸살로 내원, 3일 뒤 재진",
-    isMyAppointment: true,
-    dateObj: new Date("2025-08-11T14:00:00"),
-  },
-  {
-    id: 2,
-    code: "20250805-012345",
-    patientName: USERS.seunghee.name,
-    patientAvatar: USERS.seunghee.avatar,
-    hospitalName: "365클리닉 강남본점",
-    visitDate: "2025.08.05",
-    visitTime: "10:25",
-    doctor: "김슬기",
-    memo: "엄마 2일마다 물리치료",
-    isMyAppointment: true,
-    dateObj: new Date("2025-08-05T10:25:00"),
-  },
-  {
-    id: 3,
-    code: "REC-2024-003",
-    patientName: USERS.wellie.name,
-    patientAvatar: USERS.wellie.avatar,
-    hospitalName: "매일건강의원",
-    visitDate: "2024.11.05",
-    visitTime: "16:00",
-    doctor: "박민준 교수",
-    memo: "정기 검진 완료, 특이사항 없음",
-    isMyAppointment: false,
-    dateObj: new Date("2024-11-05T16:00:00"),
-  },
-];
-
 export default function App() {
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -330,7 +289,7 @@ export default function App() {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
-  // 날짜 생성 헬퍼 함수
+  // 날짜 생성 헬퍼 함수 (리뷰/샘플용으로만 사용)
   const getRandomPastDate = (maxDaysAgo: number = 365): Date => {
     const today = new Date();
     const daysAgo = Math.floor(Math.random() * maxDaysAgo);
@@ -450,26 +409,56 @@ export default function App() {
     ],
   );
 
-  // 작성한 리뷰 목록 초기값
+  const parseKRDateString = (dateStr: string): Date => {
+    // 괄호 뒤 요일은 버리고 "2025.08.08"만 사용
+    const [datePart] = dateStr.split("("); // "2025.08.08"
+    const [year, month, day] = datePart.split(".").map((v) => Number(v));
+    return new Date(year, month - 1, day);
+  };
+
   const initialMyReviews = (() => {
-    const review1Date = getRandomPastDate(80);
-    const review2Date = getRandomPastDate(120);
-    const review3Date = getRandomPastDate(150);
+    // 🔹 진료내역에 적어둔 날짜 문자열이랑 '완전히' 똑같이 맞춰쓰기
+    //    (아래 문자열은 진료내역 records 쪽과 동일하게 맞춰줘야 함!)
+
+    const visit1Str = "2025.08.08";
+    const visit2Str = "2025.07.14";
+    const visit3Str = "2025.06.27";
+    const visit4Str = "2025.05.20";
+    const visit5Str = "2025.05.02";
+    const visit6Str = "2025.05.01";
+
+    const review1Date = parseKRDateString(visit1Str);
+    const review2Date = parseKRDateString(visit2Str);
+    const review3Date = parseKRDateString(visit3Str);
+    const review4Date = parseKRDateString(visit4Str);
+    const review5Date = parseKRDateString(visit5Str);
+    const review6Date = parseKRDateString(visit6Str);
+
+    // 🔹 병원 정보는 hospitalMap에서 가져오기
+    const h1 = hospitalMap[8];
+    const h2 = hospitalMap[9];
+    const h3 = hospitalMap[10];
+    const h4 = hospitalMap[3];
+    const h5 = hospitalMap[10];
+    const h6 = hospitalMap[8];
+
 
     const reviews = [
       {
         id: 1001,
-        hospitalId: 1,
-        hospitalName: "매일건강의원",
-        hospitalImage: "https://example.com/hospital1.jpg",
-        visitDate: formatDateKR(review1Date),
+        hospitalId: h1.id,
+        hospitalName: h1.name,
+        hospitalImage: h1.imageUrl,
+        // 👉 화면에 보이는 날짜: 진료내역과 동일한 문자열
+        visitDate: visit1Str,
         rating: 5,
-        keywords: ["친절해요", "과잉진료가 없어요", "꼼꼼해요"],
+        keywords: ["시설 좋아요", "과잉진료가 없어요", "친절해요"],
         reviewText:
-          "아빠 감기몸살로 내원했는데 원장님이 정말 친절하게 진료해주셨어요. 과잉진료 없이 필요한 것만 처방해주셔서 좋았습니다.",
+          "대기 많아서 대리접수 해드렸어요. 꾸준히 물치 받고 많이 좋아지셨습니다 첨엔 가만히 있어도 통증이 심했는데 3개월 정도 다녔는데 이제 통증도 없으시다고 하네요. 앞으로도 잘부탁드립니다",
         userName: USERS.wellie.name,
         userAvatar: USERS.wellie.avatar,
-        createdAt: formatDateISO(review1Date),
+        // 👉 정렬/시간용 createdAt도 같은 날짜에서 생성
+        createdAt: review1Date.toISOString(),
         visitType: "재방문" as const,
         likes: 0,
         likedBy: [],
@@ -477,17 +466,17 @@ export default function App() {
       },
       {
         id: 1002,
-        hospitalId: 2,
-        hospitalName: "365클리닉 강남본점",
-        hospitalImage: "https://example.com/hospital2.jpg",
-        visitDate: formatDateKR(review2Date),
+        hospitalId: h2.id,
+        hospitalName: h2.name,
+        hospitalImage: h2.imageUrl,
+        visitDate: visit2Str,
         rating: 5,
-        keywords: ["쾌적해요", "시설이 깨끗해요", "친절해요"],
+        keywords: ["꼼꼼해요", "친절해요"],
         reviewText:
-          "피부과 시술 받았는데 시설도 깨끗하고 직원분들도 친절하세요. 최신 장비로 시술해서 만족스러웠습니다.",
+          "토닝이랑 재생관리 받으려고 방문했어요. 장비도 최신 모델이고, 시술 과정도 꼼꼼해서 믿음이 갔습니다. 레이저는 살짝 따끔했는데 바로 재생팩 해주셔서 붉은기 거의 없었어요.  다음 날 화장도 잘 먹어서 만족해요. 가격도 주변 대비 크게 부담되지 않는 편이에요.",
         userName: USERS.wellie.name,
         userAvatar: USERS.wellie.avatar,
-        createdAt: formatDateISO(review2Date),
+        createdAt: review2Date.toISOString(),
         visitType: "첫방문" as const,
         likes: 0,
         likedBy: [],
@@ -495,21 +484,75 @@ export default function App() {
       },
       {
         id: 1003,
-        hospitalId: 3,
-        hospitalName: "사랑니쏙쏙 강남본점",
-        hospitalImage: "https://example.com/hospital3.jpg",
-        visitDate: formatDateKR(review3Date),
-        rating: 4,
-        keywords: ["친절해요", "대기시간이 짧아요"],
+        hospitalId: h3.id,
+        hospitalName: h3.name,
+        hospitalImage: h3.imageUrl,
+        visitDate: visit3Str,
+        rating: 5,
+        keywords: ["진료 만족해요"],
         reviewText:
-          "사랑니 발치했는데 원장님이 꼼꼼하게 설명해주시고 통증도 거의 없었어요. 대기시간도 짧아서 좋았습니다.",
+          "제가 어렸을때부터 우리 가족 다니는 병원이에요. 항상 설명 꼼꼼하게 해주시고 과잉진료 없이 필요한 부분만 딱딱 진료해주십니다. 최근에 당때문에 주기적으로 체크중인데 원장님한테 많이 혼나서 습관 고치고 좋아지는 중이에요 항상 감사합니다!",
         userName: USERS.wellie.name,
         userAvatar: USERS.wellie.avatar,
-        createdAt: formatDateISO(review3Date),
-        visitType: "첫방문" as const,
+        createdAt: review3Date.toISOString(),
+        visitType: "재방문" as const,
         likes: 0,
         likedBy: [],
         dateObj: review3Date,
+      },
+      {
+        id: 1004,
+        hospitalId: h4.id,
+        hospitalName: h4.name,
+        hospitalImage: h4.imageUrl,
+        visitDate: visit3Str,
+        rating: 5,
+        keywords: ["과잉진료가 없어요", "꼼꼼해요"],
+        reviewText:
+          "매복 사랑니 때문에 유명하다고 해서 다녀왔는데 진짜 하나도 안아프게 뽑아주셨어요 ㅠㅠ 최고에요",
+        userName: USERS.wellie.name,
+        userAvatar: USERS.wellie.avatar,
+        createdAt: review4Date.toISOString(),
+        visitType: "첫방문" as const,
+        likes: 0,
+        likedBy: [],
+        dateObj: review4Date,
+      },
+      {
+        id: 1005,
+        hospitalId: h5.id,
+        hospitalName: h5.name,
+        hospitalImage: h5.imageUrl,
+        visitDate: visit5Str,
+        rating: 5,
+        keywords: ["과잉진료가 없어요", "꼼꼼해요"],
+        reviewText:
+          "원장님 건강하세요!!!!!!!!!! 감사합니다",
+        userName: USERS.wellie.name,
+        userAvatar: USERS.wellie.avatar,
+        createdAt: review3Date.toISOString(),
+        visitType: "재방문" as const,
+        likes: 0,
+        likedBy: [],
+        dateObj: review5Date,
+      },
+      {
+        id: 1006,
+        hospitalId: h6.id,
+        hospitalName: h6.name,
+        hospitalImage: h6.imageUrl,
+        visitDate: visit6Str,
+        rating: 5,
+        keywords: ["진료 만족해요"],
+        reviewText:
+          "엄마 오십견 증상이 있어서 오십견에 유명하다는 곳 검색해서 다녀왔어요 시설도 좋고 장비들도 다양해서 꼼꼼하게 검사해주셨어요. 통증이 심하셔서 걱정했는데 당분간 물치만 꾸준히 받으면 된다고 하네요. 최대한 수술이나 힘든 치료보다 꾸준한 관리로 추천해주셔서 좋았습니다. 원장님 설명도 잘해주시고 전문적으로 잘 봐주셔서 믿음이 갑니다.",
+        userName: USERS.wellie.name,
+        userAvatar: USERS.wellie.avatar,
+        createdAt: review3Date.toISOString(),
+        visitType: "첫방문" as const,
+        likes: 0,
+        likedBy: [],
+        dateObj: review6Date,
       },
     ];
 
@@ -518,79 +561,124 @@ export default function App() {
       .map(({ dateObj, ...rest }) => rest);
   })();
 
-  // ✅ 리뷰 작성한 진료 기록 id 목록 (1,2는 리뷰 있음으로 가정)
-  const [reviewedHospitals, setReviewedHospitals] = useState<number[]>(
-    [1, 2],
-  );
+  // ✅ 리뷰 작성한 진료 기록 id 목록
+  // 👉 1번만 "리뷰 미작성", 2,3번은 "작성한 리뷰" 상태
+  const [reviewedHospitals, setReviewedHospitals] = useState<number[]>([
+    2, 3, 5, 6, 7, 8
+  ]);
 
-  // ✅ 진료내역 데이터 관리 (메모는 그대로, 추가/미작성 기록 포함)
-  const [medicalRecords, setMedicalRecords] = useState(() => {
-    const record4Date = getRandomPastDate(30);
-    const record5Date = getRandomPastDate(200);
-    const record6Date = getRandomPastDate(10); // 미작성 예시
-
-    const additionalRecords = [
-      {
-        id: 2001,
-        code: `${record4Date.getFullYear()}${String(
-          record4Date.getMonth() + 1,
-        ).padStart(2, "0")}${String(record4Date.getDate()).padStart(
-          2,
-          "0",
-        )}-012345`,
-        patientName: USERS.wellie.name,
-        patientAvatar: USERS.wellie.avatar,
-        hospitalName: "서울대학교병원",
-        visitDate: formatDateKR(record4Date),
-        visitTime: "11:00",
-        doctor: "박민준 교수",
-        memo: "정기 검진 완료, 특이사항 없음",
-        isMyAppointment: true,
-        dateObj: record4Date,
-      },
-      {
-        id: 2002,
-        code: "REC-2024-FAM001",
-        patientName: USERS.dongseok.name,
-        patientAvatar: USERS.dongseok.avatar,
-        hospitalName: "바른정형외과의원",
-        visitDate: formatDateKR(record5Date),
-        visitTime: "15:30",
-        doctor: "최재활 원장",
-        memo: "아빠 물리치료 예약",
-        isMyAppointment: false,
-        dateObj: record5Date,
-      },
-      // ⭐ 리뷰 미작성 진료 예시
-      {
-        id: 3001,
-        code: `${record6Date.getFullYear()}${String(
-          record6Date.getMonth() + 1,
-        ).padStart(2, "0")}${String(record6Date.getDate()).padStart(
-          2,
-          "0",
-        )}-000777`,
-        patientName: USERS.wellie.name,
-        patientAvatar: USERS.wellie.avatar,
-        hospitalName: "행복이비인후과",
-        visitDate: formatDateKR(record6Date),
-        visitTime: "09:20",
-        doctor: "이청력 원장",
-        memo: "봄철 알레르기 증상 확인, 약 처방 받음",
-        isMyAppointment: true,
-        dateObj: record6Date,
-      },
-    ];
-
-    const allRecordsWithDateObj = [
-      ...MOCK_MEDICAL_RECORDS,
-      ...additionalRecords,
-    ];
-
-    return allRecordsWithDateObj
-      .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
-      .map(({ dateObj, ...rest }) => rest);
-  });
+  // ✅ 진료내역 데이터 관리 (요일까지 문자열로 직접 입력)
+  //    1번: 미작성, 2번/3번: 이미 리뷰 작성된 상태라는 설정
+  const [medicalRecords, setMedicalRecords] = useState(() => [
+    {
+      id: 1,
+      code: "20250808-012345",
+      patientName: USERS.dongseok.name,
+      patientAvatar: USERS.dongseok.avatar,
+      hospitalName: "매일건강의원",
+      visitDate: "2025.08.08",
+      visitTime: "14:00",
+      doctor: "이준호",
+      memo: "아빠 감기몸살로 내원, 3일 뒤 재진",
+      isMyAppointment: true,
+    },
+    {
+      id: 2,
+      code: "20250805-012345",
+      patientName: USERS.seunghee.name,
+      patientAvatar: USERS.seunghee.avatar,
+      hospitalName: "바른정형외과의원",
+      visitDate: "2025.08.05(화)",
+      visitTime: "10:25",
+      doctor: "김슬기",
+      memo: "엄마 2일마다 물리치료",
+      isMyAppointment: true,
+    },
+    {
+      id: 3,
+      code: "20250714-012345",
+      patientName: USERS.wellie.name,
+      patientAvatar: USERS.wellie.avatar,
+      hospitalName: "고운피부과 ",
+      visitDate: "2025.07.14",
+      visitTime: "18:50",
+      doctor: "이윤지",
+      memo: "",
+      isMyAppointment: true,
+    },
+    {
+      id: 4,
+      code: "20250702-012345",
+      patientName: USERS.dongseok.name,
+      patientAvatar: USERS.dongseok.avatar,
+      hospitalName: "오늘도강한내과의원",
+      visitDate: "2025.07.02",
+      visitTime: "11:00",
+      doctor: "강한",
+      memo: "정기 검진 완료, 특이사항 없음",
+      isMyAppointment: false,
+    },
+    {
+      id: 5,
+      code: "20250627-012345",
+      patientName: USERS.wellie.name,
+      patientAvatar: USERS.wellie.avatar,
+      hospitalName: "오늘도강한내과의원",
+      visitDate: "2025.06.27",
+      visitTime: "18:30",
+      doctor: "강한",
+      memo: "혈당재검",
+      isMyAppointment: true,
+    },
+    {
+      id: 6,
+      code: "20250520-012345",
+      patientName: USERS.wellie.name,
+      patientAvatar: USERS.wellie.avatar,
+      hospitalName: "사랑니쏙쏙 강남본점",
+      visitDate: "2025.05.20",
+      visitTime: "14:00",
+      doctor: "유치영",
+      memo: "",
+      isMyAppointment: true,
+    },
+    {
+      id: 7,
+      code: "20250502-012345",
+      patientName: USERS.dongseok.name,
+      patientAvatar: USERS.dongseok.avatar,
+      hospitalName: "오늘도강한내과의원",
+      visitDate: "2025.05.02",
+      visitTime: "11:00",
+      doctor: "강한",
+      memo: "혈압약",
+      isMyAppointment: true,
+    },
+    {
+      id: 8,
+      code: "20250501-012345",
+      patientName: USERS.seunghee.name,
+      patientAvatar: USERS.seunghee.avatar,
+      hospitalName: "바른정형외과의원",
+      visitDate: "2025.05.01",
+      visitTime: "10:10",
+      doctor: "김슬기",
+      memo: "",
+      isMyAppointment: true,
+    },
+    {
+      id: 9,
+      code: "20250311-012345",
+      patientName: USERS.seunghee.name,
+      patientAvatar: USERS.seunghee.avatar,
+      hospitalName: "오늘도강한내과의원",
+      visitDate: "2025.03.11",
+      visitTime: "15:10",
+      doctor: "김슬기",
+      memo: "",
+      isMyAppointment: false,
+    },
+  ]);
 
   // 작성한 리뷰 목록 state
   const [myReviews, setMyReviews] =
@@ -612,7 +700,6 @@ export default function App() {
     const reviews: Review[] = [];
 
     const reviewTemplates = [
-      // (여기 기존 긴 템플릿들 그대로 — 생략 없이 유지)
       {
         hospitalId: 1,
         hospitalName: "매일건강의원",
@@ -631,7 +718,6 @@ export default function App() {
         visitType: "재방문" as const,
         likes: 8,
       },
-      // ... 👇 아래 나머지 템플릿들 전부 기존 코드 그대로 유지
       {
         hospitalId: 1,
         hospitalName: "매일건강의원",
@@ -1322,6 +1408,8 @@ export default function App() {
                 setMyReviews([newReview, ...myReviews]);
                 setReviewedHospitals([
                   ...reviewedHospitals,
+                  // 여기 들어오는 hospitalId는 "병원 id"라서,
+                  // 진료내역 id와 연결하려면 나중에 구조 바꿀 수 있음.
                   reviewData.hospitalId,
                 ]);
               }

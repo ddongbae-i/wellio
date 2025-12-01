@@ -62,7 +62,7 @@ export function ProfilePage({
   myReviewsCount = 0,
 }: ProfilePageProps) {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#f7f7f7]">
       {/* Profile Header */}
       <Header
         title="내 정보"
@@ -70,9 +70,9 @@ export function ProfilePage({
         onBack={onBack}
         showSearchButton={true}
         showSettingsButton={true}
+
       />
 
-      {/* 헤더 높이(h-16)만큼 pt-16 추가 */}
       <motion.main
         className="flex-grow bg-[#F7F7F7] pb-[60px]"
         initial="hidden"
@@ -139,7 +139,7 @@ export function ProfilePage({
         </motion.div>
 
         {/* Activity Buttons */}
-        <motion.div className="flex bg-white mx-5 rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] mt-3 overflow-hidden" variants={itemVariants}>
+        <motion.div className="flex bg-white mx-5 xs:mx-6 sm:mx-8 rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] mt-3 overflow-hidden" variants={itemVariants}>
           <button
             className="flex-1 flex items-center justify-center py-3 text-[#555555] font-medium text-[17px] cursor-pointer"
             onClick={onMyReviewsClick}

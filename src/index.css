@@ -4565,27 +4565,6 @@ html {
   margin-right: 20px; /* 모바일 기준 */
 }
 
-@media (min-width: 400px) { /* xs */
-  .filter-swiper-slide:first-child {
-    margin-left: 24px; /* xs:pl-6 */
-    
-  }
-
-  .filter-swiper-slide:last-child {
-  margin-right: 24px; /* 모바일 기준 */
-}
-}
-
-@media (min-width: 640px) { /* sm */
-  .filter-swiper-slide:first-child {
-    margin-left: 32px; /* sm:pl-8 */
-    
-  }
-  .filter-swiper-slide:last-child {
-  margin-right: 32px; /* 모바일 기준 */
-}
-}
-
 .custom-bullet li {
   position: relative;
   padding-left: 8px; /* 불릿과 텍스트 간격 */
@@ -4600,4 +4579,66 @@ html {
   height: 3px;
   background: #2b2b2b; /* 원 색상 */
   border-radius: 50%;
+}
+
+/* MedicalHistoryPage 프로필 필터 Swiper 오른쪽 여백 제거 */
+
+.history-filter-swiper .swiper {
+  padding-right: 0 ;   /* Swiper 컨테이너 기본 패딩 제거 */
+}
+
+.history-filter-swiper .swiper-wrapper {
+  margin-right: 0 ;    /* wrapper 오른쪽 마진 제거 */
+}
+
+/* 슬라이드는 내용 크기만큼만 차지 */
+.history-filter-slide {
+  width: auto ;
+}
+
+/* 마지막 슬라이드 오른쪽 여백 제거 */
+.history-filter-swiper .history-filter-slide:last-child {
+  margin-right: 0 ;
+}
+
+.filter-wrap {
+  padding-left: 20px;
+} 
+
+@media (min-width: 400px) { /* xs */
+  .filter-swiper-slide:first-child {
+    margin-left: 24px; /* xs:pl-6 */
+    
+  }
+
+  .filter-swiper-slide:last-child {
+  margin-right: 24px; /* 모바일 기준 */
+}
+
+ .filter-wrap {
+  padding-left: 24px;
+} 
+}
+
+@media (min-width: 640px) { /* sm */
+  .filter-swiper-slide:first-child {
+    margin-left: 32px; /* sm:pl-8 */
+    
+  }
+  .filter-swiper-slide:last-child {
+  margin-right: 32px; /* 모바일 기준 */
+}
+
+ .filter-wrap {
+  padding-left: 32px;
+} 
+}
+
+.memo-edit[contenteditable="true"]:empty:before {
+  content: attr(data-placeholder);
+  color: #aeaeae;
+  pointer-events: none;
+  display: block;
+  white-space: pre-wrap;
+  font-weight: normal;
 }

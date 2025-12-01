@@ -46,7 +46,7 @@ export function BottomNav({
                 alt={item.label}
                 className="w-6 h-6 object-contain"
               />
-              <span className="text-[12px] font-medium">{item.label}</span>
+              <span className="text-[12px] font-normal">{item.label}</span>
             </button>
           );
         })}

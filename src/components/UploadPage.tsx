@@ -39,7 +39,7 @@ import {
 } from "./ui/alert-dialog";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 // 원본 필터 목록
@@ -311,10 +311,10 @@ export function UploadPage({
           video:
             videoDevices.length > 1
               ? {
-                  facingMode: isFrontCamera
-                    ? "user"
-                    : "environment",
-                }
+                facingMode: isFrontCamera
+                  ? "user"
+                  : "environment",
+              }
               : true,
           audio: false,
         };
@@ -466,9 +466,8 @@ export function UploadPage({
       }
 
       const today = new Date();
-      const createdAt = `${today.getFullYear()}-${
-        today.getMonth() + 1
-      }-${today.getDate()}`;
+      const createdAt = `${today.getFullYear()}-${today.getMonth() + 1
+        }-${today.getDate()}`;
 
       onUpload({
         image: finalImage,
@@ -745,103 +744,103 @@ export function UploadPage({
                         weatherInput ||
                         timeInput ||
                         healthInput) && (
-                        <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
-                          {/* 위치 */}
-                          {locationInput && (
-                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                              <MapPin
-                                size={16}
-                                className="text-white"
-                              />
-                              <span className="text-white text-sm">
-                                {locationInput}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setLocationInput("")
-                                }
-                                className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                              >
-                                <X
-                                  size={10}
+                          <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
+                            {/* 위치 */}
+                            {locationInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <MapPin
+                                  size={16}
                                   className="text-white"
                                 />
-                              </button>
-                            </div>
-                          )}
-                          {/* 날씨 */}
-                          {weatherInput && (
-                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                              <Cloud
-                                size={16}
-                                className="text-white"
-                              />
-                              <span className="text-white text-sm">
-                                {weatherInput}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setWeatherInput("")
-                                }
-                                className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                              >
-                                <X
-                                  size={10}
+                                <span className="text-white text-sm">
+                                  {locationInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setLocationInput("")
+                                  }
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <X
+                                    size={10}
+                                    className="text-white"
+                                  />
+                                </button>
+                              </div>
+                            )}
+                            {/* 날씨 */}
+                            {weatherInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <Cloud
+                                  size={16}
                                   className="text-white"
                                 />
-                              </button>
-                            </div>
-                          )}
-                          {/* 시간 */}
-                          {timeInput && (
-                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                              <Clock
-                                size={16}
-                                className="text-white"
-                              />
-                              <span className="text-white text-sm">
-                                {timeInput}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => setTimeInput("")}
-                                className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                              >
-                                <X
-                                  size={10}
+                                <span className="text-white text-sm">
+                                  {weatherInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setWeatherInput("")
+                                  }
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <X
+                                    size={10}
+                                    className="text-white"
+                                  />
+                                </button>
+                              </div>
+                            )}
+                            {/* 시간 */}
+                            {timeInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <Clock
+                                  size={16}
                                   className="text-white"
                                 />
-                              </button>
-                            </div>
-                          )}
-                          {/* 건강 */}
-                          {healthInput && (
-                            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                              <Heart
-                                size={16}
-                                className="text-white"
-                              />
-                              <span className="text-white text-sm">
-                                {healthInput}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setHealthInput("")
-                                }
-                                className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                              >
-                                <X
-                                  size={10}
+                                <span className="text-white text-sm">
+                                  {timeInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setTimeInput("")}
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <X
+                                    size={10}
+                                    className="text-white"
+                                  />
+                                </button>
+                              </div>
+                            )}
+                            {/* 건강 */}
+                            {healthInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <Heart
+                                  size={16}
                                   className="text-white"
                                 />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                                <span className="text-white text-sm">
+                                  {healthInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setHealthInput("")
+                                  }
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <X
+                                    size={10}
+                                    className="text-white"
+                                  />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                       {/* 텍스트 입력 / 캡슐 */}
                       <div
@@ -930,10 +929,10 @@ export function UploadPage({
                 }}
                 className="absolute left-4 p-1"
               >
-                   <ChevronLeft
-                size={24}
-                className="text-[#555555]"
-              />
+                <ChevronLeft
+                  size={24}
+                  className="text-[#555555]"
+                />
               </button>
               <button
                 onClick={() => setIsFilterMode(false)}
@@ -997,10 +996,10 @@ export function UploadPage({
           className="absolute left-0 right-0 z-10  px-5 xs:px-6 sm:px-8 pb-10 bg-[#f7f7f7] max-w-[500px] mx-auto"
           style={
             showTextInput &&
-            isDetailEditMode &&
-            isMobile &&
-            isTextInputFocused &&
-            keyboardHeight > 0
+              isDetailEditMode &&
+              isMobile &&
+              isTextInputFocused &&
+              keyboardHeight > 0
               ? { bottom: -keyboardHeight } // 키보드만큼 내려서 가려지게
               : { bottom: 0 } // 평소엔 화면 맨 아래 고정
           }
@@ -1049,11 +1048,10 @@ export function UploadPage({
                     >
                       {({ isActive }) => (
                         <button
-                          className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${
-                            isActive
+                          className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
                               ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
                               : "bg-[#EEEEEE] text-gray-400 scale-95"
-                          }`}
+                            }`}
                         >
                           {filter.name.toUpperCase()}
                         </button>

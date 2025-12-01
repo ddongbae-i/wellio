@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { toast } from "sonner";
 import { motion } from "motion/react";
+import { hospitalMap } from "./hospitalInfo";
 
 interface ReviewWritePageProps {
   onBack: () => void;
@@ -50,56 +51,72 @@ export function ReviewWritePage({
   onBack,
   onComplete,
   hospitalName = "매일건강의원",
-  visitDate = "2025.08.11(월) 14:00",
+  visitDate = "2025.08.08(월) 14:00",
   hospitalImage,
   userName = "사용자",
   hospitalId = 1,
   editingReview,
 }: ReviewWritePageProps) {
+  // 🔹 hospitalMap + props 를 합쳐서 최종 병원 정보 결정
+  const hospitalInfoFromId =
+    hospitalId !== undefined ? hospitalMap[hospitalId] : undefined;
+
+  const hospitalInfoFromName =
+    !hospitalInfoFromId && hospitalName
+      ? Object.values(hospitalMap).find(
+        (h) => h.name === hospitalName,
+      )
+      : undefined;
+
+  const resolvedHospital = hospitalInfoFromId || hospitalInfoFromName;
+
+  const finalHospitalId = resolvedHospital?.id ?? hospitalId ?? 0;
+  const finalHospitalName = resolvedHospital?.name ?? hospitalName;
+  const finalHospitalImage =
+    resolvedHospital?.imageUrl ??
+    hospitalImage ??
+    "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=120&h=120&fit=crop";
+
   const [rating, setRating] = useState(
     editingReview?.rating || 0,
   );
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [selectedKeywords, setSelectedKeywords] = useState<
-    string[]
-  >(editingReview?.keywords || []);
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>(
+    editingReview?.keywords || [],
+  );
   const [reviewText, setReviewText] = useState(
     editingReview?.reviewText || "",
   );
 
   const handleKeywordClick = (keyword: string) => {
     if (selectedKeywords.includes(keyword)) {
-      // 이미 선택된 키워드를 클릭하면 제거
       setSelectedKeywords(
         selectedKeywords.filter((k) => k !== keyword),
       );
     } else {
-      // 새로운 키워드 선택 (최대 3개)
       if (selectedKeywords.length < 3) {
         setSelectedKeywords([...selectedKeywords, keyword]);
       } else {
-        toast.error(
-          "키워드는 최대 3개까지 선택할 수 있습니다.",
-        );
+        toast.error("키워드는 최대 3개까지 선택할 수 있습니다.");
       }
     }
   };
 
+  const isFormValid =
+    rating > 0 && selectedKeywords.length >= 1;
+
   const handleSubmit = () => {
     if (!isFormValid) return;
 
-    // 리뷰 제출 로직
     toast.success(
       editingReview ? "리뷰가 수정되었습니다!" : "리뷰가 작성되었습니다!",
     );
 
     if (onComplete) {
       onComplete({
-        hospitalId,
-        hospitalName,
-        hospitalImage:
-          hospitalImage ||
-          "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=120&h=120&fit=crop",
+        hospitalId: finalHospitalId,
+        hospitalName: finalHospitalName,
+        hospitalImage: finalHospitalImage,
         visitDate,
         rating,
         keywords: selectedKeywords,
@@ -113,10 +130,6 @@ export function ReviewWritePage({
       onBack();
     }
   };
-
-  // 폼 유효성 검사: 별점 선택, 키워드 1개 이상 필수
-  const isFormValid =
-    rating > 0 && selectedKeywords.length >= 1;
 
   const isEditMode = !!editingReview;
 
@@ -146,22 +159,19 @@ export function ReviewWritePage({
       </header>
 
       {/* Content */}
-      <div className="pb-32 px-4 xs:px-6 sm:px-8 pt-5 space-y-3">
+      <div className="pb-10 px-5 xs:px-6 sm:px-8 pt-5 space-y-3">
         {/* 병원 정보 카드 */}
         <div className="flex items-center bg-white p-4 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] px-5 py-4">
           <div className="w-[48px] h-[48px] rounded-[8px] overflow-hidden border border-[#f0f0f0] flex-shrink-0 mr-4">
             <ImageWithFallback
-              src={
-                hospitalImage ||
-                "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=120&h=120&fit=crop"
-              }
-              alt={hospitalName}
+              src={finalHospitalImage}
+              alt={finalHospitalName}
               className="w-full h-full object-cover"
             />
           </div>
           <div>
-            <p className="text-[#2b2b2b] mb-1 text-[19px] font-semibold">
-              {hospitalName}
+            <p className="text-[#2b2b2b] mb-[2px] text-[19px] font-semibold">
+              {finalHospitalName}
             </p>
             <p className="text-[15px] text-[#555555]">
               {visitDate}
@@ -184,10 +194,10 @@ export function ReviewWritePage({
                 className="transition-transform hover:scale-110"
               >
                 <Star
-                  size={40}
+                  size={35}
                   className={`${star <= (hoveredRating || rating)
                     ? "fill-[#FFB800] text-[#FFB800]"
-                    : "text-gray-300"
+                    : "fill-[#e8e8e8] text-[#e8e8e8]"
                     } transition-colors`}
                 />
               </button>
@@ -197,12 +207,12 @@ export function ReviewWritePage({
 
         {/* 키워드 선택 영역 */}
         <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-[#1A1A1A]">키워드 선택</h3>
+          <div className="flex gap-1 items-center mb-3">
+            <h3 className="text-[#202020] text-[17px] font-medium">키워드 선택 </h3>
             <span
               className={`${selectedKeywords.length === 3
-                ? "text-[#36D2C5]"
-                : "text-gray-500"
+                ? "text-[#202020]"
+                : "text-[#202020]"
                 }`}
             >
               {selectedKeywords.length}/3
@@ -214,7 +224,7 @@ export function ReviewWritePage({
                 key={keyword}
                 onClick={() => handleKeywordClick(keyword)}
                 className={`px-3 py-2 rounded-[8px] text-sm transition-all ${selectedKeywords.includes(keyword)
-                  ? "bg-[#E2F7F7] text-[#2b2b2b] border-[#BCEEEE]"
+                  ? "bg-[#E2F7F7] text-[#2b2b2b] border border-[#BCEEEE]"
                   : "bg-white text-[#777777] border border-[#e8e8e8] hover:border-[#E2F7F7]"
                   }`}
               >
@@ -238,9 +248,11 @@ export function ReviewWritePage({
                focus:outline-none focus:border-[#36D2C5] transition-colors bg-white shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
           />
 
-          {/* 글자수 카운트 → 내부 오른쪽 아래 배치 */}
+          {/* 글자수 카운트 */}
           <span className="absolute bottom-[26px] right-5 text-[12px]">
-            <span className="text-[#777777]">{reviewText.length}</span>
+            <span className="text-[#777777]">
+              {reviewText.length}
+            </span>
             <span className="text-[#aeaeae]"> / 400</span>
           </span>
         </div>

@@ -59,10 +59,10 @@ interface MedicalVisit {
 const mockRecords: MedicalRecord[] = [
   {
     id: 1,
-    code: "20250811-012345",
+    code: "20250808-012345",
     userId: "kim-ds",
     hospitalId: 1,
-    visitDate: "2025.08.11",
+    visitDate: "2025.08.08(월)",
     visitTime: "14:00",
     doctor: "이준호",
     memo: "아빠 감기몸살로 내원, 3일 뒤 재진",
@@ -73,7 +73,7 @@ const mockRecords: MedicalRecord[] = [
     code: "20250805-012345",
     userId: "park-sw",
     hospitalId: 8,
-    visitDate: "2025.08.05",
+    visitDate: "2025.08.05(화)",
     visitTime: "10:25",
     doctor: "김슬기",
     memo: "엄마 2일마다 물리치료",
@@ -139,7 +139,7 @@ const mockMedicalVisits: MedicalVisit[] = [
   },
 
   {
-    id: 3,
+    id: 7,
     type: "hospital",
     name: "희망찬정신건강의학과의원",
     visitDate: "2025.05.31",
@@ -152,6 +152,8 @@ const getDayOfWeek = (dateString: string) => {
   if (dateString.includes("08.11")) return "(월)";
   if (dateString.includes("08.05")) return "(화)";
   if (dateString.includes("07.14")) return "(월)";
+  if (dateString.includes("06.27")) return "(금)";
+  if (dateString.includes("05.31")) return "(토)";
   if (
     dateString.includes("07.05") &&
     mockMedicalVisits.some(
@@ -242,16 +244,17 @@ export function MedicalHistoryPage({
     <div className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto min-h-screen">
       {/* Sticky Header + Tabs + Filters */}
       <motion.div
-        className="sticky top-0 z-30 bg-[#f7f7f7]"
+        // 🔹 전체 헤더 영역에만 글래스 + 살짝 투명 배경
+        className="sticky top-0 z-30 backdrop-blur-md bg-[#f7f7f7]/70"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Header (원래 레이아웃 유지) */}
-        <header className="px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full relative">
+        {/* Header */}
+        <header className="px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full relative bg-transparent">
           <button
             onClick={onBack}
-            className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
+            className="absolute left-5 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
           >
             <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
           </button>
@@ -262,7 +265,7 @@ export function MedicalHistoryPage({
 
         {/* Tabs */}
         <div>
-          <div className="flex border-b border-[#e1e1e1] bg-[#f7f7f7]/80 backdrop-blur-xs text-[19px] font-semibold">
+          <div className="flex border-b border-[#e1e1e1] text-[19px] font-semibold bg-transparent">
             <button
               onClick={() => setActiveTab("treatment")}
               className={`flex-1 py-4 text-center transition-colors ${activeTab === "treatment"
@@ -275,7 +278,7 @@ export function MedicalHistoryPage({
             <button
               onClick={() => setActiveTab("medical")}
               className={`flex-1 py-4 text-center transition-colors ${activeTab === "medical"
-                ? "text-[#135252] border-b-2 border-[#135252] "
+                ? "text-[#135252] border-b-2 border-[#135252]"
                 : "text-[#aeaeae] font-medium"
                 }`}
             >
@@ -285,8 +288,7 @@ export function MedicalHistoryPage({
 
           {/* Filter Tags: 기간검색 + 프로필 Swiper */}
           {activeTab === "treatment" && (
-            <div className="flex gap-2 px-4 xs:px-6 sm:px-8 pt-5 pb-3">
-
+            <div className="flex gap-2 filter-wrap pt-5 pb-3 bg-transparent">
               {/* 기간검색 버튼 */}
               <button
                 onClick={() => setSelectedFilter("period")}
@@ -296,8 +298,8 @@ export function MedicalHistoryPage({
                 <img src={ChevronDown} alt="뒤로가기" className="w-5 h-5" />
               </button>
 
-              {/* 프로필 Swiper — 오른쪽 여백 제거 */}
-              <div className="flex-1 overflow-hidden -mr-4">
+              {/* 프로필 Swiper */}
+              <div className="flex-1 overflow-hidden history-filter-swiper">
                 <Swiper
                   slidesPerView="auto"
                   spaceBetween={8}
@@ -306,16 +308,15 @@ export function MedicalHistoryPage({
                   {profileFilters.map((filter) => (
                     <SwiperSlide
                       key={filter.id}
-                      className="!w-auto"
+                      className="!w-auto history-filter-slide"
                     >
                       <button
                         onClick={() =>
                           !filter.isAddButton && setSelectedFilter(filter.id)
                         }
-                        className={`pl-2 pr-3 py-[6px] rounded-full whitespace-nowrap text-sm transition-colors border flex items-center gap-1 
-                ${selectedFilter === filter.id
-                            ? "bg-[#E2F7F7] border-[#BCEEEE] text-[#2b2b2b] font-medium "
-                            : "border-[#aeaeae] text-[#777] font-normal"
+                        className={`pl-2 pr-3 py-[6px] rounded-full whitespace-nowrap text-sm transition-colors border flex items-center gap-1 ${selectedFilter === filter.id
+                          ? "bg-[#E2F7F7] border-[#BCEEEE] text-[#2b2b2b] font-medium "
+                          : "border-[#aeaeae] text-[#777] font-normal"
                           }`}
                       >
                         {filter.isAddButton ? (
@@ -338,15 +339,14 @@ export function MedicalHistoryPage({
                   ))}
                 </Swiper>
               </div>
-
             </div>
           )}
-
         </div>
       </motion.div>
 
+
       {/* Content */}
-      <div className="px-4 xs:px-6 sm:px-8 pb-10 bg-[#F7F7F7] flex-1">
+      <div className="px-5 xs:px-6 sm:px-8 pb-10 bg-[#F7F7F7] flex-1 mt-2">
         {activeTab === "treatment" ? (
           // 🔹 진료내역
           <div className="space-y-3">
@@ -429,13 +429,13 @@ export function MedicalHistoryPage({
                         contentEditable
                         suppressContentEditableWarning
                         onBlur={(e) => {
-                          const newMemo =
-                            e.currentTarget.textContent || "";
+                          const newMemo = e.currentTarget.textContent || "";
                           if (newMemo !== record.memo) {
                             onUpdateMemo?.(record.id, newMemo);
                           }
                         }}
-                        className="flex-1 outline-none"
+                        className="flex-1 outline-none memo-edit"  // ✅ 여기만 추가
+                        data-placeholder="나만의 메모를 추가해보세요" // ✅ placeholder 텍스트
                       >
                         {record.memo}
                       </div>

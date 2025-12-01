@@ -5,13 +5,15 @@ import {
   ArrowLeft,
   Star,
   Trash2,
-  ChevronRight,
   Pencil,
   X,
   Check,
-  ChevronLeft,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
+import ChevronRight from "../assets/images/icon_chevron_right.svg";
+import Trash from "../assets/images/icon_review_delete.svg"
+import Edit from "../assets/images/icon_review_edit.svg";
 
 interface MyReviewsPageProps {
   onBack: () => void;
@@ -166,19 +168,19 @@ export function MyReviewsPage({
 
   return (
     <div className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto min-h-screen">
-      <header className="sticky top-0 z-30 px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 w-full bg-[#f7f7f7] relative">
+      <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full relative bg-[#f7f7f7]/80 backdrop-blur-xs min-h-[80px]">
         <button
           onClick={onBack}
-          className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
+          className="absolute left-5 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
         >
-          <ChevronLeft size={24} className="text-[#1A1A1A]" />
+          <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>
-        <span className="text-[19px] font-semibold text-[#1A1A1A]">
+        <span className="text-[19px] font-semibold text-[#202020]">
           나의 후기
         </span>
       </header>
 
-      <div className="px-4 xs:px-6 sm:px-8 pt-5 pb-20 space-y-3">
+      <div className="px-5 xs:px-6 sm:px-8 pt-5 pb-10 space-y-3">
         <AnimatePresence>
           {displayReviews.map((review) => {
             const isExpanded = expandedReviewId === review.id;
@@ -218,10 +220,7 @@ export function MyReviewsPage({
                       <span className="font-semibold text-[#2b2b2b] text-[19px]">
                         {review.hospitalName}
                       </span>
-                      <ChevronRight
-                        size={20}
-                        className="text-[#555555]"
-                      />
+                      <img src={ChevronRight} alt="바로가기" className="w-5 h-5" />
                     </div>
                   </div>
 
@@ -252,7 +251,7 @@ export function MyReviewsPage({
                   </div>
 
                   {review.keywords.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-3">
+                    <div className="flex flex-wrap gap-1 mb-3">
                       {review.keywords.map((keyword, index) => (
                         <span
                           key={index}
@@ -359,9 +358,9 @@ export function MyReviewsPage({
                                 onClick={(e) =>
                                   handleEditClick(e, review)
                                 }
-                                className="flex items-center gap-1 text-gray-500 hover:text-gray-800 text-sm py-1 px-1 transition-colors"
+                                className="flex items-center gap-[4px] text-[#777777] hover:text-gray-800 text-[12px] py-1 px-1 transition-colors font-medium"
                               >
-                                <Pencil size={14} />
+                                <img src={Edit} alt="수정" className="w-[14px] h-[14px]" />
                                 <span>수정</span>
                               </button>
                               <button
@@ -371,9 +370,9 @@ export function MyReviewsPage({
                                     review.id,
                                   )
                                 }
-                                className="flex items-center gap-1 text-gray-500 hover:text-red-500 text-sm py-1 px-1 transition-colors"
+                                className="flex items-center gap-[2px] text-[#777777] hover:text-red-500 text-[12px] py-1 px-1 transition-colors font-medium"
                               >
-                                <Trash2 size={14} />
+                                <img src={Trash} alt="삭제" className="w-[14px] h-[14px]" />
                                 <span>삭제</span>
                               </button>
                             </>

@@ -9,6 +9,7 @@ import hos6 from "../assets/images/hos6.png";
 import hos7 from "../assets/images/hos7.png";
 import hos8 from "../assets/images/hos8.png";
 import hos9 from "../assets/images/hos9.png";
+import hos10 from "../assets/images/hos10.png";
 
 export type TodayStatus = "open" | "closed" | "break";
 
@@ -135,7 +136,7 @@ export const hospitalList: Hospital[] = [
     todayStatus: "open",
     rating: 4.4,
     reviews: 56,
-    imageUrl: hos7,
+    imageUrl: hos9,
   },
   {
     id: 10,
@@ -147,7 +148,7 @@ export const hospitalList: Hospital[] = [
     todayStatus: "closed",
     rating: 5.0,
     reviews: 240,
-    imageUrl: hos9,
+    imageUrl: hos10,
   },
 ];
 
