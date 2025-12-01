@@ -558,8 +558,24 @@ export function CommunityPage({
     viewportHeight ?? baseScreenHeight ?? 800;
 
   // 카드 한 묶음 높이 (처음 화면 기준, 키보드 올라와도 일정)
-  const cardHeight =
-    (baseScreenHeight ?? effectiveViewportHeight) - 160;
+  const contentHeightWithGnb =
+    effectiveViewportHeight - 110 - 80;
+  const contentHeightWithoutGnb =
+    effectiveViewportHeight - 110;
+
+  // 스크롤 컨테이너 전체 높이
+  const scrollContentHeight =
+    isGridView || isReactionView
+      ? contentHeightWithoutGnb // 그리드/리액션: 항상 GNB 없음
+      : isKeyboardVisible
+        ? contentHeightWithoutGnb // 키보드 떠 있으면 GNB 숨김
+        : contentHeightWithGnb;   // 기본(헤더+GNB 사이)
+
+  // 피드 한 묶음(카드+댓글 입력) 높이
+  const feedHeight =
+    isKeyboardVisible
+      ? contentHeightWithoutGnb // 키보드 뜨면 헤더~키보드 사이
+      : contentHeightWithGnb;   // 평소엔 헤더~GNB 사이
 
   return (
     <div className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden">
@@ -744,12 +760,7 @@ export function CommunityPage({
       <div
         className="w-full overflow-hidden"
         style={{
-          height:
-            isGridView || isReactionView
-              ? effectiveViewportHeight - 110
-              : isKeyboardVisible
-                ? effectiveViewportHeight - 110 // 키보드 올라오면 GNB 없이
-                : effectiveViewportHeight - 110 - 80, // 기본: 헤더+GNB 제외
+          height: scrollContentHeight,
         }}
       >
         {isReactionView ? (
