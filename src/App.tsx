@@ -18,6 +18,7 @@ import { HospitalReviewsPage } from "./components/HospitalReviewsPage"; // 👈 
 import { CalendarPage } from "./components/CalendarPage"; // 👈 CalendarPage import
 import { Toaster } from "sonner"; // 👈 Toaster import
 import { hospitalMap } from "./components/hospitalInfo";
+import { COMMUNITY_IMAGES } from "./components/communityImages";
 
 
 type Page =
@@ -918,14 +919,13 @@ export default function App() {
   const [posts, setPosts] = useState<Post[]>([
     {
       id: 1,
-      image:
-        "https://images.unsplash.com/photo-1476480862126-209bfaa8ed8c?w=800&q=80",
-      badge: "🏃 아침 러닝",
-      userAvatar: USERS.dongseok.avatar,
+      image: COMMUNITY_IMAGES.IMG1,
+      badge: "🏅 주 1회 함께 걷기",
+      userAvatar: USERS.wellie.avatar,
       caption: "챌린지 시작!",
-      userName: USERS.dongseok.name,
-      textOverlay: "오전 조깅으로 상쾌하게!",
-      createdAt: "2025-10-14",
+      userName: USERS.wellie.name,
+      textOverlay: "챌린지 첫 시작!",
+      createdAt: "2025-11-14",
       comments: [
         {
           userName: USERS.seunghee.name,
@@ -948,86 +948,76 @@ export default function App() {
     },
     {
       id: 2,
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80",
-      badge: "🧘‍♀️ 요가",
-      userAvatar: USERS.seunghee.avatar,
-      caption: "요가 수업",
-      userName: USERS.seunghee.name,
-      textOverlay: "몸과 마음을 편안하게",
+      image: COMMUNITY_IMAGES.IMG2,
+      userAvatar: USERS.dongseok.avatar,
+      caption: "혈압관리를 응원",
+      userName: USERS.dongseok.name,
+      textOverlay: "님의 혈압관리를 응원해 주세요!",
       createdAt: "2025-10-15",
       comments: [],
       reactions: [],
     },
     {
       id: 3,
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
-      badge: "💪 헬스",
-      userAvatar: USERS.dongseok.avatar,
-      caption: "웨이트 트레이닝",
-      userName: USERS.dongseok.name,
-      textOverlay: "챌린지 완료!",
-      createdAt: "2025-10-16",
+      image: COMMUNITY_IMAGES.IMG3,
+      userAvatar: USERS.wellie.avatar,
+      caption: "오늘도 혈당방어 성공!",
+      userName: USERS.wellie.name,
+      textOverlay: "오늘도 혈당방어 성공!",
+      createdAt: "2025-10-13",
       comments: [],
       reactions: [],
     },
     {
       id: 4,
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+      image: COMMUNITY_IMAGES.IMG4,
       badge: "💪 운동 완료",
       userAvatar: USERS.dongseok.avatar,
-      caption: "헬스장에서",
+      caption: "오운완",
       userName: USERS.dongseok.name,
-      textOverlay: "오늘도 열심히!",
-      createdAt: "2025-11-3",
+      textOverlay: "오늘도 친구놈 버리고 오운완!",
+      createdAt: "2025-10-10",
       comments: [],
       reactions: [],
     },
     {
       id: 5,
-      image:
-        "https://images.unsplash.com/photo-1552196563-55cd4e45efb3?w=800&q=80",
-      badge: "🏃 러닝 완료",
-      userAvatar: USERS.dongseok.avatar,
-      caption: "공원에서 조깅",
-      userName: USERS.dongseok.name,
-      textOverlay: "5km 완주!",
-      createdAt: "2025-11-7",
+      image: COMMUNITY_IMAGES.IMG5,
+      userAvatar: USERS.seunghee.avatar,
+      caption: "우리 가족 깍두기 준비 완료",
+      userName: USERS.seunghee.name,
+      textOverlay: "우리 가족 깍두기 준비 완료^^",
+      createdAt: "2025-10-08",
       comments: [],
       reactions: [],
     },
     {
       id: 6,
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80",
-      badge: "🧘‍♀️ 요가 완료",
-      userAvatar: USERS.seunghee.avatar,
-      caption: "저녁 요가",
-      userName: USERS.seunghee.name,
-      textOverlay: "몸과 마음을 정리하는 시간",
-      createdAt: "2025-11-13",
+      image: COMMUNITY_IMAGES.IMG6,
+      badge: "🏃 오운완",
+      userAvatar: USERS.wellie.avatar,
+      caption: "딸은 출석 완료입니다",
+      userName: USERS.wellie.name,
+      textOverlay: "딸은 출석 완료입니다",
+      createdAt: "2025-10-05",
       comments: [],
       reactions: [],
     },
     {
       id: 7,
-      image:
-        "https://images.unsplash.com/photo-1476480862126-209bfaa8ed8c?w=800&q=80",
-      badge: "🏆 챌린지 시작",
-      userAvatar: USERS.wellie.avatar,
+      image: COMMUNITY_IMAGES.IMG7,
+      badge: "올림픽공원",
+      userAvatar: USERS.seunghee.avatar,
       caption: "새로운 챌린지 시작!",
-      userName: USERS.wellie.name,
-      textOverlay: "주 3회 운동하기",
-      createdAt: "2025-11-16",
+      userName: USERS.seunghee.name,
+      textOverlay: "가을이 오나보다 🍂",
+      createdAt: "2025-10-05",
       comments: [],
       reactions: [],
     },
     {
       id: 8,
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+      image: COMMUNITY_IMAGES.IMG8,
       badge: "🏋️ 웨이트 트레이닝",
       userAvatar: USERS.dongseok.avatar,
       caption: "챌린지 4일차",
@@ -1039,8 +1029,7 @@ export default function App() {
     },
     {
       id: 9,
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+      image: COMMUNITY_IMAGES.IMG9,
       badge: "🏆 챌린지 완료",
       userAvatar: USERS.dongseok.avatar,
       caption: "챌린지 7일차 완료!",
@@ -1052,8 +1041,7 @@ export default function App() {
     },
     {
       id: 10,
-      image:
-        "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
+      image: COMMUNITY_IMAGES.IMG10,
       badge: "🥗 식단 챌린지",
       userAvatar: USERS.wellie.avatar,
       caption: "새로운 챌린지 시작!",
@@ -1065,8 +1053,7 @@ export default function App() {
     },
     {
       id: 11,
-      image:
-        "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=800&q=80",
+      image: COMMUNITY_IMAGES.IMG11,
       badge: "🥗 건강한 식단",
       userAvatar: USERS.wellie.avatar,
       caption: "식단 챌린지 완료!",
