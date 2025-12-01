@@ -180,28 +180,6 @@ export function CommunityPage({
 
   // 키보드 & 뷰포트 높이
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const initialHeight = window.innerHeight;
-
-    const handleResize = () => {
-      const newHeight = window.innerHeight;
-      const diff = initialHeight - newHeight;
-
-      // 대략 150px 이상 줄어들면 키보드 떴다고 판단
-      if (diff > 150) {
-        setIsKeyboardVisible(true);
-      } else if (diff < 50) {
-        // 거의 원래 높이로 돌아오면 키보드 내려간 걸로 판단
-        setIsKeyboardVisible(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [baseScreenHeight, setBaseScreenHeight] = useState<number | null>(null);
 
@@ -576,9 +554,20 @@ export function CommunityPage({
   const effectiveViewportHeight =
     viewportHeight ?? baseScreenHeight ?? 800;
 
-  // 카드 한 묶음 높이 (처음 화면 기준, 키보드 올라와도 일정)
-  const cardHeight =
-    (baseScreenHeight ?? effectiveViewportHeight) - 160;
+  const HEADER_HEIGHT = 110; // 헤더 + 위 여유
+  const GNB_HEIGHT = 80;
+
+  // 콘텐츠 영역 높이
+  const contentHeightWithoutKeyboard =
+    effectiveViewportHeight - HEADER_HEIGHT - GNB_HEIGHT; // 기본: 헤더 + GNB 제외
+  const contentHeightWithKeyboard =
+    effectiveViewportHeight - HEADER_HEIGHT; // 키보드 뜨면 GNB 없음
+
+  // ✅ 카드 한 묶음 높이: 컨텐츠 높이랑 거의 맞춰서
+  const cardHeight = isKeyboardVisible
+    ? contentHeightWithKeyboard
+    : contentHeightWithoutKeyboard;
+
 
   return (
     <div className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden">
@@ -765,10 +754,10 @@ export function CommunityPage({
         style={{
           height:
             isGridView || isReactionView
-              ? effectiveViewportHeight - 110
+              ? contentHeightWithKeyboard // 그리드/리액션 뷰는 GNB 없음
               : isKeyboardVisible
-                ? effectiveViewportHeight - 110 // 키보드 올라오면 GNB 없이
-                : effectiveViewportHeight - 110 - 80, // 기본: 헤더+GNB 제외
+                ? contentHeightWithKeyboard // 키보드 있을 때: 헤더만 제외
+                : contentHeightWithoutKeyboard, // 기본: 헤더 + GNB 제외
         }}
       >
         {isReactionView ? (

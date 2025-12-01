@@ -928,19 +928,29 @@ export default function App() {
       createdAt: "2025-11-14",
       comments: [
         {
+          userName: USERS.dongseok.name,
+          userAvatar: USERS.dongseok.avatar,
+          text: "우리가족 1등 가보자!",
+          timestamp: "5분 전",
+        },
+        {
           userName: USERS.seunghee.name,
           userAvatar: USERS.seunghee.avatar,
-          text: "1등 가보자!",
-          timestamp: "5분 전",
+          text: "워치까지 맞췄으니 꼭 끝까지 ~^^",
+          timestamp: "1분 전",
         },
       ],
       reactions: [
         {
-          emoji: "❤️",
+          emoji: "🎉",
           users: [
             {
               userName: USERS.seunghee.name,
               userAvatar: USERS.seunghee.avatar,
+            },
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
             },
           ],
         },
@@ -1084,6 +1094,11 @@ export default function App() {
         userAvatar: USERS.wellie.avatar,
         text: "아빠 배아프겠는데 ㅎㅎ",
         timestamp: "25.10.05",
+      }, {
+        userName: USERS.dongseok.name,
+        userAvatar: USERS.dongseok.avatar,
+        text: "혼자가니까 좋나!!",
+        timestamp: "25.10.05",
       },],
       reactions: [{
         emoji: "❤️",
@@ -1163,7 +1178,19 @@ export default function App() {
       textOverlay: "열심히 합시다",
       createdAt: "2025-09-20",
       comments: [],
-      reactions: [],
+      reactions: [{
+        emoji: "🔥",
+        users: [
+          {
+            userName: USERS.seunghee.name,
+            userAvatar: USERS.seunghee.avatar,
+          },
+          {
+            userName: USERS.dongseok.name,
+            userAvatar: USERS.dongseok.avatar,
+          },
+        ],
+      },],
     },
     {
       id: 11,
@@ -1224,7 +1251,7 @@ export default function App() {
           ],
         },
         {
-          emoji: "❤️",
+          emoji: "🎉",
           users: [
             {
               userName: USERS.dongseok.name,
