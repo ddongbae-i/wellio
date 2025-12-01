@@ -572,10 +572,9 @@ export function CommunityPage({
         : contentHeightWithGnb;   // 기본(헤더+GNB 사이)
 
   // 피드 한 묶음(카드+댓글 입력) 높이
-  const feedHeight =
-    isKeyboardVisible
-      ? contentHeightWithoutGnb // 키보드 뜨면 헤더~키보드 사이
-      : contentHeightWithGnb;   // 평소엔 헤더~GNB 사이
+  const feedHeight = isKeyboardVisible
+    ? contentHeightWithoutGnb - 80 // 키보드 있을 때 카드 묶음 높이
+    : contentHeightWithGnb - 24;
 
   return (
     <div className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden">

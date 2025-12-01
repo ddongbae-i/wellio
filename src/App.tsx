@@ -1063,38 +1063,82 @@ export default function App() {
       id: 10,
       image: COMMUNITY_IMAGES.IMG10,
       userAvatar: USERS.wellie.avatar,
-      caption: "새로운 챌린지 시작!",
+      caption: "열심히 합시다",
       userName: USERS.wellie.name,
-      textOverlay: "건강한 식단 3일",
-      createdAt: "2025-11-23",
+      textOverlay: "열심히 합시다",
+      createdAt: "2025-09-20",
       comments: [],
       reactions: [],
     },
     {
       id: 11,
       image: COMMUNITY_IMAGES.IMG11,
-      badge: "🥗 건강한 식단",
+      badge: "🏅 9월 누적 15만보 걷기",
       userAvatar: USERS.wellie.avatar,
-      caption: "식단 챌린지 완료!",
+      caption: "챌린지 완료",
       userName: USERS.wellie.name,
-      textOverlay: "3일 완주했어요!",
-      createdAt: "2025-11-25",
-      comments: [],
-      reactions: [],
+      textOverlay: "15만보 걷기 끝이 보인다",
+      createdAt: "2025-09-16",
+      comments: [
+        {
+          userName: USERS.seunghee.name,
+          userAvatar: USERS.seunghee.avatar,
+          text: "엄마는 아직 멀었어 ㅠㅠ",
+          timestamp: "25.09.16.",
+        },
+        {
+          userName: USERS.dongseok.name,
+          userAvatar: USERS.dongseok.avatar,
+          text: "딸램 장하다",
+          timestamp: "25.09.16.",
+        },
+      ],
+      reactions: [{
+        emoji: "🎉",
+        users: [
+          {
+            userName: USERS.seunghee.name,
+            userAvatar: USERS.seunghee.avatar,
+          },
+          {
+            userName: USERS.dongseok.name,
+            userAvatar: USERS.dongseok.avatar,
+          },
+        ],
+      },],
     },
     {
       id: 12,
       image: COMMUNITY_IMAGES.IMG12,
-      badge: "🥗 건강한 식단",
+      badge: "🏅 9월 누적 15만보 걷기",
       userAvatar: USERS.wellie.avatar,
-      caption: "식단 챌린지 완료!",
+      caption: "오챌완",
       userName: USERS.wellie.name,
-      textOverlay: "3일 완주했어요!",
-      createdAt: "2025-11-25",
+      textOverlay: "오챌완💪",
+      createdAt: "2025-09-15",
       comments: [],
-      reactions: [],
-    },
-    {
+
+      reactions: [
+        {
+          emoji: "👍",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+          emoji: "❤️",
+          users: [
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
+            },
+          ],
+        },
+
+      ],
+    }
+        {
       id: 13,
       image: COMMUNITY_IMAGES.IMG13,
       badge: "🥗 건강한 식단",
