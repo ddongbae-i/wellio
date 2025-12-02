@@ -1066,7 +1066,7 @@ export function UploadPage({
               {/* 👇 1. 여기서부터 "텍스트 입력 중이 아닐 때(!showTextInput)" 조건을 시작합니다 */}
               {!showTextInput && (
                 <>
-                  <div className="flex items-center justify-center m-4 gap-4">
+                  <div className="flex items-center justify-center mt-4 gap-4">
                     <button
                       onClick={handleTextInputToggle}
                       className=""
