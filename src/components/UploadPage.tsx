@@ -1287,7 +1287,7 @@ export function UploadPage({
                   </h3>
                   <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
                     {[
-                      "15만보 걷기",
+                      "다시 15만보 걷기",
                       "주 1회 함께 걷기",
                       "건강한 습관 만들기",
                       "가족 건강 상위 10%",
