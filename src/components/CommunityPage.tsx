@@ -1493,21 +1493,21 @@ export function CommunityPage({
             <div className="flex items-center justify-around">
               <button
                 onClick={() => setIsGridView(true)}
-                className="flex flex-col items-center gap-1 text-gray-800"
+                className="flex flex-col items-center gap-1 text-[#aeaeae]"
               >
 
                 <img src={LayoutGrid} alt="모아보기" className="w-6 h-6" />
-                <span className="text-xs font-semibold">
+                <span className="text-[12px] font-normal">
                   모아보기
                 </span>
               </button>
               <div className="w-16" />
               <button
-                className="flex flex-col items-center gap-1 text-gray-400"
+                className="flex flex-col items-center gap-1 [#aeaeae]"
                 onClick={() => onPageChange?.("calendar")}
               >
                 <img src={Calendar} alt="캘린더" className="w-6 h-6" />
-                <span className="text-xs">캘린더</span>
+                <span className="text-[12px]">캘린더</span>
               </button>
             </div>
             <button
