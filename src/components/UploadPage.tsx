@@ -1210,10 +1210,10 @@ export function UploadPage({
             >
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <h3 className="text-[17px] font-bold text-[#1A1A1A]">
+                  <h3 className="text-[17px] font-bold text-[#202020]">
                     오늘 운동 기록
                   </h3>
-                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm px-4 py-2">
                     <button
                       onClick={() =>
                         handleHealthRecordSelect(
@@ -1222,10 +1222,6 @@ export function UploadPage({
                       }
                       className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
                     >
-                      <Footprints
-                        size={16}
-                        className="text-gray-300"
-                      />
                       <span className="text-[15px] font-medium">
                         👟 걸음수
                       </span>
@@ -1238,11 +1234,6 @@ export function UploadPage({
                       }
                       className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
                     >
-                      <Flame
-                        size={16}
-                        className="text-orange-400"
-                        fill="currentColor"
-                      />
                       <span className="text-[15px] font-medium">
                         🔥 소모칼로리
                       </span>
@@ -1255,10 +1246,6 @@ export function UploadPage({
                       }
                       className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
                     >
-                      <TrendingUp
-                        size={16}
-                        className="text-yellow-500"
-                      />
                       <span className="text-[15px] font-medium">
                         🪜 오른층수
                       </span>
@@ -1266,7 +1253,7 @@ export function UploadPage({
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-[17px] font-bold text-[#1A1A1A]">
+                  <h3 className="text-[17px] font-bold text-[#202020]">
                     오늘 감정 기록
                   </h3>
                   <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1">
