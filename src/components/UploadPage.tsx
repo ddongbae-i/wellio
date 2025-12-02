@@ -38,7 +38,6 @@ import Upload from "../assets/images/icon_com_up.svg"
 import RefreshCw from "../assets/images/icon_com_change.svg"
 import ImageIcon from "../assets/images/icon_com_gallery.svg"
 import Sparkles from "../assets/images/icon_com_filter.svg"
-import { Filter } from "lucide-react";
 
 // 원본 필터 목록
 const ORIGINAL_FILTERS = [
@@ -1131,7 +1130,7 @@ export function UploadPage({
                 className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 transition-colors"
               >
                 {isUploadMode ? (
-                  <img src={Filter} alt="효과" className="w-[30px] h-[30px]" />
+                  <img src={Sparkles} alt="효과" className="w-[30px] h-[30px]" />
                 ) : (
                   <img src={RefreshCw} alt="카메라전환" className="w-[30px] h-[30px]" />
                 )}
