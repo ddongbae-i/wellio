@@ -57,7 +57,6 @@ export function ReviewWritePage({
   hospitalId = 1,
   editingReview,
 }: ReviewWritePageProps) {
-  // 🔹 hospitalMap + props 를 합쳐서 최종 병원 정보 결정
   const hospitalInfoFromId =
     hospitalId !== undefined ? hospitalMap[hospitalId] : undefined;
 
@@ -77,9 +76,7 @@ export function ReviewWritePage({
     hospitalImage ??
     "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=120&h=120&fit=crop";
 
-  const [rating, setRating] = useState(
-    editingReview?.rating || 0,
-  );
+  const [rating, setRating] = useState(editingReview?.rating || 0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>(
     editingReview?.keywords || [],
@@ -90,9 +87,7 @@ export function ReviewWritePage({
 
   const handleKeywordClick = (keyword: string) => {
     if (selectedKeywords.includes(keyword)) {
-      setSelectedKeywords(
-        selectedKeywords.filter((k) => k !== keyword),
-      );
+      setSelectedKeywords(selectedKeywords.filter((k) => k !== keyword));
     } else {
       if (selectedKeywords.length < 3) {
         setSelectedKeywords([...selectedKeywords, keyword]);
@@ -102,8 +97,7 @@ export function ReviewWritePage({
     }
   };
 
-  const isFormValid =
-    rating > 0 && selectedKeywords.length >= 1;
+  const isFormValid = rating > 0 && selectedKeywords.length >= 1;
 
   const handleSubmit = () => {
     if (!isFormValid) return;
@@ -135,7 +129,7 @@ export function ReviewWritePage({
 
   return (
     <motion.div
-      className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto min-h-screen"
+      className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto h-screen"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
@@ -158,10 +152,10 @@ export function ReviewWritePage({
         </span>
       </header>
 
-      {/* Content */}
-      <div className="pb-14 px-5 xs:px-6 sm:px-8 pt-5 space-y-3">
+      {/* 스크롤 영역 */}
+      <div className="flex-1 overflow-y-auto pb-[140px] px-5 xs:px-6 sm:px-8 pt-5 space-y-3">
         {/* 병원 정보 카드 */}
-        <div className="flex items-center bg-white p-4 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] px-5 py-4">
+        <div className="flex items-center bg-white rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] px-5 py-4">
           <div className="w-[48px] h-[48px] rounded-[8px] overflow-hidden border border-[#f0f0f0] flex-shrink-0 mr-4">
             <ImageWithFallback
               src={finalHospitalImage}
@@ -180,7 +174,7 @@ export function ReviewWritePage({
         </div>
 
         {/* 별점 선택 영역 */}
-        <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] text-center">
+        <div className="bg-white px-5 pt-[22px] pb:[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] text-center">
           <h3 className="text-[#202020] mb-3 text-[17px] font-medium">
             별점을 선택해 주세요.
           </h3>
@@ -196,8 +190,8 @@ export function ReviewWritePage({
                 <Star
                   size={35}
                   className={`${star <= (hoveredRating || rating)
-                    ? "fill-[#FFB800] text-[#FFB800]"
-                    : "fill-[#e8e8e8] text-[#e8e8e8]"
+                      ? "fill-[#FFB800] text-[#FFB800]"
+                      : "fill-[#e8e8e8] text-[#e8e8e8]"
                     } transition-colors`}
                 />
               </button>
@@ -209,12 +203,7 @@ export function ReviewWritePage({
         <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
           <div className="flex gap-1 items-center mb-3">
             <h3 className="text-[#202020] text-[17px] font-medium">키워드 선택 </h3>
-            <span
-              className={`${selectedKeywords.length === 3
-                ? "text-[#202020]"
-                : "text-[#202020]"
-                }`}
-            >
+            <span className="text-[#202020]">
               {selectedKeywords.length}/3
             </span>
           </div>
@@ -224,8 +213,8 @@ export function ReviewWritePage({
                 key={keyword}
                 onClick={() => handleKeywordClick(keyword)}
                 className={`px-3 py-2 rounded-[8px] text-sm transition-all ${selectedKeywords.includes(keyword)
-                  ? "bg-[#E2F7F7] text-[#2b2b2b] border border-[#BCEEEE]"
-                  : "bg-white text-[#777777] border border-[#e8e8e8] hover:border-[#E2F7F7]"
+                    ? "bg-[#E2F7F7] text-[#2b2b2b] border border-[#BCEEEE]"
+                    : "bg-white text-[#777777] border border-[#e8e8e8] hover:border-[#E2F7F7]"
                   }`}
               >
                 {keyword}
@@ -258,14 +247,14 @@ export function ReviewWritePage({
         </div>
       </div>
 
-      {/* 하단 고정 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-[500px] mx-auto p-5 pb-[46px] bg-white shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px]">
+      {/* 하단 고정 버튼 (flex 레이아웃으로 화면 하단 고정) */}
+      <div className="p-5 pb-[46px] bg-white shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px]">
         <button
           onClick={handleSubmit}
           disabled={!isFormValid}
           className={`h-[60px] w-full rounded-xl text-white transition-all ${isFormValid
-            ? "bg-[#2ECACA] hover:bg-[#239C9C] cursor-pointer"
-            : "bg-[#f0f0f0] cursor-not-allowed text-[#aeaeae]"
+              ? "bg-[#2ECACA] hover:bg-[#239C9C] cursor-pointer"
+              : "bg-[#f0f0f0] cursor-not-allowed text-[#aeaeae]"
             }`}
         >
           {isEditMode ? "수정 완료" : "작성 완료"}
