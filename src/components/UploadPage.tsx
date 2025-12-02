@@ -1071,60 +1071,45 @@ export function UploadPage({
                       onClick={handleTextInputToggle}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#E5F9F8] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
                         <Type size={24} />
                       </div>
-                      <span className="text-xs text-gray-600">
-                        텍스트
-                      </span>
                     </button>
 
                     <button
                       onClick={handleLocationInput}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#FFF4E5] text-[#FF9800] transition-colors hover:bg-[#FFE8CC]">
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
                         <MapPin size={24} />
                       </div>
-                      <span className="text-xs text-gray-600">
-                        위치
-                      </span>
                     </button>
 
                     <button
                       onClick={handleWeatherInput}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#E8F8F7] text-[#36D2C5] transition-colors hover:bg-[#D0F0ED]">
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
                         <Cloud size={24} />
                       </div>
-                      <span className="text-xs text-gray-600">
-                        날씨
-                      </span>
                     </button>
 
                     <button
                       onClick={handleTimeInput}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#F3E5F5] text-[#9C27B0] transition-colors hover:bg-[#E1BEE7]">
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
                         <Clock size={24} />
                       </div>
-                      <span className="text-xs text-gray-600">
-                        시간
-                      </span>
                     </button>
 
                     <button
                       onClick={handleHealthInput}
                       className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[#FFEBEE] text-[#F44336] transition-colors hover:bg-[#FFCDD2]">
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
                         <Heart size={24} />
                       </div>
-                      <span className="text-xs text-gray-600">
-                        건강
-                      </span>
                     </button>
                   </div>
 
