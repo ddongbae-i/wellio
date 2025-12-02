@@ -895,7 +895,7 @@ export function CommunityPage({
                   className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8
     ${!isKeyboardVisible
                       ? "justify-center snap-start snap-always"
-                      : "justify-start pb-300px"
+                      : "justify-start pb-100px"
                     }
   `}
                   key={post.id}

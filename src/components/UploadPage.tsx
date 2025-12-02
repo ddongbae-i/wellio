@@ -1213,14 +1213,14 @@ export function UploadPage({
                   <h3 className="text-[17px] font-bold text-[#202020]">
                     오늘 운동 기록
                   </h3>
-                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm px-4 py-2">
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
                     <button
                       onClick={() =>
                         handleHealthRecordSelect(
                           "👟 8,542보",
                         )
                       }
-                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
+                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
                     >
                       <span className="text-[15px] font-medium">
                         👟 걸음수
@@ -1232,7 +1232,7 @@ export function UploadPage({
                           "🔥 450kcal",
                         )
                       }
-                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
+                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
                     >
                       <span className="text-[15px] font-medium">
                         🔥 소모칼로리
@@ -1244,7 +1244,7 @@ export function UploadPage({
                           "🪜 12층",
                         )
                       }
-                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
+                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
                     >
                       <span className="text-[15px] font-medium">
                         🪜 오른층수
@@ -1287,7 +1287,7 @@ export function UploadPage({
                   </h3>
                   <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
                     {[
-                      "이미지 넣기 15만보 걷기",
+                      "15만보 걷기",
                       "주 1회 함께 걷기",
                       "건강한 습관 만들기",
                       "가족 건강 상위 10%",
