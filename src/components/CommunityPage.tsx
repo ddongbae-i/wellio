@@ -882,7 +882,7 @@ export function CommunityPage({
         ) : (
           <div
             ref={scrollContainerRef}
-            className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide ${!isKeyboardVisible ? "snap-y snap-mandatory" : "pb-10"
+            className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide snap-y snap-mandatory ${isKeyboardVisible ? "pb-40" : ""
               }`}
           >
             {filteredPosts.map((post) => {
@@ -892,18 +892,15 @@ export function CommunityPage({
                   ref={(el) => {
                     postRefs.current[post.id] = el;
                   }}
-                  className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8
-    ${!isKeyboardVisible
-                      ? "justify-center snap-start snap-always"
-                      : "justify-start pt-4"
-                    }
-  `}
+                  className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 snap-start snap-always ${isKeyboardVisible ? "justify-start pt-4" : "justify-center"
+                    }`}
                   key={post.id}
                   style={{
                     height: cardHeight,
-                    minHeight: cardHeight,   // ✅ 키보드 떠도 항상 같은 카드 높이 유지
+                    minHeight: cardHeight, // 카드 높이는 그대로 유지
                   }}
                 >
+
                   <div>
                     <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400]">
                       {post.userName === currentUser.userName &&
