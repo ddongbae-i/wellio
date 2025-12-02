@@ -500,9 +500,24 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       toast.error("카메라를 사용할 수 없습니다.");
     }
   };
+  const isIOSStandalone = () =>
+    (window.navigator as any).standalone === true ||
+    window.matchMedia("(display-mode: standalone)").matches;
 
-  const handleCameraSwitch = () =>
+  const handleCameraSwitch = () => {
+    // iOS PWA 감지
+    if (isIOSStandalone()) {
+      // 업로드 모드 진입 전이면 → 촬영모드 fallback
+      if (!isUploadMode) {
+        fileInputRef.current?.setAttribute("capture", "environment");
+        fileInputRef.current?.click();
+        return;
+      }
+    }
+
+    // 정상 웹 환경 → 전면/후면 전환
     setIsFrontCamera((prev) => !prev);
+  };
 
   const handleImageSelect = (
     event: React.ChangeEvent<HTMLInputElement>,
