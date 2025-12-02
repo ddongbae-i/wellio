@@ -549,7 +549,25 @@ export function CommunityPage({
     };
   }, []);
 
+  useEffect(() => {
+    if (!isKeyboardVisible || currentPostId == null) return;
 
+    const container = scrollContainerRef.current;
+    const el = postRefs.current[currentPostId];
+    if (!container || !el) return;
+
+    // 이 값이 "얼마나 위로 올릴지"를 정하는 값
+    // 숫자 줄이면 -> 카드가 화면에서 더 아래에 위치
+    // 숫자 늘리면 -> 카드가 헤더 가까이 더 올라감
+    const HEADER_OFFSET = 140; // 120~160 사이에서 취향대로 조절해봐
+
+    const targetTop = Math.max(el.offsetTop - HEADER_OFFSET, 0);
+
+    container.scrollTo({
+      top: targetTop,
+      behavior: "smooth",
+    });
+  }, [isKeyboardVisible, currentPostId]);
 
   // 처음 화면 높이 (없으면 800 fallback)
   const baseHeight = screenHeight ?? 800;
@@ -567,7 +585,7 @@ export function CommunityPage({
 
   // 카드 한 묶음 높이: 항상 일정(키보드 여부 상관 X)
   // 160이 너무 크거나 작으면 숫자만 살짝 조절해서 본인 폰에 맞춰봐
-  const cardHeight = baseHeight - 100;
+  const cardHeight = baseHeight - 160;
 
 
   return (
@@ -769,7 +787,7 @@ export function CommunityPage({
         {isReactionView ? (
           <div className="pb-20">
             {/* 리액션 필터 바 */}
-            <div className="px-4 py-4 flex gap-3 overflow-x-auto scrollbar-hide bg-white sticky top-0 z-20 justify-center">
+            <div className="px-5 py-4 flex gap-3 overflow-x-auto scrollbar-hide bg-white sticky top-0 z-20 justify-center">
               <button
                 onClick={() => setReactionFilter("ALL")}
                 className={`flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center text-sm font-bold transition-all border-2 ${reactionFilter === "ALL"
