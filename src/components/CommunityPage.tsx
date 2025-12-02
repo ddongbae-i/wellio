@@ -913,7 +913,7 @@ export function CommunityPage({
         ) : (
           <div
             ref={scrollContainerRef}
-            className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide snap-y snap-mandatory ${isKeyboardVisible ? "pb-40" : ""
+            className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide snap-y snap-mandatory ${isKeyboardVisible ? "pb-20" : ""
               }`}
           >
             {filteredPosts.map((post) => {
@@ -1281,53 +1281,38 @@ export function CommunityPage({
                                     ))}
                                   </motion.div>
                                 ) : (
-                                  <motion.div
+                                  <motion.form
                                     key="comment-input"
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
                                     transition={{ duration: 0.25 }}
                                     className="absolute inset-y-1 inset-x-0 flex items-center bg-[#f0f0f0] border border-[#777777] backdrop-blur-md rounded-[16px] px-4"
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      if (currentPostId === post.id && newComment.trim()) {
+                                        handleAddComment(post.id);
+                                      }
+                                    }}
                                   >
                                     <input
                                       type="text"
                                       placeholder="댓글을 작성해주세요"
                                       className="w-full bg-transparent outline-none text-[#2b2b2b] placeholder:text-[#aeaeae]"
-                                      value={
-                                        currentPostId ===
-                                          post.id
-                                          ? newComment
-                                          : ""
-                                      }
+                                      enterKeyHint="send"               // iOS 키보드에 '보내기' 느낌 주기
+                                      value={currentPostId === post.id ? newComment : ""}
                                       onChange={(e) => {
-                                        if (
-                                          currentPostId !==
-                                          post.id
-                                        )
-                                          return;
+                                        if (currentPostId !== post.id) return;
 
-                                        const value =
-                                          e.target.value;
-                                        const maxLen =
-                                          getMaxCommentLength(
-                                            value,
-                                          );
+                                        const value = e.target.value;
+                                        const maxLen = getMaxCommentLength(value);
                                         const trimmed =
-                                          value.length <=
-                                            maxLen
-                                            ? value
-                                            : value.slice(
-                                              0,
-                                              maxLen,
-                                            );
-                                        setNewComment(
-                                          trimmed,
-                                        );
+                                          value.length <= maxLen ? value : value.slice(0, maxLen);
+                                        setNewComment(trimmed);
                                       }}
                                       onFocus={(e) => {
                                         setCurrentPostId(post.id);
                                         e.preventDefault();
-                                        // 브라우저의 자동 스크롤 방지
                                         if (scrollContainerRef.current) {
                                           const currentScroll = scrollContainerRef.current.scrollTop;
                                           setTimeout(() => {
@@ -1337,25 +1322,24 @@ export function CommunityPage({
                                           }, 0);
                                         }
                                       }}
-
                                       onKeyDown={(e) => {
-                                        if (
-                                          e.key === "Enter" &&
-                                          !e.shiftKey
-                                        ) {
+                                        // 한글 조합 중에는 Enter를 무시
+                                        const nativeEvent = e.nativeEvent as KeyboardEvent & {
+                                          isComposing?: boolean;
+                                        };
+
+                                        if (nativeEvent.isComposing) return;
+
+                                        if (e.key === "Enter" && !e.shiftKey) {
                                           e.preventDefault();
-                                          if (
-                                            currentPostId ===
-                                            post.id
-                                          ) {
-                                            handleAddComment(
-                                              post.id,
-                                            );
+                                          if (currentPostId === post.id && newComment.trim()) {
+                                            handleAddComment(post.id);
                                           }
                                         }
                                       }}
                                     />
-                                  </motion.div>
+                                  </motion.form>
+
                                 )}
                               </AnimatePresence>
                             </div>

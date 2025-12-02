@@ -1032,7 +1032,7 @@ export function UploadPage({
               </div>
             </div>
           ) : isDetailEditMode ? (
-            <div className="flex flex-col items-center gap-3 max-w-md mx-auto px-4">
+            <div className="flex flex-col items-center gap-5 max-w-md mx-auto px-4">
               {/* 👇 1. 여기서부터 "텍스트 입력 중이 아닐 때(!showTextInput)" 조건을 시작합니다 */}
               {!showTextInput && (
                 <>
@@ -1086,9 +1086,9 @@ export function UploadPage({
                   {/* 👇 2. 원래 밖에 있던 "업로드 버튼"을 여기(조건문 안)로 가져왔습니다 */}
                   <button
                     onClick={handleCapture}
-                    className="w-16 h-16 rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                    className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
                   >
-                    <img src={Upload} alt="업로드" className="w-[70px] h-[70px]" />
+                    <img src={Upload} alt="업로드" className="w-[35px] h-[35px]" />
                   </button>
                 </>
               )}
@@ -1104,7 +1104,7 @@ export function UploadPage({
                 className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder- bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
               >
                 {isUploadMode ? (
-                  <img src={Edit} alt="꾸미기" className="w-[30px] h-[30px]" />
+                  <img src={Edit} alt="꾸미기" className="w-[24px] h-[24px]" />
                 ) : (
                   <img src={ImageIcon} alt="꾸미기" className="w-[30px] h-[30px]" />
                 )}
@@ -1112,12 +1112,12 @@ export function UploadPage({
 
               <button
                 onClick={handleCapture}
-                className="w-16 h-16 rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
               >
                 {isUploadMode ? (
-                  <img src={Upload} alt="업로드" className="w-[70px] h-[70px]" />
+                  <img src={Upload} alt="업로드" className="w-[35px] h-[35px]" />
                 ) : (
-                  <div className="w-14 h-14 rounded-full border-4 border-white" />
+                  <div className="w-[70px] h-[70px] rounded-full border-4 border-white" />
                 )}
               </button>
 
@@ -1127,12 +1127,12 @@ export function UploadPage({
                     ? handleFilter
                     : handleCameraSwitch
                 }
-                className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 transition-colors"
+                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder- bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
               >
                 {isUploadMode ? (
-                  <img src={Sparkles} alt="효과" className="w-[30px] h-[30px]" />
+                  <img src={Sparkles} alt="효과" className="w-[32px] h-[32px]" />
                 ) : (
-                  <img src={RefreshCw} alt="카메라전환" className="w-[30px] h-[30px]" />
+                  <img src={RefreshCw} alt="카메라전환" className="w-[27px] h-[27px]" />
                 )}
               </button>
             </div>
