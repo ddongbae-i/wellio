@@ -1049,8 +1049,8 @@ export function UploadPage({
                       {({ isActive }) => (
                         <button
                           className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                              ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                              : "bg-[#EEEEEE] text-gray-400 scale-95"
+                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
+                            : "bg-[#EEEEEE] text-gray-400 scale-95"
                             }`}
                         >
                           {filter.name.toUpperCase()}
@@ -1291,6 +1291,62 @@ export function UploadPage({
                         {emoji}
                       </button>
                     ))}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-[17px] font-bold text-[#1A1A1A]">
+                    오늘 운동 기록
+                  </h3>
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                    <button
+                      onClick={() =>
+                        handleHealthRecordSelect(
+                          "걸음수 8,542보",
+                        )
+                      }
+                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
+                    >
+                      <Footprints
+                        size={16}
+                        className="text-gray-300"
+                      />
+                      <span className="text-[15px] font-medium">
+                        걸음수
+                      </span>
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleHealthRecordSelect(
+                          "소모칼로리 450kcal",
+                        )
+                      }
+                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
+                    >
+                      <Flame
+                        size={16}
+                        className="text-orange-400"
+                        fill="currentColor"
+                      />
+                      <span className="text-[15px] font-medium">
+                        소모칼로리
+                      </span>
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleHealthRecordSelect(
+                          "오른층수 12층",
+                        )
+                      }
+                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
+                    >
+                      <TrendingUp
+                        size={16}
+                        className="text-yellow-500"
+                      />
+                      <span className="text-[15px] font-medium">
+                        오른층수
+                      </span>
+                    </button>
                   </div>
                 </div>
               </div>

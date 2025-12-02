@@ -565,9 +565,7 @@ export function CommunityPage({
 
   // 카드 한 묶음 높이: 항상 일정(키보드 여부 상관 X)
   // 160이 너무 크거나 작으면 숫자만 살짝 조절해서 본인 폰에 맞춰봐
-  const cardHeight = isKeyboardVisible
-    ? baseHeight - 350  // 키보드 있을 때는 더 작게
-    : baseHeight - 160; // 기본
+  const cardHeight = baseHeight - 160;
 
 
   return (
