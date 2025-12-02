@@ -744,7 +744,7 @@ export function CommunityPage({
               >
                 <img
                   src={Search}
-                  alt="드롭다운"
+                  alt="검색"
                   className="w-6 h-6"
                 />
               </button>
@@ -884,7 +884,7 @@ export function CommunityPage({
         ) : (
           <div
             ref={scrollContainerRef}
-            className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide ${!isKeyboardVisible ? "snap-y snap-mandatory" : ""
+            className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide ${!isKeyboardVisible ? "snap-y snap-mandatory" : "pb-40"
               }`}
           >
             {filteredPosts.map((post) => {
@@ -894,20 +894,18 @@ export function CommunityPage({
                   ref={(el) => {
                     postRefs.current[post.id] = el;
                   }}
-                  className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 justify-center
-                  ${!isKeyboardVisible
-                      ? "snap-start snap-always"
-                      : ""
+                  className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8
+    ${!isKeyboardVisible
+                      ? "justify-center snap-start snap-always"
+                      : "justify-start pt-4"
                     }
-                  ${isKeyboardVisible
-                      ? "pt-12 overflow-y-auto"
-                      : ""
-                    }`}
+  `}
                   key={post.id}
-                  style={{
-                    height: cardHeight,
-                    minHeight: cardHeight,
-                  }}
+                  style={
+                    !isKeyboardVisible
+                      ? { height: cardHeight, minHeight: cardHeight } // 스냅 모드일 때만 한 화면 높이
+                      : undefined                                      // 키보드 올라오면 auto 높이
+                  }
                 >
                   <div>
                     <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
@@ -1483,7 +1481,8 @@ export function CommunityPage({
                 onClick={() => setIsGridView(true)}
                 className="flex flex-col items-center gap-1 text-gray-800"
               >
-                <LayoutGrid size={24} />
+
+                <img src={LayoutGrid} alt="모아보기" className="w-6 h-6" />
                 <span className="text-xs font-semibold">
                   모아보기
                 </span>
@@ -1493,7 +1492,7 @@ export function CommunityPage({
                 className="flex flex-col items-center gap-1 text-gray-400"
                 onClick={() => onPageChange?.("calendar")}
               >
-                <Calendar size={24} />
+                <img src={Calendar} alt="캘린더" className="w-6 h-6" />
                 <span className="text-xs">캘린더</span>
               </button>
             </div>
