@@ -8,7 +8,6 @@ import {
   useMemo,
   useCallback,
 } from "react";
-import { Button } from "./ui/button";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import {
   AlertDialog,
@@ -85,18 +84,6 @@ interface UploadPageProps {
   }) => void;
 }
 
-// ✅ 텍스트 길이 제한 헬퍼
-const MAX_KR = 28; // 한글 포함
-const MAX_EN = 33; // 영어/숫자/기호만
-
-const enforceTextLimit = (value: string) => {
-  // ASCII(영어/숫자/기본 기호)만 있으면 영어로 판단
-  const isEnglishOnly = /^[\u0000-\u007F]*$/.test(value);
-  const limit = isEnglishOnly ? MAX_EN : MAX_KR;
-  if (value.length <= limit) return value;
-  return value.slice(0, limit);
-};
-
 export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const [showCameraPermission, setShowCameraPermission] =
     useState(false);
@@ -147,12 +134,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const initialViewportHeight = useRef(0);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  // 너무 큰 값으로 튀는 걸 막기 위해 클램핑
-  const effectiveKeyboardHeight = Math.min(
-    Math.max(keyboardHeight, 0),
-    360,
-  );
-
   // 필터 모드 state
   const [isFilterMode, setIsFilterMode] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("Normal");
@@ -173,15 +154,22 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     { text: "갓 수확한 채소 🥬" },
   ];
 
+  // ✅ 글자 수 제한 함수 (한글 28, 그 외 33)
+  const applyTextLimit = (value: string) => {
+    const hasKorean = /[ㄱ-ㅎ가-힣]/.test(value);
+    const limit = hasKorean ? 28 : 33;
+    return value.slice(0, limit);
+  };
+
   const handleCaptionClick = useCallback(
     (caption: string) =>
       (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        const merged = textInput.trim()
+        const combined = textInput.trim()
           ? `${textInput.trim()} ${caption}`
           : caption;
-        const limited = enforceTextLimit(merged);
-        setTextInput(limited);
+        const newText = applyTextLimit(combined);
+        setTextInput(newText);
         if (textInputRef.current) {
           textInputRef.current.focus();
         }
@@ -199,7 +187,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   );
 
   const isKeyboardVisible =
-    effectiveKeyboardHeight > 0 &&
+    keyboardHeight > 0 &&
     showTextInput &&
     isDetailEditMode &&
     isMobile &&
@@ -219,10 +207,13 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // 키보드 높이 감지
+  // ✅ 키보드 높이 감지 + body 높이 조절
   useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
     if (initialViewportHeight.current === 0) {
-      initialViewportHeight.current = window.innerHeight;
+      initialViewportHeight.current = vv.height;
     }
 
     const handleResize = () => {
@@ -235,33 +226,30 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         )
       ) {
         setKeyboardHeight(0);
+        document.body.style.height = "";
         return;
       }
 
-      if (!window.visualViewport) return;
-
-      const diff =
-        window.innerHeight - window.visualViewport.height;
+      const base = initialViewportHeight.current || vv.height;
+      const diff = base - vv.height; // 키보드로 줄어든 높이
 
       if (diff > 80) {
         setKeyboardHeight(diff);
+        // 👉 뷰포트를 키보드 위까지만 보이게
+        document.body.style.height = `${vv.height}px`;
       } else {
         setKeyboardHeight(0);
+        document.body.style.height = "";
       }
     };
 
-    window.visualViewport?.addEventListener("resize", handleResize);
-    window.visualViewport?.addEventListener("scroll", handleResize);
+    vv.addEventListener("resize", handleResize);
+    vv.addEventListener("scroll", handleResize);
 
     return () => {
-      window.visualViewport?.removeEventListener(
-        "resize",
-        handleResize,
-      );
-      window.visualViewport?.removeEventListener(
-        "scroll",
-        handleResize,
-      );
+      vv.removeEventListener("resize", handleResize);
+      vv.removeEventListener("scroll", handleResize);
+      document.body.style.height = "";
     };
   }, [
     showTextInput,
@@ -577,10 +565,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   // 텍스트 인풋/캡슐 bottom 위치 (카드 안에서 12px)
   const getTextBottom = () => 12;
 
-  // AI 캡션 바 (키보드 높이만큼 올림)
-  const AICaptionToolbar: React.FC<{
-    keyboardHeight: number;
-  }> = ({ keyboardHeight }) => (
+  // ✅ 캡션 바: 항상 "현재 뷰포트"의 바닥 (키보드 위) 에 고정
+  const AICaptionToolbar: React.FC = () => (
     <motion.div
       key="ai-caption-toolbar"
       initial={{ y: "100%", opacity: 0 }}
@@ -593,7 +579,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        bottom: keyboardHeight > 0 ? keyboardHeight : 0,
+        bottom: 0,
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
@@ -667,10 +653,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             <div
               className="absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300"
               style={{
-                top: isKeyboardVisible
-                  ? `calc(50% - ${effectiveKeyboardHeight / 2}px)`
-                  : "50%",
-                transform: "translateY(-50%)",
+                top: isKeyboardVisible ? "96px" : "50%",
+                transform: isKeyboardVisible
+                  ? "translateY(0)"
+                  : "translateY(-50%)",
               }}
             >
               <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
@@ -822,7 +808,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             value={textInput}
                             onChange={(e) =>
                               setTextInput(
-                                enforceTextLimit(e.target.value),
+                                applyTextLimit(e.target.value),
                               )
                             }
                             onKeyDown={(e) => {
@@ -852,7 +838,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 80,
                               );
                             }}
-                            className="w-full text-left text-[#555555] text-[15px] bg-white/80 backdrop-blur-sm px-5 py-2 rounded-[50px] "
+                            className="w-full text-left text-[#555555] text-[15px] bg-white/80 backdrop-blur-sm px-5 py-2 rounded-[50px]"
                           >
                             {textInput}
                           </button>
@@ -962,7 +948,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           </h1>
         </header>
 
-        {/* 하단 컨트롤 */}
+        {/* 하단 컨트롤 (카메라/필터 버튼) */}
         <div className="absolute left-0 right-0 z-10 px-5 xs:px-6 sm:px-8 pb-10 bg-[#f7f7f7] max-w-[500px] mx-auto bottom-0">
           <input
             ref={fileInputRef}
@@ -1295,11 +1281,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         {selectedImage &&
           isDetailEditMode &&
           showTextInput &&
-          isTextInputFocused && (
-            <AICaptionToolbar
-              keyboardHeight={effectiveKeyboardHeight}
-            />
-          )}
+          isTextInputFocused && <AICaptionToolbar />}
       </AnimatePresence>
 
       {/* 세부조정 종료 확인 */}
