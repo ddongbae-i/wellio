@@ -549,6 +549,23 @@ export function CommunityPage({
     };
   }, []);
 
+  useEffect(() => {
+    if (!isKeyboardVisible || currentPostId == null) return;
+
+    const container = scrollContainerRef.current;
+    const el = postRefs.current[currentPostId];
+    if (!container || !el) return;
+
+    const HEADER_OFFSET = -60;
+
+    const targetTop = Math.max(el.offsetTop - HEADER_OFFSET, 0);
+
+    container.scrollTo({
+      top: targetTop,
+      behavior: "smooth",
+    });
+  }, [isKeyboardVisible, currentPostId]);
+
   // 처음 화면 높이 (없으면 800 fallback)
   const baseHeight = screenHeight ?? 800;
 
