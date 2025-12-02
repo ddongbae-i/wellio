@@ -266,36 +266,46 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           stream.getTracks().forEach((track) => track.stop());
         }
 
+        // 장치 목록 조회
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter((d) => d.kind === "videoinput");
 
         if (videoDevices.length === 0) {
-          setCameraError("사용 가능한 카메라가 없습니다.");
           setHasCameraDevice(false);
+          setCameraError("사용 가능한 카메라가 없습니다.");
           return;
         }
 
         setHasCameraDevice(true);
 
-        // 🔥 1) 전면/후면 카메라 ID 찾기
-        const frontCam = videoDevices.find((d) =>
-          d.label.toLowerCase().includes("front")
-        );
-        const backCam = videoDevices.find((d) =>
-          d.label.toLowerCase().includes("back")
-        );
-
-        // 🔥 2) deviceId 우선 사용 (환경 기준 가장 안정적)
-        const selectedDeviceId = isFrontCamera
-          ? frontCam?.deviceId || videoDevices[0].deviceId
-          : backCam?.deviceId || videoDevices[videoDevices.length - 1].deviceId;
-
-        const constraints: MediaStreamConstraints = {
-          video: { deviceId: { exact: selectedDeviceId } },
+        // 1) iOS / 모바일 우선: facingMode 우선
+        let constraints: MediaStreamConstraints = {
+          video: {
+            facingMode: isFrontCamera ? "user" : "environment",
+          },
           audio: false,
         };
 
-        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+        let newStream: MediaStream;
+
+        try {
+          // 1차: facingMode 시도 (iOS 호환)
+          newStream = await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (err) {
+          console.warn("facingMode 실패 → deviceId로 fallback 시도");
+
+          // 2차: deviceId 기반 (Android 호환)
+          const fallbackDeviceId = isFrontCamera
+            ? videoDevices[0].deviceId
+            : videoDevices[videoDevices.length - 1].deviceId;
+
+          newStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              deviceId: { exact: fallbackDeviceId },
+            },
+            audio: false,
+          });
+        }
 
         setStream(newStream);
         setCameraError(null);
@@ -308,6 +318,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         setCameraError("카메라를 시작할 수 없습니다.");
       }
     };
+
 
 
     startCamera();
