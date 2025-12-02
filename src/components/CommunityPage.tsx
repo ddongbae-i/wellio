@@ -895,7 +895,7 @@ export function CommunityPage({
                   className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8
     ${!isKeyboardVisible
                       ? "justify-center snap-start snap-always"
-                      : " snap-start justify-start"
+                      : "justify-start pt-4"
                     }
   `}
                   key={post.id}
@@ -1359,11 +1359,19 @@ export function CommunityPage({
                                           trimmed,
                                         );
                                       }}
-                                      onFocus={() =>
-                                        setCurrentPostId(
-                                          post.id,
-                                        )
-                                      }
+                                      onFocus={(e) => {
+                                        setCurrentPostId(post.id);
+                                        e.preventDefault();
+                                        // 브라우저의 자동 스크롤 방지
+                                        if (scrollContainerRef.current) {
+                                          const currentScroll = scrollContainerRef.current.scrollTop;
+                                          setTimeout(() => {
+                                            if (scrollContainerRef.current) {
+                                              scrollContainerRef.current.scrollTop = currentScroll;
+                                            }
+                                          }, 0);
+                                        }
+                                      }}
 
                                       onKeyDown={(e) => {
                                         if (

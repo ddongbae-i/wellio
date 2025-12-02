@@ -1066,10 +1066,10 @@ export function UploadPage({
               {/* 👇 1. 여기서부터 "텍스트 입력 중이 아닐 때(!showTextInput)" 조건을 시작합니다 */}
               {!showTextInput && (
                 <>
-                  <div className="flex items-center justify-center gap-4">
+                  <div className="flex items-center justify-center m-4 gap-4">
                     <button
                       onClick={handleTextInputToggle}
-                      className="flex flex-col items-center gap-2"
+                      className=""
                     >
                       <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
                         <Type size={24} />
@@ -1078,7 +1078,7 @@ export function UploadPage({
 
                     <button
                       onClick={handleLocationInput}
-                      className="flex flex-col items-center gap-2"
+                      className=""
                     >
                       <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
                         <MapPin size={24} />
