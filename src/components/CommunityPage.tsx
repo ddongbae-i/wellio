@@ -558,7 +558,7 @@ export function CommunityPage({
 
     const HEADER_OFFSET = -60;
 
-    const targetTop = Math.max(el.offsetTop - HEADER_OFFSET, 0);
+    const targetTop = Math.max(el.offsetTop - HEADER_OFFSET + 150, 0);
 
     container.scrollTo({
       top: targetTop,

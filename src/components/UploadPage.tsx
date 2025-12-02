@@ -1217,7 +1217,7 @@ export function UploadPage({
                     <button
                       onClick={() =>
                         handleHealthRecordSelect(
-                          "걸음수 8,542보",
+                          "👟 8,542보",
                         )
                       }
                       className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
@@ -1227,13 +1227,13 @@ export function UploadPage({
                         className="text-gray-300"
                       />
                       <span className="text-[15px] font-medium">
-                        걸음수
+                        👟 걸음수
                       </span>
                     </button>
                     <button
                       onClick={() =>
                         handleHealthRecordSelect(
-                          "소모칼로리 450kcal",
+                          "🔥 450kcal",
                         )
                       }
                       className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
@@ -1244,13 +1244,13 @@ export function UploadPage({
                         fill="currentColor"
                       />
                       <span className="text-[15px] font-medium">
-                        소모칼로리
+                        🔥 소모칼로리
                       </span>
                     </button>
                     <button
                       onClick={() =>
                         handleHealthRecordSelect(
-                          "오른층수 12층",
+                          "🪜 12층",
                         )
                       }
                       className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2.5 rounded-full whitespace-nowrap"
@@ -1260,7 +1260,7 @@ export function UploadPage({
                         className="text-yellow-500"
                       />
                       <span className="text-[15px] font-medium">
-                        오른층수
+                        🪜 오른층수
                       </span>
                     </button>
                   </div>
@@ -1273,11 +1273,12 @@ export function UploadPage({
                     {[
                       "😄",
                       "😊",
+                      "🙂",
                       "😐",
-                      "😔",
-                      "😫",
-                      "😢",
+                      "🙁",
+                      "🥲",
                       "😭",
+                      "😤",
                     ].map((emoji, idx) => (
                       <button
                         key={idx}
@@ -1311,7 +1312,7 @@ export function UploadPage({
                             `${challenge}`,
                           )
                         }
-                        className="w-11 h-11 flex items-center justify-center bg-[#555555] rounded-full text-2xl shrink-0 hover:bg-[#444444] transition-colors"
+                        className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
                       >
                         {challenge}
                       </button>
