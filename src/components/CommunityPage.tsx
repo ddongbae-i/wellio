@@ -1506,11 +1506,11 @@ export function CommunityPage({
               </button>
               <div className="w-16" />
               <button
-                className="flex flex-col items-center gap-1 [#aeaeae]"
+                className="flex flex-col items-center gap-1 text-[#aeaeae]"
                 onClick={() => onPageChange?.("calendar")}
               >
                 <img src={Calendar} alt="캘린더" className="w-6 h-6" />
-                <span className="text-[12px]">캘린더</span>
+                <span className="text-[12px] font-normal">캘린더</span>
               </button>
             </div>
             <button
