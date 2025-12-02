@@ -157,7 +157,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     { text: "오랫동안 ❤️" },
     { text: "오운완 💪" },
     { text: "우리 가족 건강의 발걸음 👣" },
-    { text: "오늘은 맑음 ☀️" },
+    { text: "좋은 날 좋은 시간 ☀️" },
     { text: "갓 수확한 채소 🥬" },
   ];
 
@@ -584,8 +584,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
-      <div className="px-4 pt-3 pb-2">
-        <p className="text-[15px] font-semibold text-[#222222] mb-2">
+      <div className="px-6 pt-6 pb-2">
+        <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2">
           AI 추천 캡션
         </p>
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
@@ -593,7 +593,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             <button
               key={index}
               onMouseDown={handleCaptionClick(caption.text)}
-              className="flex-shrink-0 px-4 py-2 text-[13px] font-medium border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#E0E0E0]"
+              className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
             >
               {caption.text}
             </button>
