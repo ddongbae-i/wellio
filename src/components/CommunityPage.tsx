@@ -178,6 +178,8 @@ export function CommunityPage({
   const [postToDelete, setPostToDelete] = useState<number | null>(null);
 
   const [isScrolling, setIsScrolling] = useState(false);
+  const blurByClickRef = useRef(false);
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const postRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
@@ -587,7 +589,15 @@ export function CommunityPage({
 
 
   return (
-    <div className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden">
+    <div
+      className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden"
+      onPointerDownCapture={() => {
+        blurByClickRef.current = true;
+        setTimeout(() => {
+          blurByClickRef.current = false;
+        }, 0);
+      }}
+    >
       {/* 헤더 */}
       <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 flex flex-col justify-center w-full max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
         {isSearchActive ? (
@@ -1299,7 +1309,7 @@ export function CommunityPage({
                                       type="text"
                                       placeholder="댓글을 작성해주세요"
                                       className="w-full bg-transparent outline-none text-[#2b2b2b] placeholder:text-[#aeaeae]"
-                                      enterKeyHint="send"               // iOS 키보드에 '보내기' 느낌 주기
+                                      enterKeyHint="send"   // iOS 키보드에 '전송' 느낌
                                       value={currentPostId === post.id ? newComment : ""}
                                       onChange={(e) => {
                                         if (currentPostId !== post.id) return;
@@ -1322,14 +1332,28 @@ export function CommunityPage({
                                           }, 0);
                                         }
                                       }}
+                                      onBlur={() => {
+                                        // 👇 여기서 '완료' / '밖 클릭' 구분
+                                        const blurredByClick = blurByClickRef.current;
+
+                                        // 1) 밖 탭해서 포커스 빠진 경우 → 등록 X, 텍스트 유지
+                                        if (blurredByClick) {
+                                          return;
+                                        }
+
+                                        // 2) 키보드 위 '완료' 버튼으로 포커스 빠진 경우 → 등록 O
+                                        if (currentPostId === post.id && newComment.trim()) {
+                                          handleAddComment(post.id);
+                                        }
+                                      }}
                                       onKeyDown={(e) => {
-                                        // 한글 조합 중에는 Enter를 무시
+                                        // 한글 조합 중 Enter는 무시
                                         const nativeEvent = e.nativeEvent as KeyboardEvent & {
                                           isComposing?: boolean;
                                         };
-
                                         if (nativeEvent.isComposing) return;
 
+                                        // 키보드의 '전송' / Enter 눌렀을 때
                                         if (e.key === "Enter" && !e.shiftKey) {
                                           e.preventDefault();
                                           if (currentPostId === post.id && newComment.trim()) {
@@ -1339,6 +1363,7 @@ export function CommunityPage({
                                       }}
                                     />
                                   </motion.form>
+
 
                                 )}
                               </AnimatePresence>
