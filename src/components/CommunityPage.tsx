@@ -565,7 +565,9 @@ export function CommunityPage({
 
   // 카드 한 묶음 높이: 항상 일정(키보드 여부 상관 X)
   // 160이 너무 크거나 작으면 숫자만 살짝 조절해서 본인 폰에 맞춰봐
-  const cardHeight = baseHeight - 160;
+  const cardHeight = isKeyboardVisible
+    ? baseHeight - 350  // 키보드 있을 때는 더 작게
+    : baseHeight - 160; // 기본
 
 
   return (
@@ -895,7 +897,7 @@ export function CommunityPage({
                   className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8
     ${!isKeyboardVisible
                       ? "justify-center snap-start snap-always"
-                      : "justify-start pt-16"
+                      : "justify-start pt-4"
                     }
   `}
                   key={post.id}
