@@ -97,16 +97,14 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
   const [isFrontCamera, setIsFrontCamera] = useState(true);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [cameraError, setCameraError] = useState<string | null>(
-    null,
-  );
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(
     null,
   );
   const [isUploadMode, setIsUploadMode] = useState(false);
-  const [hasCameraDevice, setHasCameraDevice] = useState<
-    boolean | null
-  >(null);
+  const [hasCameraDevice, setHasCameraDevice] = useState<boolean | null>(
+    null,
+  );
   const [isDetailEditMode, setIsDetailEditMode] = useState(false);
 
   // 세부 입력 state
@@ -136,6 +134,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   // 키보드 높이 감지 상태 및 Ref
   const initialViewportHeight = useRef(0);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  // ✅ 너무 큰 값으로 튀는 걸 막기 위해 클램핑
+  const effectiveKeyboardHeight = Math.min(
+    Math.max(keyboardHeight, 0),
+    360,
+  );
 
   // 필터 모드 state
   const [isFilterMode, setIsFilterMode] = useState(false);
@@ -182,7 +186,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   );
 
   const isKeyboardVisible =
-    keyboardHeight > 0 &&
+    effectiveKeyboardHeight > 0 &&
     showTextInput &&
     isDetailEditMode &&
     isMobile &&
@@ -202,7 +206,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // 키보드 높이 감지
+  // ✅ 키보드 높이 감지 (간단 버전)
   useEffect(() => {
     if (initialViewportHeight.current === 0) {
       initialViewportHeight.current = window.innerHeight;
@@ -223,17 +227,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
       if (!window.visualViewport) return;
 
-      const currentVisualHeight = window.visualViewport.height;
-      const initialHeight = initialViewportHeight.current;
-      const layoutHeightNow = window.innerHeight;
+      const diff =
+        window.innerHeight - window.visualViewport.height;
 
-      const diff = initialHeight - currentVisualHeight;
-
-      const isLayoutResized =
-        Math.abs(layoutHeightNow - initialViewportHeight.current) >
-        40;
-
-      if (diff > 80 && !isLayoutResized) {
+      if (diff > 80) {
         setKeyboardHeight(diff);
       } else {
         setKeyboardHeight(0);
@@ -372,7 +369,13 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, targetWidth, targetHeight);
-        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+        ctx.drawImage(
+          img,
+          offsetX,
+          offsetY,
+          drawWidth,
+          drawHeight,
+        );
         resolve(canvas.toDataURL("image/jpeg", 0.95));
       };
 
@@ -558,12 +561,13 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     setPreviousFilter(selectedFilter);
   };
 
+  // 텍스트 인풋/캡슐 bottom 위치 (카드 안에서 12px)
   const getTextBottom = () => 12;
 
-  // 기존: const AICaptionToolbar: React.FC = () => (
-  const AICaptionToolbar: React.FC<{ keyboardHeight: number }> = ({
-    keyboardHeight,
-  }) => (
+  // ✅ 캡션 바: 키보드 높이만큼 올리기
+  const AICaptionToolbar: React.FC<{
+    keyboardHeight: number;
+  }> = ({ keyboardHeight }) => (
     <motion.div
       key="ai-caption-toolbar"
       initial={{ y: "100%", opacity: 0 }}
@@ -576,7 +580,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        // 🔥 키보드가 올라온 높이만큼 위로 올려서 "키보드 딱 위"에 붙임
         bottom: keyboardHeight > 0 ? keyboardHeight : 0,
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
@@ -600,7 +603,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     </motion.div>
   );
 
-
   return (
     <>
       {/* 카메라/갤러리 권한 다이얼로그 */}
@@ -616,9 +618,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             <AlertDialogCancel onClick={handlePermissionDeny}>
               거부
             </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleCameraPermissionAllow}
-            >
+            <AlertDialogAction onClick={handleCameraPermissionAllow}>
               허용
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -646,24 +646,20 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 메인 레이아웃 */}
+      {/* ✅ 메인 래퍼: 높이 고정(100vh) */}
       <div className="relative w-full min-h-screen bg-[#f7f7f7] overflow-hidden">
-        {/* 가운데 카드 영역 */}
         <div className="absolute inset-0 flex justify-center overflow-visible">
           <div className="relative w-full max-w-[500px] h-full">
+            {/* 이미지 카드 컨테이너 */}
             <div
-              className={`absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300`}
-              style={
-                isKeyboardVisible
-                  ? {
-                    top: "110px", // 헤더 아래 일정 위치
-                    transform: "none",
-                  }
-                  : {
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                  }
-              }
+              className="absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300"
+              style={{
+                // ✅ 키보드 없을 때는 중앙, 있을 때는 헤더 아래에 고정
+                top: isKeyboardVisible ? "96px" : "50%",
+                transform: isKeyboardVisible
+                  ? "translateY(0)"
+                  : "translateY(-50%)",
+              }}
             >
               <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
                 <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50">
@@ -716,9 +712,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    setLocationInput("")
-                                  }
+                                  onClick={() => setLocationInput("")}
                                   className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
                                 >
                                   <img
@@ -742,9 +736,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    setWeatherInput("")
-                                  }
+                                  onClick={() => setWeatherInput("")}
                                   className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
                                 >
                                   <img
@@ -792,9 +784,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    setHealthInput("")
-                                  }
+                                  onClick={() => setHealthInput("")}
                                   className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
                                 >
                                   <img
@@ -829,9 +819,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 textInputRef.current?.blur();
                               }
                             }}
-                            onFocus={() =>
-                              setIsTextInputFocused(true)
-                            }
+                            onFocus={() => setIsTextInputFocused(true)}
                             onBlur={() => {
                               setIsTextInputFocused(false);
                               setShowTextInput(false);
@@ -846,8 +834,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                               setShowTextInput(true);
                               setIsTextInputFocused(true);
                               setTimeout(
-                                () =>
-                                  textInputRef.current?.focus(),
+                                () => textInputRef.current?.focus(),
                                 80,
                               );
                             }}
@@ -962,7 +949,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         </header>
 
         {/* 하단 컨트롤 */}
-        <div className="absolute left-0 right-0 bottom-0 z-10 px-5 xs:px-6 sm:px-8 pb-10 bg-[#f7f7f7] max-w-[500px] mx-auto">
+        <div className="absolute left-0 right-0 z-10 px-5 xs:px-6 sm:px-8 pb-10 bg-[#f7f7f7] max-w-[500px] mx-auto bottom-0">
           <input
             ref={fileInputRef}
             type="file"
@@ -1007,8 +994,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       {({ isActive }) => (
                         <button
                           className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                            : "bg-[#EEEEEE] text-gray-400 scale-95"
+                              ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
+                              : "bg-[#EEEEEE] text-gray-400 scale-95"
                             }`}
                         >
                           {filter.name.toUpperCase()}
@@ -1107,7 +1094,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 ) : (
                   <img
                     src={ImageIcon}
-                    alt="갤러리"
+                    alt="꾸미기"
                     className="w-[30px] h-[30px]"
                   />
                 )}
@@ -1132,7 +1119,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 onClick={
                   isUploadMode ? handleFilter : handleCameraSwitch
                 }
-                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
+                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder- bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
               >
                 {isUploadMode ? (
                   <img
@@ -1295,7 +1282,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           isDetailEditMode &&
           showTextInput &&
           isTextInputFocused && (
-            <AICaptionToolbar keyboardHeight={keyboardHeight} />
+            <AICaptionToolbar
+              keyboardHeight={effectiveKeyboardHeight}
+            />
           )}
       </AnimatePresence>
 
