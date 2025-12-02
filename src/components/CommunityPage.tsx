@@ -131,10 +131,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     !!timeInput ||
     !!healthInput;
 
-  // 키보드 높이 감지 상태 및 Ref
-  const initialViewportHeight = useRef(0);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-
   // 필터 모드 state
   const [isFilterMode, setIsFilterMode] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("Normal");
@@ -155,28 +151,15 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     { text: "갓 수확한 채소 🥬" },
   ];
 
-  // 🔹 글자수 제한 함수 (한글 28, 영어 33)
-  const applyTextLimit = (value: string) => {
-    const hasKorean = /[ㄱ-ㅎ가-힣]/.test(value);
-    const maxLen = hasKorean ? 28 : 33;
-    if (value.length > maxLen) {
-      return value.slice(0, maxLen);
-    }
-    return value;
-  };
-
   const handleCaptionClick = useCallback(
     (caption: string) =>
       (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        const raw = textInput.trim()
+        const newText = textInput.trim()
           ? `${textInput.trim()} ${caption}`
           : caption;
-        const limited = applyTextLimit(raw);
-        setTextInput(limited);
-        if (textInputRef.current) {
-          textInputRef.current.focus();
-        }
+        setTextInput(newText);
+        textInputRef.current?.focus();
       },
     [textInput],
   );
@@ -189,13 +172,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     ],
     [],
   );
-
-  const isKeyboardVisible =
-    keyboardHeight > 0 &&
-    showTextInput &&
-    isDetailEditMode &&
-    isMobile &&
-    isTextInputFocused;
 
   // 권한은 디자인 상 이미 허용된 상태로 가정
   useEffect(() => {
@@ -210,47 +186,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-
-  // ✅ 키보드 높이 감지 (innerHeight 기준 – 커뮤니티 페이지 방식)
-  useEffect(() => {
-    if (initialViewportHeight.current === 0) {
-      initialViewportHeight.current = window.innerHeight;
-    }
-
-    const handleResize = () => {
-      if (
-        !(
-          showTextInput &&
-          isDetailEditMode &&
-          isMobile &&
-          isTextInputFocused
-        )
-      ) {
-        setKeyboardHeight(0);
-        return;
-      }
-
-      const currentHeight = window.innerHeight;
-      const diff = initialViewportHeight.current - currentHeight;
-
-      if (diff > 50) {
-        setKeyboardHeight(Math.min(diff, 360));
-      } else {
-        setKeyboardHeight(0);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [
-    showTextInput,
-    isDetailEditMode,
-    isMobile,
-    isTextInputFocused,
-  ]);
 
   // 카메라 스트림 시작
   useEffect(() => {
@@ -295,7 +230,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         setStream(newStream);
         setCameraError(null);
         if (videoRef.current) {
-          (videoRef.current as any).srcObject = newStream;
+          videoRef.current.srcObject = newStream;
         }
       } catch (error) {
         console.error("카메라 접근 실패:", error);
@@ -451,12 +386,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     // 카메라 캡처
     if (hasCameraDevice && videoRef.current && stream) {
       const canvas = document.createElement("canvas");
-      canvas.width = (videoRef.current as any).videoWidth;
-      canvas.height = (videoRef.current as any).videoHeight;
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      ctx.drawImage(videoRef.current as any, 0, 0);
+      ctx.drawImage(videoRef.current, 0, 0);
       canvas.toBlob(async (blob) => {
         if (!blob) return;
         const reader = new FileReader();
@@ -559,10 +494,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   // 텍스트 인풋/캡슐 bottom 위치 (카드 안에서 12px)
   const getTextBottom = () => 12;
 
-  // ✅ 캡션 바: 키보드 높이만큼 올리기
-  const AICaptionToolbar: React.FC<{
-    keyboardHeight: number;
-  }> = ({ keyboardHeight }) => (
+  // ✅ AI 추천 캡션 바 – 키보드 신경 안 쓰고 항상 bottom: 0
+  const AICaptionToolbar: React.FC = () => (
     <motion.div
       key="ai-caption-toolbar"
       initial={{ y: "100%", opacity: 0 }}
@@ -575,7 +508,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        bottom: keyboardHeight > 0 ? keyboardHeight : 0,
+        bottom: 0,
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
@@ -597,6 +530,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       </div>
     </motion.div>
   );
+
+  const isTextMode = showTextInput && isDetailEditMode;
 
   return (
     <>
@@ -649,8 +584,710 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             <div
               className="absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300"
               style={{
-                top: "50%",
-                transform: "translateY(-50%)",
+                top: isTextMode ? "96px" : "50%",
+                transform: isTextMode
+                  ? "translateY(0)"
+                  : "translateY(-50%)",
               }}
             >
-              <div className="relati
+              <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
+                <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50">
+                  {/* 카메라 비디오 */}
+                  {!isUploadMode && (
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+
+                  {/* 선택된 이미지 */}
+                  {selectedImage && (
+                    <div className="absolute inset-0 bg-white">
+                      <ImageWithFallback
+                        src={selectedImage}
+                        alt="Selected Image"
+                        className="w-full h-full object-cover"
+                        style={{
+                          filter:
+                            ORIGINAL_FILTERS.find(
+                              (f) => f.name === selectedFilter,
+                            )?.filter || "none",
+                        }}
+                      />
+
+                      {/* 텍스트 모드일 때 이미지 어둡게 */}
+                      {showTextInput && (
+                        <div className="absolute inset-0 bg-black/35" />
+                      )}
+
+                      {/* 위치 / 날씨 / 시간 / 건강 캡슐들 */}
+                      {(locationInput ||
+                        weatherInput ||
+                        timeInput ||
+                        healthInput) && (
+                          <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
+                            {locationInput && (
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
+                                <img
+                                  src={MapPin}
+                                  alt="위치"
+                                  className="w-[22px] h-[22px]"
+                                />
+                                <span className="text-[#555555] text-[15px]">
+                                  {locationInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setLocationInput("")}
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <img
+                                    src={X}
+                                    alt="삭제"
+                                    className="w-2 h-2"
+                                  />
+                                </button>
+                              </div>
+                            )}
+
+                            {weatherInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <img
+                                  src={Cloud}
+                                  alt="날씨"
+                                  className="w-[22px] h-[22px]"
+                                />
+                                <span className="text-white text-sm">
+                                  {weatherInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setWeatherInput("")}
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <img
+                                    src={X}
+                                    alt="삭제"
+                                    className="w-2 h-2"
+                                  />
+                                </button>
+                              </div>
+                            )}
+
+                            {timeInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <img
+                                  src={Clock}
+                                  alt="시간"
+                                  className="w-[22px] h-[22px]"
+                                />
+                                <span className="text-white text-sm">
+                                  {timeInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setTimeInput("")}
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <img
+                                    src={X}
+                                    alt="삭제"
+                                    className="w-2 h-2"
+                                  />
+                                </button>
+                              </div>
+                            )}
+
+                            {healthInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <img
+                                  src={Heart}
+                                  alt="데이터"
+                                  className="w-[22px] h-[22px]"
+                                />
+                                <span className="text-white text-sm">
+                                  {healthInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setHealthInput("")}
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <img
+                                    src={X}
+                                    alt="삭제"
+                                    className="w-2 h-2"
+                                  />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                      {/* 텍스트 입력 / 캡슐 */}
+                      <div
+                        className="absolute left-4 right-4 transition-all duration-200 ease-out"
+                        style={{ bottom: getTextBottom() }}
+                      >
+                        {showTextInput ? (
+                          <input
+                            ref={textInputRef}
+                            type="text"
+                            value={textInput}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const hasKorean =
+                                /[ㄱ-ㅎ가-힣]/.test(value);
+                              const maxLen = hasKorean ? 28 : 33;
+                              const trimmed = value.slice(
+                                0,
+                                maxLen,
+                              );
+                              setTextInput(trimmed);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                setShowTextInput(false);
+                                setIsTextInputFocused(false);
+                                textInputRef.current?.blur();
+                              }
+                            }}
+                            onFocus={() => setIsTextInputFocused(true)}
+                            onBlur={() => {
+                              setIsTextInputFocused(false);
+                              setShowTextInput(false);
+                            }}
+                            placeholder="텍스트를 입력하세요"
+                            className="w-full text-[#555555] text-[15px] bg-white/80 backdrop-blur-sm px-5 py-2 rounded-[50px] outline-none placeholder:text-[#aeaeae] border border-[#ffffff]"
+                          />
+                        ) : textInput ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowTextInput(true);
+                              setIsTextInputFocused(true);
+                              setTimeout(
+                                () => textInputRef.current?.focus(),
+                                80,
+                              );
+                            }}
+                            className="w-full text-left text-[#555555] text-[15px] bg-white/80 backdrop-blur-sm px-5 py-2 rounded-[50px]"
+                          >
+                            {textInput}
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 카메라 에러 (업로드 모드 아닐 때만) */}
+                  {cameraError && !isUploadMode && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm rounded-[16px] z-20">
+                      <div className="text-center px-6">
+                        <Camera
+                          size={48}
+                          className="text-gray-400 mx-auto mb-4"
+                        />
+                        <p className="text-white mb-2">
+                          {cameraError}
+                        </p>
+                        <p className="text-[#aeaeae] text-sm">
+                          갤러리 버튼을 눌러 사진을 업로드할 수
+                          있습니다.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 헤더 */}
+        <header className="fixed top-0 left-0 right-0 z-40 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full bg-[#f7f7f7]/80 backdrop-blur-xs relative max-w-[500px] mx-auto min-h-[80px]">
+          {isFilterMode ? (
+            <>
+              <button
+                onClick={() => {
+                  setSelectedFilter(previousFilter);
+                  setIsFilterMode(false);
+                }}
+                className="absolute left-4 p-1"
+              >
+                <img
+                  src={ChevronLeft}
+                  alt="뒤로가기"
+                  className="w-6 h-6"
+                />
+              </button>
+              <button
+                onClick={() => setIsFilterMode(false)}
+                className="absolute right-4 px-4 py-2 text-[#36D2C5] font-semibold"
+              >
+                완료
+              </button>
+            </>
+          ) : isDetailEditMode ? (
+            <>
+              <button
+                onClick={() => {
+                  if (hasDraft) {
+                    setShowLeaveDetailAlert(true);
+                  } else {
+                    handleCloseDetailEdit();
+                  }
+                }}
+                className="absolute left-4 p-1"
+              >
+                <img src={X} alt="닫기" className="w-6 h-6" />
+              </button>
+              <button
+                onClick={() => {
+                  setShowTextInput(false);
+                  textInputRef.current?.blur();
+                  setIsDetailEditMode(false);
+                }}
+                className="absolute right-4 px-4 py-2 text-[#36D2C5] font-semibold"
+              >
+                완료
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => {
+                if (hasDraft) {
+                  setShowLeaveUploadAlert(true);
+                } else {
+                  onBack();
+                }
+              }}
+              className="absolute left-4 p-1"
+            >
+              <img
+                src={ChevronLeft}
+                alt="뒤로가기"
+                className="w-6 h-6"
+              />
+            </button>
+          )}
+
+          <h1 className="text-xl font-bold text-[#1A1A1A] text-center">
+            {isFilterMode
+              ? "필터"
+              : isDetailEditMode
+                ? "세부조정"
+                : "업로드"}
+          </h1>
+        </header>
+
+        {/* 하단 컨트롤 */}
+        <div className="absolute left-0 right-0 z-10 px-5 xs:px-6 sm:px-8 pb-10 bg-[#f7f7f7] max-w-[500px] mx-auto bottom-0">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="hidden"
+          />
+
+          {isFilterMode ? (
+            <div className="w-full h-28 relative flex items-center justify-center">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+                <div className="w-[68px] h-[68px] rounded-full border-[3px] border-[#36D2C5]" />
+              </div>
+              <div className="w-full h-full z-20">
+                <Swiper
+                  spaceBetween={14}
+                  slidesPerView="auto"
+                  className="w-full h-full"
+                  loop={true}
+                  centeredSlides={true}
+                  slideToClickedSlide={true}
+                  threshold={10}
+                  speed={400}
+                  onRealIndexChange={(swiper) => {
+                    const realIndex =
+                      swiper.realIndex % ORIGINAL_FILTERS.length;
+                    setSelectedFilter(
+                      ORIGINAL_FILTERS[realIndex].name,
+                    );
+                  }}
+                >
+                  {loopFilters.map((filter, index) => (
+                    <SwiperSlide
+                      key={`${filter.name}-${index}`}
+                      style={{
+                        width: "auto",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      {({ isActive }) => (
+                        <button
+                          className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
+                              ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
+                              : "bg-[#EEEEEE] text-gray-400 scale-95"
+                            }`}
+                        >
+                          {filter.name.toUpperCase()}
+                        </button>
+                      )}
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            </div>
+          ) : isDetailEditMode ? (
+            <div className="flex flex-col items-center gap-5 max-w-md mx-auto px-4">
+              {!showTextInput && (
+                <>
+                  <div className="flex items-center justify-center mt-4 gap-4">
+                    <button onClick={handleTextInputToggle}>
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
+                        <img
+                          src={Type}
+                          alt="텍스트"
+                          className="w-[22px] h-[22px]"
+                        />
+                      </div>
+                    </button>
+
+                    <button onClick={handleLocationInput}>
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
+                        <img
+                          src={MapPin}
+                          alt="위치"
+                          className="w-[22px] h-[22px]"
+                        />
+                      </div>
+                    </button>
+
+                    <button onClick={handleWeatherInput}>
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
+                        <img
+                          src={Cloud}
+                          alt="날씨"
+                          className="w-[22px] h-[22px]"
+                        />
+                      </div>
+                    </button>
+
+                    <button onClick={handleTimeInput}>
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
+                        <img
+                          src={Clock}
+                          alt="날짜"
+                          className="w-[22px] h-[22px]"
+                        />
+                      </div>
+                    </button>
+
+                    <button onClick={handleHealthInput}>
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
+                        <img
+                          src={Heart}
+                          alt="텍스트"
+                          className="w-[22px] h-[22px]"
+                        />
+                      </div>
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={handleCapture}
+                    className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                  >
+                    <img
+                      src={Upload}
+                      alt="업로드"
+                      className="w-[35px] h-[35px]"
+                    />
+                  </button>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-between max-w-md mx-auto px-6">
+              <button
+                onClick={
+                  isUploadMode
+                    ? handleEdit
+                    : () => fileInputRef.current?.click()
+                }
+                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder-[#e8e8e8] bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
+              >
+                {isUploadMode ? (
+                  <img
+                    src={Edit}
+                    alt="꾸미기"
+                    className="w-[24px] h-[24px]"
+                  />
+                ) : (
+                  <img
+                    src={ImageIcon}
+                    alt="꾸미기"
+                    className="w-[30px] h-[30px]"
+                  />
+                )}
+              </button>
+
+              <button
+                onClick={handleCapture}
+                className="w-[70px] h-[70px] rounded-full border-[4px] border-[#2ECACA] bg-white hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+              >
+                {isUploadMode ? (
+                  <img
+                    src={Upload}
+                    alt="업로드"
+                    className="w-[35px] h-[35px]"
+                  />
+                ) : (
+                  <div className="w-[70px] h-[70px] rounded-full" />
+                )}
+              </button>
+
+              <button
+                onClick={
+                  isUploadMode ? handleFilter : handleCameraSwitch
+                }
+                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder- bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
+              >
+                {isUploadMode ? (
+                  <img
+                    src={Sparkles}
+                    alt="효과"
+                    className="w-[32px] h-[32px]"
+                  />
+                ) : (
+                  <img
+                    src={RefreshCw}
+                    alt="카메라전환"
+                    className="w-[27px] h-[27px]"
+                  />
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 건강 기록 모달 */}
+      <AnimatePresence>
+        {showHealthModal && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 bg-black/30"
+              onClick={() => setShowHealthModal(false)}
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{
+                type: "spring",
+                damping: 30,
+                stiffness: 300,
+              }}
+              className="relative w-full max-w-[500px] bg-white rounded-t-2xl p-6 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+            >
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <h3 className="text-[17px] font-bold text-[#202020]">
+                    오늘 운동 기록
+                  </h3>
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
+                    <button
+                      onClick={() =>
+                        handleHealthRecordSelect("👟 8,542보")
+                      }
+                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
+                    >
+                      <span className="text-[15px] font-medium">
+                        👟 걸음수
+                      </span>
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleHealthRecordSelect("🔥 450kcal")
+                      }
+                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
+                    >
+                      <span className="text-[15px] font-medium">
+                        🔥 소모칼로리
+                      </span>
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleHealthRecordSelect("🪜 12층")
+                      }
+                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
+                    >
+                      <span className="text-[15px] font-medium">
+                        🪜 오른층수
+                      </span>
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-[17px] font-bold text-[#202020]">
+                    오늘 감정 기록
+                  </h3>
+                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1">
+                    {[
+                      "😄",
+                      "😊",
+                      "🙂",
+                      "😐",
+                      "🙁",
+                      "🥲",
+                      "😭",
+                      "😤",
+                    ].map((emoji, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() =>
+                          handleHealthRecordSelect(`${emoji}`)
+                        }
+                        className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-[17px] font-bold text-[#202020]">
+                    진행중인 챌린지
+                  </h3>
+                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
+                    {[
+                      "다시 15만보 걷기",
+                      "주 1회 함께 걷기",
+                      "건강한 습관 만들기",
+                      "가족 건강 상위 10%",
+                    ].map((challenge, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() =>
+                          handleHealthRecordSelect(`${challenge}`)
+                        }
+                        className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
+                      >
+                        {challenge}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* 이미지 선택 안 했을 때 경고 */}
+      <AlertDialog open={showNoImageAlert}>
+        <AlertDialogContent className="max-w-[340px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>이미지 선택 필요</AlertDialogTitle>
+            <AlertDialogDescription>
+              사진을 선택하거나 촬영한 후 업로드할 수 있습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => setShowNoImageAlert(false)}
+            >
+              닫기
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* AI 추천 캡션 바 */}
+      <AnimatePresence>
+        {selectedImage &&
+          isDetailEditMode &&
+          showTextInput &&
+          isTextInputFocused && <AICaptionToolbar />}
+      </AnimatePresence>
+
+      {/* 세부조정 종료 확인 */}
+      <AlertDialog open={showLeaveDetailAlert}>
+        <AlertDialogContent className="max-w-[340px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              세부조정을 종료할까요?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              입력한 내용은 그대로 유지되지만 세부조정 화면을
+              닫습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => setShowLeaveDetailAlert(false)}
+            >
+              취소
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowLeaveDetailAlert(false);
+                handleCloseDetailEdit();
+              }}
+            >
+              종료
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 업로드 작성 취소 확인 */}
+      <AlertDialog open={showLeaveUploadAlert}>
+        <AlertDialogContent className="max-w-[340px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              작성을 취소할까요?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              지금까지 작성한 내용이 모두 사라집니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => setShowLeaveUploadAlert(false)}
+            >
+              계속 작성
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowLeaveUploadAlert(false);
+                setSelectedImage(null);
+                setTextInput("");
+                setLocationInput("");
+                setWeatherInput("");
+                setTimeInput("");
+                setHealthInput("");
+                setIsUploadMode(false);
+                setIsDetailEditMode(false);
+                setShowTextInput(false);
+                onBack();
+              }}
+            >
+              취소하고 나가기
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
