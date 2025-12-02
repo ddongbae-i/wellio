@@ -560,7 +560,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
   const getTextBottom = () => 12;
 
-  const AICaptionToolbar: React.FC = () => (
+  // 기존: const AICaptionToolbar: React.FC = () => (
+  const AICaptionToolbar: React.FC<{ keyboardHeight: number }> = ({
+    keyboardHeight,
+  }) => (
     <motion.div
       key="ai-caption-toolbar"
       initial={{ y: "100%", opacity: 0 }}
@@ -573,8 +576,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        // visualViewport가 줄어든 높이의 맨 아래 = 키보드 상단
-        bottom: 0,
+        // 🔥 키보드가 올라온 높이만큼 위로 올려서 "키보드 딱 위"에 붙임
+        bottom: keyboardHeight > 0 ? keyboardHeight : 0,
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
@@ -596,6 +599,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       </div>
     </motion.div>
   );
+
 
   return (
     <>
@@ -1003,8 +1007,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       {({ isActive }) => (
                         <button
                           className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                              ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                              : "bg-[#EEEEEE] text-gray-400 scale-95"
+                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
+                            : "bg-[#EEEEEE] text-gray-400 scale-95"
                             }`}
                         >
                           {filter.name.toUpperCase()}
@@ -1290,7 +1294,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         {selectedImage &&
           isDetailEditMode &&
           showTextInput &&
-          isTextInputFocused && <AICaptionToolbar />}
+          isTextInputFocused && (
+            <AICaptionToolbar keyboardHeight={keyboardHeight} />
+          )}
       </AnimatePresence>
 
       {/* 세부조정 종료 확인 */}
