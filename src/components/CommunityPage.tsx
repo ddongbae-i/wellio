@@ -1391,7 +1391,7 @@ export function CommunityPage({
                                         const offsetInContainer = elRect.top - containerRect.top;
 
                                         // 이 값이 "헤더에서 얼마나 떨어지게 할지"야
-                                        const HEADER_OFFSET = 80; // 60~140 사이에서 조절해보면 딱 느낌 잡힐 거야
+                                        const HEADER_OFFSET = 20; // 60~140 사이에서 조절해보면 딱 느낌 잡힐 거야
 
                                         const targetTop = Math.max(
                                           currentScrollTop + offsetInContainer - HEADER_OFFSET,

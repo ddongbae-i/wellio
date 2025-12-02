@@ -1295,10 +1295,10 @@ export function UploadPage({
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-[17px] font-bold text-[#1A1A1A]">
+                  <h3 className="text-[17px] font-bold text-[#202020]">
                     진행중인 챌린지
                   </h3>
-                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1">
+                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
                     {[
                       "15만보 걷기",
                       "주 1회 함께 걷기",
