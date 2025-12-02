@@ -161,6 +161,35 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     return value.slice(0, limit);
   };
 
+
+  const [frontId, setFrontId] = useState<string | null>(null);
+  const [backId, setBackId] = useState<string | null>(null);
+  async function initCameraDevices() {
+    try {
+      // iOS에서는 label을 보려면 먼저 getUserMedia를 한 번 실행해야 함
+      await navigator.mediaDevices.getUserMedia({ video: true });
+
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter((d) => d.kind === "videoinput");
+
+      const front = videoDevices.find((d) =>
+        d.label.toLowerCase().includes("front")
+      );
+      const back = videoDevices.find((d) =>
+        d.label.toLowerCase().includes("back")
+      );
+
+      setFrontId(front?.deviceId || null);
+      setBackId(back?.deviceId || null);
+    } catch (e) {
+      console.error("카메라 초기화 실패:", e);
+    }
+  }
+
+  useEffect(() => {
+    initCameraDevices();
+  }, []);
+
   const handleCaptionClick = useCallback(
     (caption: string) =>
       (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -260,64 +289,37 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   useEffect(() => {
     if (!permissionsGranted || isUploadMode) return;
 
-    const startCamera = async () => {
+    async function startCamera() {
       try {
-        if (stream) {
-          stream.getTracks().forEach((track) => track.stop());
+        if (stream) stream.getTracks().forEach(t => t.stop());
+
+        let constraints: MediaStreamConstraints;
+
+        if (isFrontCamera) {
+          constraints = {
+            video: frontId
+              ? { deviceId: { exact: frontId } }
+              : { facingMode: "user" },
+          };
+        } else {
+          constraints = {
+            video: backId
+              ? { deviceId: { exact: backId } }
+              : { facingMode: "environment" },
+          };
         }
 
-        // 장치 목록 조회
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter((d) => d.kind === "videoinput");
-
-        if (videoDevices.length === 0) {
-          setHasCameraDevice(false);
-          setCameraError("사용 가능한 카메라가 없습니다.");
-          return;
-        }
-
-        setHasCameraDevice(true);
-
-        // 1) iOS / 모바일 우선: facingMode 우선
-        let constraints: MediaStreamConstraints = {
-          video: {
-            facingMode: isFrontCamera ? "user" : "environment",
-          },
-          audio: false,
-        };
-
-        let newStream: MediaStream;
-
-        try {
-          // 1차: facingMode 시도 (iOS 호환)
-          newStream = await navigator.mediaDevices.getUserMedia(constraints);
-        } catch (err) {
-          console.warn("facingMode 실패 → deviceId로 fallback 시도");
-
-          // 2차: deviceId 기반 (Android 호환)
-          const fallbackDeviceId = isFrontCamera
-            ? videoDevices[0].deviceId
-            : videoDevices[videoDevices.length - 1].deviceId;
-
-          newStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-              deviceId: { exact: fallbackDeviceId },
-            },
-            audio: false,
-          });
-        }
-
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
         setStream(newStream);
-        setCameraError(null);
 
         if (videoRef.current) {
           videoRef.current.srcObject = newStream;
         }
       } catch (err) {
-        console.error("카메라 접근 실패:", err);
+        console.error("카메라 시작 실패:", err);
         setCameraError("카메라를 시작할 수 없습니다.");
       }
-    };
+    }
 
 
 
@@ -505,19 +507,17 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     window.matchMedia("(display-mode: standalone)").matches;
 
   const handleCameraSwitch = () => {
-    // iOS PWA 감지
-    if (isIOSStandalone()) {
-      // 업로드 모드 진입 전이면 → 촬영모드 fallback
-      if (!isUploadMode) {
-        fileInputRef.current?.setAttribute("capture", "environment");
-        fileInputRef.current?.click();
-        return;
-      }
+    // iOS PWA 감지 → 후면 카메라 불가 → 파일 input fallback
+    if (isIOSStandalone() && !isUploadMode) {
+      fileInputRef.current?.setAttribute("capture", "environment");
+      fileInputRef.current?.click();
+      return;
     }
 
-    // 정상 웹 환경 → 전면/후면 전환
+    // 정상 웹 환경에서만 전면/후면 전환
     setIsFrontCamera((prev) => !prev);
   };
+
 
   const handleImageSelect = (
     event: React.ChangeEvent<HTMLInputElement>,
