@@ -159,7 +159,7 @@ export function ReviewWritePage({
       </header>
 
       {/* Content */}
-      <div className="pb-10 px-5 xs:px-6 sm:px-8 pt-5 space-y-3">
+      <div className="pb-14 px-5 xs:px-6 sm:px-8 pt-5 space-y-3">
         {/* 병원 정보 카드 */}
         <div className="flex items-center bg-white p-4 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] px-5 py-4">
           <div className="w-[48px] h-[48px] rounded-[8px] overflow-hidden border border-[#f0f0f0] flex-shrink-0 mr-4">
