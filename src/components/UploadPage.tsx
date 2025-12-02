@@ -266,46 +266,49 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           stream.getTracks().forEach((track) => track.stop());
         }
 
-        const devices =
-          await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(
-          (device) => device.kind === "videoinput",
-        );
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter((d) => d.kind === "videoinput");
 
         if (videoDevices.length === 0) {
           setCameraError("사용 가능한 카메라가 없습니다.");
           setHasCameraDevice(false);
           return;
-        } else {
-          setHasCameraDevice(true);
         }
 
+        setHasCameraDevice(true);
+
+        // 🔥 1) 전면/후면 카메라 ID 찾기
+        const frontCam = videoDevices.find((d) =>
+          d.label.toLowerCase().includes("front")
+        );
+        const backCam = videoDevices.find((d) =>
+          d.label.toLowerCase().includes("back")
+        );
+
+        // 🔥 2) deviceId 우선 사용 (환경 기준 가장 안정적)
+        const selectedDeviceId = isFrontCamera
+          ? frontCam?.deviceId || videoDevices[0].deviceId
+          : backCam?.deviceId || videoDevices[videoDevices.length - 1].deviceId;
+
         const constraints: MediaStreamConstraints = {
-          video:
-            videoDevices.length > 1
-              ? {
-                facingMode: isFrontCamera
-                  ? "user"
-                  : "environment",
-              }
-              : true,
+          video: { deviceId: { exact: selectedDeviceId } },
           audio: false,
         };
 
-        const newStream =
-          await navigator.mediaDevices.getUserMedia(
-            constraints,
-          );
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+
         setStream(newStream);
         setCameraError(null);
+
         if (videoRef.current) {
           videoRef.current.srcObject = newStream;
         }
-      } catch (error) {
-        console.error("카메라 접근 실패:", error);
+      } catch (err) {
+        console.error("카메라 접근 실패:", err);
         setCameraError("카메라를 시작할 수 없습니다.");
       }
     };
+
 
     startCamera();
     return () => {
@@ -994,8 +997,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       {({ isActive }) => (
                         <button
                           className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                              ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                              : "bg-[#EEEEEE] text-gray-400 scale-95"
+                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
+                            : "bg-[#EEEEEE] text-gray-400 scale-95"
                             }`}
                         >
                           {filter.name.toUpperCase()}
