@@ -218,7 +218,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         )
       ) {
         setKeyboardHeight(0);
-        document.body.style.height = "";
         return;
       }
 
@@ -231,27 +230,18 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       const diff = initialHeight - currentVisualHeight;
 
       const isLayoutResized =
-        Math.abs(
-          layoutHeightNow - initialViewportHeight.current,
-        ) > 40;
+        Math.abs(layoutHeightNow - initialViewportHeight.current) >
+        40;
 
       if (diff > 80 && !isLayoutResized) {
         setKeyboardHeight(diff);
-        document.body.style.height = currentVisualHeight + "px";
       } else {
         setKeyboardHeight(0);
-        document.body.style.height = "";
       }
     };
 
-    window.visualViewport?.addEventListener(
-      "resize",
-      handleResize,
-    );
-    window.visualViewport?.addEventListener(
-      "scroll",
-      handleResize,
-    );
+    window.visualViewport?.addEventListener("resize", handleResize);
+    window.visualViewport?.addEventListener("scroll", handleResize);
 
     return () => {
       window.visualViewport?.removeEventListener(
@@ -583,8 +573,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        // 🔁 viewport 자체를 키보드 위까지 줄이고 있으니까
-        //    여기서는 항상 화면 맨 아래(= 키보드 상단)에 붙이면 됨
+        // visualViewport가 줄어든 높이의 맨 아래 = 키보드 상단
         bottom: 0,
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
@@ -623,7 +612,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             <AlertDialogCancel onClick={handlePermissionDeny}>
               거부
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleCameraPermissionAllow}>
+            <AlertDialogAction
+              onClick={handleCameraPermissionAllow}
+            >
               허용
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -642,17 +633,255 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             <AlertDialogCancel onClick={handlePermissionDeny}>
               거부
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleGalleryPermissionAllow}>
+            <AlertDialogAction
+              onClick={handleGalleryPermissionAllow}
+            >
               허용
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 메인 레이아웃: h-screen + flex-col */}
-      <div className="relative bg-[#f7f7f7] flex flex-col h-screen w-full">
-        {/* 헤더 (하나만) */}
-        <header className="fixed top-0 left-1/2 -translate-x-1/2 z-40 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full bg-[#f7f7f7]/80 backdrop-blur-xs max-w-[500px] min-h-[80px]">
+      {/* 메인 레이아웃 */}
+      <div className="relative w-full min-h-screen bg-[#f7f7f7] overflow-hidden">
+        {/* 가운데 카드 영역 */}
+        <div className="absolute inset-0 flex justify-center overflow-visible">
+          <div className="relative w-full max-w-[500px] h-full">
+            <div
+              className={`absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300`}
+              style={
+                isKeyboardVisible
+                  ? {
+                    top: "110px", // 헤더 아래 일정 위치
+                    transform: "none",
+                  }
+                  : {
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                  }
+              }
+            >
+              <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
+                <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50">
+                  {/* 카메라 비디오 */}
+                  {!isUploadMode && (
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+
+                  {/* 선택된 이미지 */}
+                  {selectedImage && (
+                    <div className="absolute inset-0 bg-white">
+                      <ImageWithFallback
+                        src={selectedImage}
+                        alt="Selected Image"
+                        className="w-full h-full object-cover"
+                        style={{
+                          filter:
+                            ORIGINAL_FILTERS.find(
+                              (f) => f.name === selectedFilter,
+                            )?.filter || "none",
+                        }}
+                      />
+
+                      {/* 텍스트 모드일 때 이미지 어둡게 */}
+                      {showTextInput && (
+                        <div className="absolute inset-0 bg-black/35" />
+                      )}
+
+                      {/* 위치 / 날씨 / 시간 / 건강 캡슐들 */}
+                      {(locationInput ||
+                        weatherInput ||
+                        timeInput ||
+                        healthInput) && (
+                          <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
+                            {locationInput && (
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
+                                <img
+                                  src={MapPin}
+                                  alt="위치"
+                                  className="w-[22px] h-[22px]"
+                                />
+                                <span className="text-[#555555] text-[15px]">
+                                  {locationInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setLocationInput("")
+                                  }
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <img
+                                    src={X}
+                                    alt="삭제"
+                                    className="w-2 h-2"
+                                  />
+                                </button>
+                              </div>
+                            )}
+
+                            {weatherInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <img
+                                  src={Cloud}
+                                  alt="날씨"
+                                  className="w-[22px] h-[22px]"
+                                />
+                                <span className="text-white text-sm">
+                                  {weatherInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setWeatherInput("")
+                                  }
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <img
+                                    src={X}
+                                    alt="삭제"
+                                    className="w-2 h-2"
+                                  />
+                                </button>
+                              </div>
+                            )}
+
+                            {timeInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <img
+                                  src={Clock}
+                                  alt="시간"
+                                  className="w-[22px] h-[22px]"
+                                />
+                                <span className="text-white text-sm">
+                                  {timeInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setTimeInput("")}
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <img
+                                    src={X}
+                                    alt="삭제"
+                                    className="w-2 h-2"
+                                  />
+                                </button>
+                              </div>
+                            )}
+
+                            {healthInput && (
+                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                <img
+                                  src={Heart}
+                                  alt="데이터"
+                                  className="w-[22px] h-[22px]"
+                                />
+                                <span className="text-white text-sm">
+                                  {healthInput}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setHealthInput("")
+                                  }
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                >
+                                  <img
+                                    src={X}
+                                    alt="삭제"
+                                    className="w-2 h-2"
+                                  />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                      {/* 텍스트 입력 / 캡슐 */}
+                      <div
+                        className="absolute left-4 right-4 transition-all duration-200 ease-out"
+                        style={{ bottom: getTextBottom() }}
+                      >
+                        {showTextInput ? (
+                          <input
+                            ref={textInputRef}
+                            type="text"
+                            value={textInput}
+                            onChange={(e) =>
+                              setTextInput(e.target.value)
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                setShowTextInput(false);
+                                setIsTextInputFocused(false);
+                                textInputRef.current?.blur();
+                              }
+                            }}
+                            onFocus={() =>
+                              setIsTextInputFocused(true)
+                            }
+                            onBlur={() => {
+                              setIsTextInputFocused(false);
+                              setShowTextInput(false);
+                            }}
+                            placeholder="텍스트를 입력하세요"
+                            className="w-full text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] outline-none focus:ring-2 focus:ring-[#36D2C5] placeholder:text-gray-500/70"
+                          />
+                        ) : textInput ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowTextInput(true);
+                              setIsTextInputFocused(true);
+                              setTimeout(
+                                () =>
+                                  textInputRef.current?.focus(),
+                                80,
+                              );
+                            }}
+                            className="w-full text-left text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+                          >
+                            {textInput}
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 카메라 에러 (업로드 모드 아닐 때만) */}
+                  {cameraError && !isUploadMode && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm rounded-[16px] z-20">
+                      <div className="text-center px-6">
+                        <Camera
+                          size={48}
+                          className="text-gray-400 mx-auto mb-4"
+                        />
+                        <p className="text-white mb-2">
+                          {cameraError}
+                        </p>
+                        <p className="text-[#aeaeae] text-sm">
+                          갤러리 버튼을 눌러 사진을 업로드할 수
+                          있습니다.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 헤더 */}
+        <header className="fixed top-0 left-0 right-0 z-40 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full bg-[#f7f7f7]/80 backdrop-blur-xs relative max-w-[500px] mx-auto min-h-[80px]">
           {isFilterMode ? (
             <>
               <button
@@ -728,239 +957,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           </h1>
         </header>
 
-        {/* 가운데 카드 영역 – 커뮤니티처럼 flex-1 중앙 정렬 + 키보드 시 위로 */}
-        <div
-          className="flex justify-center px-5 xs:px-6 sm:px-8 transition-transform duration-300"
-          style={{
-            // 화면 전체에서 헤더(80px) + 하단 컨트롤(120px)을 뺀 높이
-            height: "calc(100vh - 80px - 120px)",
-            // 헤더만큼 아래에서 시작
-            marginTop: 80,
-            // 키보드 올라오면 카드 묶음 전체를 위로 살짝 올리기
-            transform: isKeyboardVisible
-              ? `translateY(-${keyboardHeight / 2}px)`
-              : "translateY(0)",
-          }}
-        >
-          <div className="relative w-full max-w-[500px] mx-auto flex items-center justify-center">
-            <div className="relative w-full aspect-[335/400] max-h-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50">
-              {/* 카메라 비디오 */}
-              {!isUploadMode && (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              )}
-
-              {/* 선택된 이미지 */}
-              {selectedImage && (
-                <div className="absolute inset-0 bg-white">
-                  <ImageWithFallback
-                    src={selectedImage}
-                    alt="Selected Image"
-                    className="w-full h-full object-cover"
-                    style={{
-                      filter:
-                        ORIGINAL_FILTERS.find(
-                          (f) => f.name === selectedFilter,
-                        )?.filter || "none",
-                    }}
-                  />
-
-                  {/* 텍스트 모드일 때 이미지 어둡게 */}
-                  {showTextInput && (
-                    <div className="absolute inset-0 bg-black/35" />
-                  )}
-
-                  {/* 위치 / 날씨 / 시간 / 건강 캡슐들 */}
-                  {(locationInput ||
-                    weatherInput ||
-                    timeInput ||
-                    healthInput) && (
-                      <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
-                        {/* 위치 */}
-                        {locationInput && (
-                          <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
-                            <img
-                              src={MapPin}
-                              alt="위치"
-                              className="w-[22px] h-[22px]"
-                            />
-                            <span className="text-[#555555] text-[15px]">
-                              {locationInput}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setLocationInput("")}
-                              className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                            >
-                              <img
-                                src={X}
-                                alt="삭제"
-                                className="w-2 h-2"
-                              />
-                            </button>
-                          </div>
-                        )}
-                        {/* 날씨 */}
-                        {weatherInput && (
-                          <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                            <img
-                              src={Cloud}
-                              alt="날씨"
-                              className="w-[22px] h-[22px]"
-                            />
-                            <span className="text-white text-sm">
-                              {weatherInput}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setWeatherInput("")}
-                              className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                            >
-                              <img
-                                src={X}
-                                alt="삭제"
-                                className="w-2 h-2"
-                              />
-                            </button>
-                          </div>
-                        )}
-                        {/* 시간 */}
-                        {timeInput && (
-                          <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                            <img
-                              src={Clock}
-                              alt="시간"
-                              className="w-[22px] h-[22px]"
-                            />
-                            <span className="text-white text-sm">
-                              {timeInput}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setTimeInput("")}
-                              className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                            >
-                              <img
-                                src={X}
-                                alt="삭제"
-                                className="w-2 h-2"
-                              />
-                            </button>
-                          </div>
-                        )}
-                        {/* 건강 */}
-                        {healthInput && (
-                          <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                            <img
-                              src={Heart}
-                              alt="데이터"
-                              className="w-[22px] h-[22px]"
-                            />
-                            <span className="text-white text-sm">
-                              {healthInput}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setHealthInput("")}
-                              className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                            >
-                              <img
-                                src={X}
-                                alt="삭제"
-                                className="w-2 h-2"
-                              />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                  {/* 텍스트 입력 / 캡슐 */}
-                  <div
-                    className="absolute left-4 right-4 transition-all duration-200 ease-out"
-                    style={{ bottom: getTextBottom() }}
-                  >
-                    {showTextInput ? (
-                      <input
-                        ref={textInputRef}
-                        type="text"
-                        value={textInput}
-                        onChange={(e) =>
-                          setTextInput(e.target.value)
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            setShowTextInput(false);
-                            setIsTextInputFocused(false);
-                            textInputRef.current?.blur();
-                          }
-                        }}
-                        onFocus={() => setIsTextInputFocused(true)}
-                        onBlur={() => {
-                          setIsTextInputFocused(false);
-                          setShowTextInput(false);
-                        }}
-                        placeholder="텍스트를 입력하세요"
-                        className="w-full text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] outline-none focus:ring-2 focus:ring-[#36D2C5] placeholder:text-gray-500/70"
-                      />
-                    ) : textInput ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowTextInput(true);
-                          setIsTextInputFocused(true);
-                          setTimeout(
-                            () => textInputRef.current?.focus(),
-                            80,
-                          );
-                        }}
-                        className="w-full text-left text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
-                      >
-                        {textInput}
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              )}
-
-              {/* 카메라 에러 (업로드 모드 아닐 때만) */}
-              {cameraError && !isUploadMode && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm rounded-[16px] z-20">
-                  <div className="text-center px-6">
-                    <Camera
-                      size={48}
-                      className="text-gray-400 mx-auto mb-4"
-                    />
-                    <p className="text-white mb-2">{cameraError}</p>
-                    <p className="text-[#aeaeae] text-sm">
-                      갤러리 버튼을 눌러 사진을 업로드할 수 있습니다.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* 하단 컨트롤: 화면 아래 고정, 키보드 시 아래로 숨기기 */}
-        <div
-          className="fixed left-1/2 -translate-x-1/2 z-10 px-5 xs:px-6 sm:px-8 pb-10 bg-[#f7f7f7] w-full max-w-[500px]"
-          style={
-            showTextInput &&
-              isDetailEditMode &&
-              isMobile &&
-              isTextInputFocused &&
-              keyboardHeight > 0
-              ? { bottom: -keyboardHeight }
-              : { bottom: 0 }
-          }
-        >
+        {/* 하단 컨트롤 */}
+        <div className="absolute left-0 right-0 bottom-0 z-10 px-5 xs:px-6 sm:px-8 pb-10 bg-[#f7f7f7] max-w-[500px] mx-auto">
           <input
             ref={fileInputRef}
             type="file"
@@ -1005,8 +1003,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       {({ isActive }) => (
                         <button
                           className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                            : "bg-[#EEEEEE] text-gray-400 scale-95"
+                              ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
+                              : "bg-[#EEEEEE] text-gray-400 scale-95"
                             }`}
                         >
                           {filter.name.toUpperCase()}
@@ -1105,7 +1103,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 ) : (
                   <img
                     src={ImageIcon}
-                    alt="꾸미기"
+                    alt="갤러리"
                     className="w-[30px] h-[30px]"
                   />
                 )}
@@ -1329,7 +1327,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       <AlertDialog open={showLeaveUploadAlert}>
         <AlertDialogContent className="max-w-[340px]">
           <AlertDialogHeader>
-            <AlertDialogTitle>작성을 취소할까요?</AlertDialogTitle>
+            <AlertDialogTitle>
+              작성을 취소할까요?
+            </AlertDialogTitle>
             <AlertDialogDescription>
               지금까지 작성한 내용이 모두 사라집니다.
             </AlertDialogDescription>
