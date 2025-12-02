@@ -559,7 +559,7 @@ export function CommunityPage({
     // 이 값이 "얼마나 위로 올릴지"를 정하는 값
     // 숫자 줄이면 -> 카드가 화면에서 더 아래에 위치
     // 숫자 늘리면 -> 카드가 헤더 가까이 더 올라감
-    const HEADER_OFFSET = 140; // 120~160 사이에서 취향대로 조절해봐
+    const HEADER_OFFSET = 60; // 120~160 사이에서 취향대로 조절해봐
 
     const targetTop = Math.max(el.offsetTop - HEADER_OFFSET, 0);
 
