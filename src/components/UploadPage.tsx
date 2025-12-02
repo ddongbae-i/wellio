@@ -181,8 +181,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
       setFrontId(front?.deviceId || null);
       setBackId(back?.deviceId || null);
+
+      setHasCameraDevice(videoDevices.length > 0);
     } catch (e) {
       console.error("카메라 초기화 실패:", e);
+      // ❗ 카메라 없음 처리
+      setHasCameraDevice(false);
     }
   }
 
@@ -329,7 +333,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [permissionsGranted, isFrontCamera, isUploadMode]);
+  }, [permissionsGranted, isFrontCamera, isUploadMode, frontId, backId]);
 
   const handleCameraPermissionAllow = () => {
     setShowCameraPermission(false);
@@ -467,7 +471,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       toast.success("업로드 되었습니다!");
       return;
     }
-
+    // 📌 iOS PWA + 업로드 모드 전 = 파일 input fallback 촬영
+    if (isIOSStandalone() && !isUploadMode) {
+      fileInputRef.current?.setAttribute("capture", "environment");
+      fileInputRef.current?.click();
+      return;
+    }
     // 카메라 캡처
     if (hasCameraDevice && videoRef.current && stream) {
       const canvas = document.createElement("canvas");
