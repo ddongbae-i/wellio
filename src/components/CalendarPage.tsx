@@ -16,23 +16,53 @@ interface Post {
 
 interface CalendarPageProps {
   onBack: () => void;
-  posts: Post[]; // 커뮤니티 피드 데이터
-  onPostClick?: (postId: number) => void; // 피드 클릭 시 콜백
+  posts: Post[];
+  onPostClick?: (postId: number) => void;
 }
 
 interface DayData {
   date: number;
-  posts?: Array<{ image: string; id: number }>; // 여러 개의 피드 (이미지 + ID)
-  challengeStart?: boolean; // 챌린지 시작
-  challengeEnd?: boolean; // 챌린지 끝
-  inChallenge?: boolean; // 챌린지 기간 중
+  posts?: Array<{ image: string; id: number }>;
+  challengeStart?: boolean;
+  challengeEnd?: boolean;
+  inChallenge?: boolean;
 }
 
+// 🔹 날짜 포맷 유틸: 항상 YYYY-MM-DD
+const formatDateKey = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+// 🔹 createdAt 문자열을 안전하게 정규화
+const normalizeDateKey = (raw: string): string => {
+  if (!raw) return "";
+  // 이미 YYYY-MM-DD면 그대로 사용
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+
+  // YYYY-M-D 같은 형태면 0 padding
+  if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(raw)) {
+    const [y, m, d] = raw.split("-");
+    return [
+      y,
+      m.padStart(2, "0"),
+      d.padStart(2, "0"),
+    ].join("-");
+  }
+
+  // 그 외는 Date로 한번 파싱해서 다시 포맷
+  const parsed = new Date(raw);
+  if (!isNaN(parsed.getTime())) {
+    return formatDateKey(parsed);
+  }
+
+  return raw;
+};
+
 // 특정 년/월의 날짜 배열 생성
-const generateMonthDays = (
-  year: number,
-  month: number,
-): DayData[] => {
+const generateMonthDays = (year: number, month: number): DayData[] => {
   const firstDay = new Date(year, month - 1, 1).getDay();
   const lastDate = new Date(year, month, 0).getDate();
 
@@ -50,28 +80,27 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
   const swiperRef = useRef<SwiperCore | null>(null);
 
-  // 날짜별 피드 맵핑 (이미지와 ID)
+  // 🔹 날짜별 피드 맵핑 (이미지와 ID)
   const postsByDate = useMemo(() => {
     const map: { [key: string]: Array<{ image: string; id: number }> } = {};
     posts.forEach((post) => {
       if (post.createdAt) {
-        if (!map[post.createdAt]) {
-          map[post.createdAt] = [];
+        const key = normalizeDateKey(post.createdAt);
+        if (!map[key]) {
+          map[key] = [];
         }
-        map[post.createdAt].push({ image: post.image, id: post.id });
+        map[key].push({ image: post.image, id: post.id });
       }
     });
     return map;
   }, [posts]);
 
-  // 챌린지 데이터 (가족 간 챌린지)
+  // 챌린지 데이터 (가족 간 챌린지) — 기존 그대로 유지
   const challengeData: { [key: string]: Partial<DayData> } = {
-    // 첫 번째 챌린지: 10월 14-16일
     "2025-10-14": { challengeStart: true, inChallenge: true },
     "2025-10-15": { inChallenge: true },
     "2025-10-16": { challengeEnd: true, inChallenge: true },
-    
-    // 두 번째 챌린지: 11월 16-22일
+
     "2025-11-16": { challengeStart: true, inChallenge: true },
     "2025-11-17": { inChallenge: true },
     "2025-11-18": { inChallenge: true },
@@ -79,8 +108,7 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
     "2025-11-20": { inChallenge: true },
     "2025-11-21": { inChallenge: true },
     "2025-11-22": { challengeEnd: true, inChallenge: true },
-    
-    // 세 번째 챌린지: 11월 23-25일
+
     "2025-11-23": { challengeStart: true, inChallenge: true },
     "2025-11-24": { inChallenge: true },
     "2025-11-25": { challengeEnd: true, inChallenge: true },
@@ -109,24 +137,13 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
     }
   }, []);
 
-  // 달력 일자 렌더링 함수
   const renderDay = (
     day: DayData,
     year: number,
     month: number,
     idx: number,
   ) => {
-    const dateKey = `${year}-${month}-${day.date}`;
-    const feedPosts = postsByDate[dateKey] || [];
-    const challengeInfo = challengeData[dateKey] || {};
-    
-    const currentDay = {
-      ...day,
-      posts: feedPosts,
-      ...challengeInfo,
-    };
-
-    if (currentDay.date === 0) {
+    if (day.date === 0) {
       return (
         <div
           key={`${year}-${month}-${idx}`}
@@ -135,17 +152,29 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
       );
     }
 
-    const isInChallengePeriod = currentDay.inChallenge;
-    const isChalllengeStart = currentDay.challengeStart;
+    // 🔹 캘린더 셀의 날짜 키도 YYYY-MM-DD로 통일
+    const cellDate = new Date(year, month - 1, day.date);
+    const dateKey = formatDateKey(cellDate);
 
-    // 챌린지 배경 스타일
-    const challengeBgClass = `absolute top-0 bottom-0 left-0 right-0 bg-[#e0f8f8] z-0 ${
-      currentDay.challengeStart && !currentDay.challengeEnd
+    const feedPosts = postsByDate[dateKey] || [];
+    const challengeInfo = challengeData[dateKey] || {};
+
+    const currentDay: DayData = {
+      ...day,
+      posts: feedPosts,
+      ...challengeInfo,
+    };
+
+    const isInChallengePeriod = currentDay.inChallenge;
+    const isChallengeStart = currentDay.challengeStart;
+    const isChallengeEnd = currentDay.challengeEnd;
+
+    const challengeBgClass = `absolute top-0 bottom-0 left-0 right-0 bg-[#e0f8f8] z-0 ${isChallengeStart && !isChallengeEnd
         ? "rounded-l-full"
-        : currentDay.challengeEnd && !currentDay.challengeStart
+        : isChallengeEnd && !isChallengeStart
           ? "rounded-r-full"
           : ""
-    }`;
+      }`;
 
     return (
       <div
@@ -155,7 +184,7 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
         {/* 챌린지 배경 */}
         {isInChallengePeriod && <div className={challengeBgClass} />}
 
-        {isChalllengeStart ? (
+        {isChallengeStart ? (
           // 챌린지 시작일: 아이콘 표시
           <div className="w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center text-white shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] bg-[#36D2C5]">
             <Target size={20} className="relative z-10 text-white" />
@@ -174,9 +203,7 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
               alt=""
               className="absolute w-full h-full object-cover z-0"
             />
-            {/* 이미지 위에 어두운 오버레이 */}
             <div className="absolute inset-0 bg-black opacity-30 z-0" />
-            {/* 날짜 숫자 */}
             <span className="relative z-10 text-white">
               {currentDay.date}
             </span>
@@ -194,12 +221,11 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
   return (
     <div className="h-screen w-full max-w-[500px] mx-auto bg-white flex flex-col relative shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
       <style>{`
-        /* Swiper의 슬라이드가 내용물 크기를 갖도록 조정 */
         .swiper-wrapper {
           align-items: flex-start;
         }
         .swiper-slide {
-            height: auto !important;
+          height: auto !important;
         }
       `}</style>
 

@@ -2,11 +2,6 @@
 
 import {
   Plus,
-  MapPin,
-  Cloud,
-  Clock,
-  Heart,
-  X,
   Smile,
   Trash2,
 } from "lucide-react";
@@ -24,6 +19,12 @@ import Calendar from "../assets/images/icon_com_calendar.svg";
 import { patientMap, type PatientId } from "./userProfiles";
 import Reaction from "../assets/images/icon_reaction.svg";
 import SearchColor from "../assets/images/icon_search_color.svg"
+import MapPin from "../assets/images/icon_com_map.svg"
+import Cloud from "../assets/images/icon_com_sun.svg"
+import Clock from "../assets/images/icon_com_time.svg"
+import Type from "../assets/images/icon_com_text.svg"
+import Heart from "../assets/images/icon_com_data.svg"
+import X from "../assets/images/icon_com_x.svg"
 
 interface CommunityPageProps {
   onBack: () => void;
@@ -1130,10 +1131,7 @@ export function CommunityPage({
                             <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
                               {post.location && (
                                 <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <MapPin
-                                    size={16}
-                                    className="text-white"
-                                  />
+                                  <img src={MapPin} alt="위치" className="w-[22px] h-[22px]" />
                                   <span className="text-white text-sm">
                                     {post.location}
                                   </span>
@@ -1141,10 +1139,7 @@ export function CommunityPage({
                               )}
                               {post.weather && (
                                 <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <Cloud
-                                    size={16}
-                                    className="text-white"
-                                  />
+                                  <img src={Cloud} alt="날씨" className="w-[22px] h-[22px]" />
                                   <span className="text-white text-sm">
                                     {post.weather}
                                   </span>
@@ -1152,10 +1147,7 @@ export function CommunityPage({
                               )}
                               {post.time && (
                                 <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <Clock
-                                    size={16}
-                                    className="text-white"
-                                  />
+                                  <img src={Clock} alt="시간" className="w-[22px] h-[22px]" />
                                   <span className="text-white text-sm">
                                     {post.time}
                                   </span>
@@ -1163,10 +1155,7 @@ export function CommunityPage({
                               )}
                               {post.health && (
                                 <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <Heart
-                                    size={16}
-                                    className="text-white"
-                                  />
+                                  <img src={Heart} alt="데이터" className="w-[22px] h-[22px]" />
                                   <span className="text-white text-sm">
                                     {post.health}
                                   </span>
@@ -1242,7 +1231,7 @@ export function CommunityPage({
                                     transition={{ duration: 0.18 }}
                                     className="absolute inset-0 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8]"
                                   >
-                                    <X size={20} />
+                                    <img src={X} alt="삭제" className="w-6 h-6" />
                                   </motion.div>
                                 ) : (
                                   // 스마일 이미지

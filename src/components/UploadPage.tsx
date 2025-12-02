@@ -1,22 +1,7 @@
 "use client";
 
 import {
-  Image as ImageIcon,
-  Camera,
-  RefreshCw,
-  ChevronLeft,
-  Upload,
-  Edit,
-  Sparkles,
-  X,
-  Type,
-  MapPin,
-  Cloud,
-  Clock,
-  Heart,
-  Footprints,
-  Flame,
-  TrendingUp,
+  Camera
 } from "lucide-react";
 import {
   useState,
@@ -41,6 +26,19 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import MapPin from "../assets/images/icon_com_map.svg"
+import Cloud from "../assets/images/icon_com_sun.svg"
+import Clock from "../assets/images/icon_com_time.svg"
+import Type from "../assets/images/icon_com_text.svg"
+import Heart from "../assets/images/icon_com_data.svg"
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg"
+import Edit from "../assets/images/icon_com_edit.svg"
+import X from "../assets/images/icon_com_x.svg"
+import Upload from "../assets/images/icon_com_up.svg"
+import RefreshCw from "../assets/images/icon_com_change.svg"
+import ImageIcon from "../assets/images/icon_com_gallery.svg"
+import Sparkles from "../assets/images/icon_com_filter.svg"
+import { Filter } from "lucide-react";
 
 // 원본 필터 목록
 const ORIGINAL_FILTERS = [
@@ -747,12 +745,9 @@ export function UploadPage({
                           <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
                             {/* 위치 */}
                             {locationInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                <MapPin
-                                  size={16}
-                                  className="text-white"
-                                />
-                                <span className="text-white text-sm">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
+                                <img src={MapPin} alt="위치" className="w-[22px] h-[22px]" />
+                                <span className="text-[#555555] text-[15px]">
                                   {locationInput}
                                 </span>
                                 <button
@@ -762,20 +757,14 @@ export function UploadPage({
                                   }
                                   className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
                                 >
-                                  <X
-                                    size={10}
-                                    className="text-white"
-                                  />
+                                  <img src={X} alt="삭제" className="w-2 h-2" />
                                 </button>
                               </div>
                             )}
                             {/* 날씨 */}
                             {weatherInput && (
                               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                <Cloud
-                                  size={16}
-                                  className="text-white"
-                                />
+                                <img src={Cloud} alt="날씨" className="w-[22px] h-[22px]" />
                                 <span className="text-white text-sm">
                                   {weatherInput}
                                 </span>
@@ -786,20 +775,14 @@ export function UploadPage({
                                   }
                                   className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
                                 >
-                                  <X
-                                    size={10}
-                                    className="text-white"
-                                  />
+                                  <img src={X} alt="삭제" className="w-2 h-2" />
                                 </button>
                               </div>
                             )}
                             {/* 시간 */}
                             {timeInput && (
                               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                <Clock
-                                  size={16}
-                                  className="text-white"
-                                />
+                                <img src={Clock} alt="시간" className="w-[22px] h-[22px]" />
                                 <span className="text-white text-sm">
                                   {timeInput}
                                 </span>
@@ -808,20 +791,14 @@ export function UploadPage({
                                   onClick={() => setTimeInput("")}
                                   className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
                                 >
-                                  <X
-                                    size={10}
-                                    className="text-white"
-                                  />
+                                  <img src={X} alt="삭제" className="w-2 h-2" />
                                 </button>
                               </div>
                             )}
                             {/* 건강 */}
                             {healthInput && (
                               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                <Heart
-                                  size={16}
-                                  className="text-white"
-                                />
+                                <img src={Heart} alt="데이터" className="w-[22px] h-[22px]" />
                                 <span className="text-white text-sm">
                                   {healthInput}
                                 </span>
@@ -832,10 +809,7 @@ export function UploadPage({
                                   }
                                   className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
                                 >
-                                  <X
-                                    size={10}
-                                    className="text-white"
-                                  />
+                                  <img src={X} alt="삭제" className="w-2 h-2" />
                                 </button>
                               </div>
                             )}
@@ -896,7 +870,7 @@ export function UploadPage({
 
                   {/* 카메라 에러 (업로드 모드 아닐 때만) */}
                   {cameraError && !isUploadMode && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm rounded-2xl z-20">
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm rounded-[16px] z-20">
                       <div className="text-center px-6">
                         <Camera
                           size={48}
@@ -905,7 +879,7 @@ export function UploadPage({
                         <p className="text-white mb-2">
                           {cameraError}
                         </p>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-[#aeaeae] text-sm">
                           갤러리 버튼을 눌러 사진을 업로드할 수
                           있습니다.
                         </p>
@@ -929,10 +903,7 @@ export function UploadPage({
                 }}
                 className="absolute left-4 p-1"
               >
-                <ChevronLeft
-                  size={24}
-                  className="text-[#555555]"
-                />
+                <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
               </button>
               <button
                 onClick={() => setIsFilterMode(false)}
@@ -953,7 +924,7 @@ export function UploadPage({
                 }}
                 className="absolute left-4 p-1"
               >
-                <X size={24} className="text-[#1A1A1A]" />
+                <img src={X} alt="닫기" className="w-6 h-6" />
               </button>
               {/* ✅ 세부조정 완료: 업로드 X, 세부조정 모드만 종료 */}
               <button
@@ -978,7 +949,7 @@ export function UploadPage({
               }}
               className="absolute left-4 p-1"
             >
-              <ChevronLeft size={24} className="text-[#1A1A1A]" />
+              <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
             </button>
           )}
 
@@ -1072,7 +1043,7 @@ export function UploadPage({
                       className=""
                     >
                       <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <Type size={24} />
+                        <img src={Type} alt="텍스트" className="w-[22px] h-[22px]" />
                       </div>
                     </button>
 
@@ -1081,7 +1052,7 @@ export function UploadPage({
                       className=""
                     >
                       <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <MapPin size={24} />
+                        <img src={MapPin} alt="위치" className="w-[22px] h-[22px]" />
                       </div>
                     </button>
 
@@ -1090,7 +1061,7 @@ export function UploadPage({
                       className="flex flex-col items-center gap-2"
                     >
                       <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <Cloud size={24} />
+                        <img src={Cloud} alt="날씨" className="w-[22px] h-[22px]" />
                       </div>
                     </button>
 
@@ -1099,7 +1070,7 @@ export function UploadPage({
                       className="flex flex-col items-center gap-2"
                     >
                       <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <Clock size={24} />
+                        <img src={Clock} alt="날짜" className="w-[22px] h-[22px]" />
                       </div>
                     </button>
 
@@ -1108,7 +1079,7 @@ export function UploadPage({
                       className="flex flex-col items-center gap-2"
                     >
                       <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <Heart size={24} />
+                        <img src={Heart} alt="텍스트" className="w-[22px] h-[22px]" />
                       </div>
                     </button>
                   </div>
@@ -1118,7 +1089,7 @@ export function UploadPage({
                     onClick={handleCapture}
                     className="w-16 h-16 rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
                   >
-                    <Upload size={28} className="text-white" />
+                    <img src={Upload} alt="업로드" className="w-[70px] h-[70px]" />
                   </button>
                 </>
               )}
@@ -1131,12 +1102,12 @@ export function UploadPage({
                     ? handleEdit
                     : () => fileInputRef.current?.click()
                 }
-                className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 transition-colors hover:bg-gray-200"
+                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder- bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
               >
                 {isUploadMode ? (
-                  <Edit size={32} />
+                  <img src={Edit} alt="꾸미기" className="w-[30px] h-[30px]" />
                 ) : (
-                  <ImageIcon size={32} />
+                  <img src={ImageIcon} alt="꾸미기" className="w-[30px] h-[30px]" />
                 )}
               </button>
 
@@ -1145,7 +1116,7 @@ export function UploadPage({
                 className="w-16 h-16 rounded-full border-4 border-gray-100 bg-[#36D2C5] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
               >
                 {isUploadMode ? (
-                  <Upload size={28} className="text-white" />
+                  <img src={Upload} alt="업로드" className="w-[70px] h-[70px]" />
                 ) : (
                   <div className="w-14 h-14 rounded-full border-4 border-white" />
                 )}
@@ -1160,9 +1131,9 @@ export function UploadPage({
                 className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 transition-colors"
               >
                 {isUploadMode ? (
-                  <Sparkles size={32} />
+                  <img src={Filter} alt="효과" className="w-[30px] h-[30px]" />
                 ) : (
-                  <RefreshCw size={32} />
+                  <img src={RefreshCw} alt="카메라전환" className="w-[30px] h-[30px]" />
                 )}
               </button>
             </div>

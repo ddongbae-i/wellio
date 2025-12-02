@@ -5,21 +5,20 @@ import { LoginPage } from "./components/LoginPage";
 import { HomePage } from "./components/HomePage";
 import { HospitalSearchPage } from "./components/HospitalSearchPage";
 import { CommunityPage } from "./components/CommunityPage";
-import { ProfilePage } from "./components/ProfilePage"; // 👈 1. ProfilePage import
-import { HospitalDetailPage } from "./components/HospitalDetailPage"; // 👈 HospitalDetailPage import
-import { UploadPage } from "./components/UploadPage"; // 👈 UploadPage import
-import { MedicalHistoryPage } from "./components/MedicalHistoryPage"; // 👈 MedicalHistoryPage import
-import { MyReviewsPage } from "./components/MyReviewsPage"; // 👈 MyReviewsPage import
-import { FavoriteHospitalsPage } from "./components/FavoriteHospitalsPage"; // 👈 FavoriteHospitalsPage import
-import { NotificationPage } from "./components/NotificationPage"; // 👈 NotificationPage import
-import { OnboardingPage } from "./components/OnboardingPage"; // 👈 OnboardingPage import
-import { ReviewWritePage } from "./components/ReviewWritePage"; // 👈 ReviewWritePage import
-import { HospitalReviewsPage } from "./components/HospitalReviewsPage"; // 👈 HospitalReviewsPage import
-import { CalendarPage } from "./components/CalendarPage"; // 👈 CalendarPage import
-import { Toaster } from "sonner"; // 👈 Toaster import
+import { ProfilePage } from "./components/ProfilePage";
+import { HospitalDetailPage } from "./components/HospitalDetailPage";
+import { UploadPage } from "./components/UploadPage";
+import { MedicalHistoryPage } from "./components/MedicalHistoryPage";
+import { MyReviewsPage } from "./components/MyReviewsPage";
+import { FavoriteHospitalsPage } from "./components/FavoriteHospitalsPage";
+import { NotificationPage } from "./components/NotificationPage";
+import { OnboardingPage } from "./components/OnboardingPage";
+import { ReviewWritePage } from "./components/ReviewWritePage";
+import { HospitalReviewsPage } from "./components/HospitalReviewsPage";
+import { CalendarPage } from "./components/CalendarPage";
+import { Toaster } from "sonner";
 import { hospitalMap } from "./components/hospitalInfo";
 import { COMMUNITY_IMAGES } from "./components/communityImages";
-
 
 type Page =
   | "home"
@@ -208,6 +207,508 @@ const REVIEW_AUTHORS = [
       "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&q=80",
   },
 ];
+
+// 🔹 날짜 유틸: YYYY-MM-DD 형식으로 통일
+const formatDateKey = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const getDateNDaysAgo = (daysAgo: number): string => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  today.setDate(today.getDate() - daysAgo);
+  return formatDateKey(today);
+};
+
+// 🔹 오늘 기준으로 초기 커뮤니티 포스트 생성
+const createInitialPosts = (): Post[] => {
+  return [
+    {
+      id: 1,
+      image: COMMUNITY_IMAGES.IMG1,
+      badge: "🏅 주 1회 함께 걷기",
+      userAvatar: USERS.wellie.avatar,
+      caption: "챌린지 시작!",
+      userName: USERS.wellie.name,
+      textOverlay: "챌린지 첫 시작!",
+      createdAt: getDateNDaysAgo(0), // 오늘
+      comments: [
+        {
+          userName: USERS.dongseok.name,
+          userAvatar: USERS.dongseok.avatar,
+          text: "우리가족 1등 가보자!",
+          timestamp: "5분 전",
+        },
+        {
+          userName: USERS.seunghee.name,
+          userAvatar: USERS.seunghee.avatar,
+          text: "워치까지 맞췄으니 꼭 끝까지 ~^^",
+          timestamp: "1분 전",
+        },
+      ],
+      reactions: [
+        {
+          emoji: "🎉",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      image: COMMUNITY_IMAGES.IMG2,
+      userAvatar: USERS.dongseok.avatar,
+      caption: "혈압관리를 응원",
+      userName: USERS.dongseok.name,
+      textOverlay: "님의 혈압관리를 응원해 주세요!",
+      createdAt: getDateNDaysAgo(1), // 1일 전
+      comments: [],
+      reactions: [
+        {
+          emoji: "🔥",
+          users: [
+            {
+              userName: USERS.wellie.name,
+              userAvatar: USERS.wellie.avatar,
+            },
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 3,
+      image: COMMUNITY_IMAGES.IMG3,
+      userAvatar: USERS.wellie.avatar,
+      caption: "오늘도 혈당방어 성공!",
+      userName: USERS.wellie.name,
+      textOverlay: "오늘도 혈당방어 성공!",
+      createdAt: getDateNDaysAgo(2),
+      comments: [],
+      reactions: [
+        {
+          emoji: "👍",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 4,
+      image: COMMUNITY_IMAGES.IMG4,
+      userAvatar: USERS.dongseok.avatar,
+      caption: "오운완",
+      userName: USERS.dongseok.name,
+      textOverlay: "오늘도 친구놈 버리고 오운완!",
+      createdAt: getDateNDaysAgo(4),
+      comments: [],
+      reactions: [
+        {
+          emoji: "👍",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 5,
+      image: COMMUNITY_IMAGES.IMG5,
+      userAvatar: USERS.seunghee.avatar,
+      caption: "우리 가족 깍두기 준비 완료",
+      userName: USERS.seunghee.name,
+      textOverlay: "우리 가족 깍두기 준비 완료^^",
+      createdAt: getDateNDaysAgo(6),
+      comments: [
+        {
+          userName: USERS.wellie.name,
+          userAvatar: USERS.wellie.avatar,
+          text: "참석 희망합니다 🖐️",
+          timestamp: "5분 전",
+        },
+      ],
+      reactions: [
+        {
+          emoji: "❤️",
+          users: [
+            {
+              userName: USERS.wellie.name,
+              userAvatar: USERS.wellie.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 6,
+      image: COMMUNITY_IMAGES.IMG6,
+      badge: "🏃 오운완",
+      userAvatar: USERS.wellie.avatar,
+      caption: "딸은 출석 완료입니다",
+      userName: USERS.wellie.name,
+      textOverlay: "딸은 출석 완료입니다",
+      createdAt: getDateNDaysAgo(15),
+      comments: [],
+      reactions: [
+        {
+          emoji: "👍",
+          users: [
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
+            },
+          ],
+        },
+        {
+          emoji: "🔥",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 7,
+      image: COMMUNITY_IMAGES.IMG7,
+      badge: "올림픽공원",
+      userAvatar: USERS.seunghee.avatar,
+      caption: "가을이 오나보다",
+      userName: USERS.seunghee.name,
+      textOverlay: "가을이 오나보다 🍂",
+      createdAt: getDateNDaysAgo(17),
+      comments: [
+        {
+          userName: USERS.wellie.name,
+          userAvatar: USERS.wellie.avatar,
+          text: "아빠 배아프겠는데 ㅎㅎ",
+          timestamp: "25.10.05",
+        },
+        {
+          userName: USERS.dongseok.name,
+          userAvatar: USERS.dongseok.avatar,
+          text: "혼자가니까 좋나!!",
+          timestamp: "25.10.05",
+        },
+      ],
+      reactions: [
+        {
+          emoji: "👍",
+          users: [
+            {
+              userName: USERS.wellie.name,
+              userAvatar: USERS.wellie.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 8,
+      image: COMMUNITY_IMAGES.IMG8,
+      badge: "📍 타이베이시",
+      userAvatar: USERS.wellie.avatar,
+      caption: "자전거",
+      userName: USERS.wellie.name,
+      textOverlay: "대만에서도 관리중",
+      createdAt: getDateNDaysAgo(20),
+      comments: [
+        {
+          userName: USERS.seunghee.name,
+          userAvatar: USERS.seunghee.avatar,
+          text: "올때 누가크래커 ^^",
+          timestamp: "2025-09-30",
+        },
+      ],
+      reactions: [
+        {
+          emoji: "❤️",
+          users: [
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 9,
+      image: COMMUNITY_IMAGES.IMG9,
+      userAvatar: USERS.dongseok.avatar,
+      caption: "당신 닮은 꽃 사간다",
+      userName: USERS.dongseok.name,
+      textOverlay: "당신 닮은 꽃 사간다",
+      createdAt: getDateNDaysAgo(25),
+      comments: [
+        {
+          userName: USERS.wellie.name,
+          userAvatar: USERS.wellie.avatar,
+          text: "크 로맨티스트 멋져멋져",
+          timestamp: "25.09.22.",
+        },
+      ],
+      reactions: [
+        {
+          emoji: "❤️",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+            {
+              userName: USERS.wellie.name,
+              userAvatar: USERS.wellie.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 10,
+      image: COMMUNITY_IMAGES.IMG10,
+      userAvatar: USERS.wellie.avatar,
+      caption: "열심히 합시다",
+      userName: USERS.wellie.name,
+      textOverlay: "열심히 합시다",
+      createdAt: getDateNDaysAgo(27),
+      comments: [],
+      reactions: [
+        {
+          emoji: "🔥",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 11,
+      image: COMMUNITY_IMAGES.IMG11,
+      badge: "🏅 9월 누적 15만보 걷기",
+      userAvatar: USERS.wellie.avatar,
+      caption: "챌린지 완료",
+      userName: USERS.wellie.name,
+      textOverlay: "15만보 걷기 끝이 보인다",
+      createdAt: getDateNDaysAgo(30),
+      comments: [
+        {
+          userName: USERS.seunghee.name,
+          userAvatar: USERS.seunghee.avatar,
+          text: "엄마는 아직 멀었어 ㅠㅠ",
+          timestamp: "25.09.16.",
+        },
+        {
+          userName: USERS.dongseok.name,
+          userAvatar: USERS.dongseok.avatar,
+          text: "딸램 장하다",
+          timestamp: "25.09.16.",
+        },
+      ],
+      reactions: [
+        {
+          emoji: "🎉",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 12,
+      image: COMMUNITY_IMAGES.IMG12,
+      badge: "🏅 9월 누적 15만보 걷기",
+      userAvatar: USERS.wellie.avatar,
+      caption: "오챌완",
+      userName: USERS.wellie.name,
+      textOverlay: "오챌완💪",
+      createdAt: getDateNDaysAgo(31),
+      comments: [],
+      reactions: [
+        {
+          emoji: "👍",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+        },
+        {
+          emoji: "🎉",
+          users: [
+            {
+              userName: USERS.dongseok.name,
+              userAvatar: USERS.dongseok.avatar,
+            },
+            {
+              userName: USERS.wellie.name,
+              userAvatar: USERS.wellie.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 13,
+      image: COMMUNITY_IMAGES.IMG13,
+      userAvatar: USERS.wellie.avatar,
+      caption: "자주 삐뚤어지기",
+      userName: USERS.wellie.name,
+      textOverlay: "자주 삐뚤어지기",
+      createdAt: getDateNDaysAgo(32),
+      comments: [
+        {
+          userName: USERS.seunghee.name,
+          userAvatar: USERS.seunghee.avatar,
+          text: "반달이만 보이는데!?^^",
+          timestamp: "25.09.14",
+        },
+      ],
+      reactions: [],
+    },
+    {
+      id: 14,
+      image: COMMUNITY_IMAGES.IMG14,
+      userAvatar: USERS.wellie.avatar,
+      caption: "가끔은 삐뚤어지기",
+      userName: USERS.wellie.name,
+      textOverlay: "가끔은 삐뚤어지기",
+      createdAt: getDateNDaysAgo(33),
+      comments: [
+        {
+          userName: USERS.seunghee.name,
+          userAvatar: USERS.seunghee.avatar,
+          text: "이번주 혈당 낮았으니까 봐준다",
+          timestamp: "25.09.14",
+        },
+        {
+          userName: USERS.dongseok.name,
+          userAvatar: USERS.dongseok.avatar,
+          text: "아빠는!!",
+          timestamp: "25.09.14",
+        },
+      ],
+      reactions: [
+        {
+          emoji: "🔥",
+          users: [
+            {
+              userName: USERS.seunghee.name,
+              userAvatar: USERS.seunghee.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 15,
+      image: COMMUNITY_IMAGES.IMG15,
+      badge: "🏅 9월 누적 15만보 걷기",
+      userAvatar: USERS.wellie.avatar,
+      caption: "오챌완",
+      userName: USERS.wellie.name,
+      textOverlay: "오챌완💪",
+      createdAt: getDateNDaysAgo(34),
+      comments: [],
+      reactions: [],
+    },
+    {
+      id: 16,
+      image: COMMUNITY_IMAGES.IMG16,
+      badge: "🏅 9월 누적 15만보 걷기",
+      userAvatar: USERS.seunghee.avatar,
+      caption: "오챌완",
+      userName: USERS.seunghee.name,
+      textOverlay: "오챌완💪 이렇게 하면 되나",
+      createdAt: getDateNDaysAgo(34),
+      comments: [
+        {
+          userName: USERS.wellie.name,
+          userAvatar: USERS.wellie.avatar,
+          text: "짜란다 짜란다 짜란다👏👏",
+          timestamp: "25.09.14",
+        },
+      ],
+      reactions: [
+        {
+          emoji: "🔥",
+          users: [
+            {
+              userName: USERS.wellie.name,
+              userAvatar: USERS.wellie.avatar,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 17,
+      image: COMMUNITY_IMAGES.IMG17,
+      userAvatar: USERS.seunghee.avatar,
+      caption: "예쁘니들 수확 완료",
+      userName: USERS.seunghee.name,
+      textOverlay: "예쁘니들 수확 완료^^",
+      createdAt: getDateNDaysAgo(35),
+      comments: [
+        {
+          userName: USERS.wellie.name,
+          userAvatar: USERS.wellie.avatar,
+          text: "드라이토마토 신청합니다",
+          timestamp: "25.09.14",
+        },
+      ],
+      reactions: [
+        {
+          emoji: "❤️",
+          users: [
+            {
+              userName: USERS.wellie.name,
+              userAvatar: USERS.wellie.avatar,
+            },
+          ],
+        },
+      ],
+    },
+  ];
+};
 
 export default function App() {
   // 로그인 상태 관리
@@ -412,15 +913,12 @@ export default function App() {
 
   const parseKRDateString = (dateStr: string): Date => {
     // 괄호 뒤 요일은 버리고 "2025.08.08"만 사용
-    const [datePart] = dateStr.split("("); // "2025.08.08"
+    const [datePart] = dateStr.split("(");
     const [year, month, day] = datePart.split(".").map((v) => Number(v));
     return new Date(year, month - 1, day);
   };
 
   const initialMyReviews = (() => {
-    // 🔹 진료내역에 적어둔 날짜 문자열이랑 '완전히' 똑같이 맞춰쓰기
-    //    (아래 문자열은 진료내역 records 쪽과 동일하게 맞춰줘야 함!)
-
     const visit1Str = "2025.08.08";
     const visit2Str = "2025.07.14";
     const visit3Str = "2025.06.27";
@@ -435,7 +933,6 @@ export default function App() {
     const review5Date = parseKRDateString(visit5Str);
     const review6Date = parseKRDateString(visit6Str);
 
-    // 🔹 병원 정보는 hospitalMap에서 가져오기
     const h1 = hospitalMap[8];
     const h2 = hospitalMap[9];
     const h3 = hospitalMap[10];
@@ -443,14 +940,12 @@ export default function App() {
     const h5 = hospitalMap[10];
     const h6 = hospitalMap[8];
 
-
     const reviews = [
       {
         id: 1001,
         hospitalId: h1.id,
         hospitalName: h1.name,
         hospitalImage: h1.imageUrl,
-        // 👉 화면에 보이는 날짜: 진료내역과 동일한 문자열
         visitDate: visit1Str,
         rating: 5,
         keywords: ["시설 좋아요", "과잉진료가 없어요", "친절해요"],
@@ -458,7 +953,6 @@ export default function App() {
           "대기 많아서 대리접수 해드렸어요. 꾸준히 물치 받고 많이 좋아지셨습니다 첨엔 가만히 있어도 통증이 심했는데 3개월 정도 다녔는데 이제 통증도 없으시다고 하네요. 앞으로도 잘부탁드립니다",
         userName: USERS.wellie.name,
         userAvatar: USERS.wellie.avatar,
-        // 👉 정렬/시간용 createdAt도 같은 날짜에서 생성
         createdAt: review1Date.toISOString(),
         visitType: "재방문" as const,
         likes: 0,
@@ -527,8 +1021,7 @@ export default function App() {
         visitDate: visit5Str,
         rating: 5,
         keywords: ["과잉진료가 없어요", "꼼꼼해요"],
-        reviewText:
-          "원장님 건강하세요!!!!!!!!!! 감사합니다",
+        reviewText: "원장님 건강하세요!!!!!!!!!! 감사합니다",
         userName: USERS.wellie.name,
         userAvatar: USERS.wellie.avatar,
         createdAt: review3Date.toISOString(),
@@ -562,14 +1055,10 @@ export default function App() {
       .map(({ dateObj, ...rest }) => rest);
   })();
 
-  // ✅ 리뷰 작성한 진료 기록 id 목록
-  // 👉 1번만 "리뷰 미작성", 2,3번은 "작성한 리뷰" 상태
   const [reviewedHospitals, setReviewedHospitals] = useState<number[]>([
-    2, 3, 5, 6, 7, 8
+    2, 3, 5, 6, 7, 8,
   ]);
 
-  // ✅ 진료내역 데이터 관리 (요일까지 문자열로 직접 입력)
-  //    1번: 미작성, 2번/3번: 이미 리뷰 작성된 상태라는 설정
   const [medicalRecords, setMedicalRecords] = useState(() => [
     {
       id: 1,
@@ -681,11 +1170,9 @@ export default function App() {
     },
   ]);
 
-  // 작성한 리뷰 목록 state
   const [myReviews, setMyReviews] =
     useState<Review[]>(initialMyReviews);
 
-  // 샘플 리뷰 데이터 (다른 사용자들)
   const [sampleReviews, setSampleReviews] = useState<Review[]>(() => {
     const getRandomReviewer = () => {
       const randomIndex = Math.floor(
@@ -799,7 +1286,6 @@ export default function App() {
     return reviews.slice(0, 30);
   });
 
-  // 병원별 리뷰 개수
   const getHospitalReviewCount = (hospitalId: number): number => {
     const sampleCount = sampleReviews.filter(
       (review) => review.hospitalId === hospitalId,
@@ -810,7 +1296,6 @@ export default function App() {
     return sampleCount + userCount;
   };
 
-  // 병원별 평균 별점
   const getHospitalAverageRating = (hospitalId: number): number => {
     const hospitalReviews = [
       ...sampleReviews.filter(
@@ -830,7 +1315,6 @@ export default function App() {
     return Math.round((totalRating / hospitalReviews.length) * 10) / 10;
   };
 
-  // 병원별 키워드 통계
   const getHospitalKeywordStats = (
     hospitalId: number,
   ): Array<{ keyword: string; count: number; percentage: number }> => {
@@ -866,12 +1350,10 @@ export default function App() {
     return stats;
   };
 
-  // 리뷰 삭제
   const handleDeleteReview = (reviewId: number) => {
     setMyReviews(myReviews.filter((review) => review.id !== reviewId));
   };
 
-  // 도움돼요 토글
   const handleToggleLike = (reviewId: number) => {
     setSampleReviews((prevReviews) =>
       prevReviews.map((review) => {
@@ -906,7 +1388,6 @@ export default function App() {
     );
   };
 
-  // 진료내역에서 선택한 기록
   const [selectedMedicalRecord, setSelectedMedicalRecord] =
     useState<{
       id: number;
@@ -915,460 +1396,8 @@ export default function App() {
       visitTime: string;
     } | null>(null);
 
-  // 커뮤니티 포스트
-  const [posts, setPosts] = useState<Post[]>([
-    {
-      id: 1,
-      image: COMMUNITY_IMAGES.IMG1,
-      badge: "🏅 주 1회 함께 걷기",
-      userAvatar: USERS.wellie.avatar,
-      caption: "챌린지 시작!",
-      userName: USERS.wellie.name,
-      textOverlay: "챌린지 첫 시작!",
-      createdAt: "2025-11-14",
-      comments: [
-        {
-          userName: USERS.dongseok.name,
-          userAvatar: USERS.dongseok.avatar,
-          text: "우리가족 1등 가보자!",
-          timestamp: "5분 전",
-        },
-        {
-          userName: USERS.seunghee.name,
-          userAvatar: USERS.seunghee.avatar,
-          text: "워치까지 맞췄으니 꼭 끝까지 ~^^",
-          timestamp: "1분 전",
-        },
-      ],
-      reactions: [
-        {
-          emoji: "🎉",
-          users: [
-            {
-              userName: USERS.seunghee.name,
-              userAvatar: USERS.seunghee.avatar,
-            },
-            {
-              userName: USERS.dongseok.name,
-              userAvatar: USERS.dongseok.avatar,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 2,
-      image: COMMUNITY_IMAGES.IMG2,
-      userAvatar: USERS.dongseok.avatar,
-      caption: "혈압관리를 응원",
-      userName: USERS.dongseok.name,
-      textOverlay: "님의 혈압관리를 응원해 주세요!",
-      createdAt: "2025-10-15",
-      comments: [],
-      reactions: [
-        {
-          emoji: "🔥",
-          users: [
-            {
-              userName: USERS.wellie.name,
-              userAvatar: USERS.wellie.avatar,
-
-            },
-            {
-              userName: USERS.seunghee.name,
-              userAvatar: USERS.seunghee.avatar,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 3,
-      image: COMMUNITY_IMAGES.IMG3,
-      userAvatar: USERS.wellie.avatar,
-      caption: "오늘도 혈당방어 성공!",
-      userName: USERS.wellie.name,
-      textOverlay: "오늘도 혈당방어 성공!",
-      createdAt: "2025-10-13",
-      comments: [],
-      reactions: [{
-        emoji: "👍",
-        users: [
-          {
-            userName: USERS.seunghee.name,
-            userAvatar: USERS.seunghee.avatar,
-          },
-        ],
-      },],
-    },
-    {
-      id: 4,
-      image: COMMUNITY_IMAGES.IMG4,
-      badge: "💪 운동 완료",
-      userAvatar: USERS.dongseok.avatar,
-      caption: "오운완",
-      userName: USERS.dongseok.name,
-      textOverlay: "오늘도 친구놈 버리고 오운완!",
-      createdAt: "2025-10-10",
-      comments: [],
-      reactions: [
-        {
-          emoji: "👍",
-          users: [
-            {
-              userName: USERS.seunghee.name,
-              userAvatar: USERS.seunghee.avatar,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 5,
-      image: COMMUNITY_IMAGES.IMG5,
-      userAvatar: USERS.seunghee.avatar,
-      caption: "우리 가족 깍두기 준비 완료",
-      userName: USERS.seunghee.name,
-      textOverlay: "우리 가족 깍두기 준비 완료^^",
-      createdAt: "2025-10-08",
-      comments: [
-        {
-          userName: USERS.wellie.name,
-          userAvatar: USERS.wellie.avatar,
-          text: "참석 희망합니다 🖐️",
-          timestamp: "5분 전",
-        },
-      ],
-      reactions: [{
-        emoji: "❤️",
-        users: [
-          {
-            userName: USERS.wellie.name,
-            userAvatar: USERS.wellie.avatar,
-          },
-        ],
-      },],
-    },
-    {
-      id: 6,
-      image: COMMUNITY_IMAGES.IMG6,
-      badge: "🏃 오운완",
-      userAvatar: USERS.wellie.avatar,
-      caption: "딸은 출석 완료입니다",
-      userName: USERS.wellie.name,
-      textOverlay: "딸은 출석 완료입니다",
-      createdAt: "2025-10-05",
-      comments: [],
-      reactions: [
-        {
-          emoji: "👍",
-          users: [
-            {
-              userName: USERS.dongseok.name,
-              userAvatar: USERS.dongseok.avatar,
-            },
-          ],
-        },
-        {
-          emoji: "🔥",
-          users: [
-            {
-              userName: USERS.seunghee.name,
-              userAvatar: USERS.seunghee.avatar,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 7,
-      image: COMMUNITY_IMAGES.IMG7,
-      badge: "올림픽공원",
-      userAvatar: USERS.seunghee.avatar,
-      caption: "가을이 오나보다",
-      userName: USERS.seunghee.name,
-      textOverlay: "가을이 오나보다 🍂",
-      createdAt: "2025-10-05",
-      comments: [{
-        userName: USERS.wellie.name,
-        userAvatar: USERS.wellie.avatar,
-        text: "아빠 배아프겠는데 ㅎㅎ",
-        timestamp: "25.10.05",
-      }, {
-        userName: USERS.dongseok.name,
-        userAvatar: USERS.dongseok.avatar,
-        text: "혼자가니까 좋나!!",
-        timestamp: "25.10.05",
-      },],
-      reactions: [{
-        emoji: "❤️",
-        users: [
-          {
-            userName: USERS.wellie.name,
-            userAvatar: USERS.wellie.avatar,
-          },
-        ],
-      },],
-    },
-    {
-      id: 8,
-      image: COMMUNITY_IMAGES.IMG8,
-      badge: "📍 타이베이시",
-      userAvatar: USERS.wellie.avatar,
-      caption: "자전거",
-      userName: USERS.wellie.name,
-      textOverlay: "대만에서도 관리중",
-      createdAt: "2025-09-30",
-      comments: [
-        {
-          userName: USERS.seunghee.name,
-          userAvatar: USERS.seunghee.avatar,
-          text: "올때 누가크래커 ^^",
-          timestamp: "2025-09-30",
-        },
-      ],
-      reactions: [{
-        emoji: "❤️",
-        users: [
-          {
-            userName: USERS.dongseok.name,
-            userAvatar: USERS.dongseok.avatar,
-          },
-        ],
-      },],
-    },
-    {
-      id: 9,
-      image: COMMUNITY_IMAGES.IMG9,
-      userAvatar: USERS.dongseok.avatar,
-      caption: "당신 닮은 꽃 사간다",
-      userName: USERS.dongseok.name,
-      textOverlay: "당신 닮은 꽃 사간다",
-      createdAt: "2025-09-22",
-      comments: [
-        {
-          userName: USERS.wellie.name,
-          userAvatar: USERS.wellie.avatar,
-          text: "크 로맨티스트 멋져멋져",
-          timestamp: "25.09.22.",
-        },
-      ],
-      reactions: [
-        {
-          emoji: "❤️",
-          users: [
-            {
-              userName: USERS.seunghee.name,
-              userAvatar: USERS.seunghee.avatar,
-            },
-            {
-              userName: USERS.wellie.name,
-              userAvatar: USERS.wellie.avatar,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 10,
-      image: COMMUNITY_IMAGES.IMG10,
-      userAvatar: USERS.wellie.avatar,
-      caption: "열심히 합시다",
-      userName: USERS.wellie.name,
-      textOverlay: "열심히 합시다",
-      createdAt: "2025-09-20",
-      comments: [],
-      reactions: [{
-        emoji: "🔥",
-        users: [
-          {
-            userName: USERS.seunghee.name,
-            userAvatar: USERS.seunghee.avatar,
-          },
-          {
-            userName: USERS.dongseok.name,
-            userAvatar: USERS.dongseok.avatar,
-          },
-        ],
-      },],
-    },
-    {
-      id: 11,
-      image: COMMUNITY_IMAGES.IMG11,
-      badge: "🏅 9월 누적 15만보 걷기",
-      userAvatar: USERS.wellie.avatar,
-      caption: "챌린지 완료",
-      userName: USERS.wellie.name,
-      textOverlay: "15만보 걷기 끝이 보인다",
-      createdAt: "2025-09-16",
-      comments: [
-        {
-          userName: USERS.seunghee.name,
-          userAvatar: USERS.seunghee.avatar,
-          text: "엄마는 아직 멀었어 ㅠㅠ",
-          timestamp: "25.09.16.",
-        },
-        {
-          userName: USERS.dongseok.name,
-          userAvatar: USERS.dongseok.avatar,
-          text: "딸램 장하다",
-          timestamp: "25.09.16.",
-        },
-      ],
-      reactions: [{
-        emoji: "🎉",
-        users: [
-          {
-            userName: USERS.seunghee.name,
-            userAvatar: USERS.seunghee.avatar,
-          },
-          {
-            userName: USERS.dongseok.name,
-            userAvatar: USERS.dongseok.avatar,
-          },
-        ],
-      },],
-    },
-    {
-      id: 12,
-      image: COMMUNITY_IMAGES.IMG12,
-      badge: "🏅 9월 누적 15만보 걷기",
-      userAvatar: USERS.wellie.avatar,
-      caption: "오챌완",
-      userName: USERS.wellie.name,
-      textOverlay: "오챌완💪",
-      createdAt: "2025-09-15",
-      comments: [],
-
-      reactions: [
-        {
-          emoji: "👍",
-          users: [
-            {
-              userName: USERS.seunghee.name,
-              userAvatar: USERS.seunghee.avatar,
-            },
-          ],
-        },
-        {
-          emoji: "🎉",
-          users: [
-            {
-              userName: USERS.dongseok.name,
-              userAvatar: USERS.dongseok.avatar,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 13,
-      image: COMMUNITY_IMAGES.IMG13,
-      userAvatar: USERS.wellie.avatar,
-      caption: "자주 삐뚤어지기",
-      userName: USERS.wellie.name,
-      textOverlay: "자주 삐뚤어지기",
-      createdAt: "2025-09-14",
-      comments: [{
-        userName: USERS.seunghee.name,
-        userAvatar: USERS.seunghee.avatar,
-        text: "반달이만 보이는데!?^^",
-        timestamp: "25.09.14",
-      },],
-      reactions: [],
-    },
-    {
-      id: 14,
-      image: COMMUNITY_IMAGES.IMG14,
-      userAvatar: USERS.wellie.avatar,
-      caption: "가끔은 삐뚤어지기",
-      userName: USERS.wellie.name,
-      textOverlay: "가끔은 삐뚤어지기",
-      createdAt: "2025-09-13",
-      comments: [{
-        userName: USERS.seunghee.name,
-        userAvatar: USERS.seunghee.avatar,
-        text: "이번주 혈당 낮았으니까 봐준다",
-        timestamp: "25.09.14",
-      },
-      {
-        userName: USERS.dongseok.name,
-        userAvatar: USERS.dongseok.avatar,
-        text: "아빠는!!",
-        timestamp: "25.09.14",
-      }],
-      reactions: [{
-        emoji: "🔥",
-        users: [
-          {
-            userName: USERS.seunghee.name,
-            userAvatar: USERS.seunghee.avatar,
-          },
-        ],
-      },],
-    },
-    {
-      id: 15,
-      image: COMMUNITY_IMAGES.IMG15,
-      badge: "🏅 9월 누적 15만보 걷기",
-      userAvatar: USERS.wellie.avatar,
-      caption: "오챌완",
-      userName: USERS.wellie.name,
-      textOverlay: "오챌완💪",
-      createdAt: "2025-09-13",
-      comments: [],
-      reactions: [],
-    },
-    {
-      id: 16,
-      image: COMMUNITY_IMAGES.IMG16,
-      badge: "🏅 9월 누적 15만보 걷기",
-      userAvatar: USERS.seunghee.avatar,
-      caption: "오챌완",
-      userName: USERS.seunghee.name,
-      textOverlay: "오챌완💪 이렇게 하면 되나",
-      createdAt: "2025-09-13",
-      comments: [{
-        userName: USERS.wellie.name,
-        userAvatar: USERS.wellie.avatar,
-        text: "짜란다 짜란다 짜란다👏👏",
-        timestamp: "25.09.14",
-      }],
-      reactions: [{
-        emoji: "🔥",
-        users: [
-          {
-            userName: USERS.wellie.name,
-            userAvatar: USERS.wellie.avatar,
-          },
-        ],
-      },],
-    },
-    {
-      id: 17,
-      image: COMMUNITY_IMAGES.IMG17,
-      userAvatar: USERS.seunghee.avatar,
-      caption: "예쁘니들 수확 완료",
-      userName: USERS.seunghee.name,
-      textOverlay: "예쁘니들 수확 완료^^",
-      createdAt: "2025-09-13",
-      comments: [{
-        userName: USERS.wellie.name,
-        userAvatar: USERS.wellie.avatar,
-        text: "드라이토마토 신청합니다",
-        timestamp: "25.09.14",
-      },],
-      reactions: [{
-        emoji: "❤️",
-        users: [
-          {
-            userName: USERS.wellie.name,
-            userAvatar: USERS.wellie.avatar,
-          }],
-      },
-      ]
-    },
-  ]);
+  // 🔹 커뮤니티 포스트: 오늘 기준 상대 날짜 사용
+  const [posts, setPosts] = useState<Post[]>(() => createInitialPosts());
 
   const handleLogin = (name: string) => {
     setUserName(name);
@@ -1384,8 +1413,7 @@ export default function App() {
     newPost: Omit<Post, "id" | "userName" | "userAvatar">,
   ) => {
     const today = new Date();
-    const dateStr = `${today.getFullYear()}-${today.getMonth() + 1
-      }-${today.getDate()}`;
+    const dateStr = formatDateKey(today); // 🔹 업로드도 동일 포맷
 
     const post: Post = {
       ...newPost,
@@ -1398,7 +1426,7 @@ export default function App() {
     navigateTo("community");
   };
 
-  const toggleFavorite = (hospital: any) => {
+  const toggleFavorite = (hospital: Hospital) => {
     const isFavorite = favoriteHospitals.some(
       (h) => h.id === hospital.id,
     );
@@ -1700,8 +1728,6 @@ export default function App() {
                 setMyReviews([newReview, ...myReviews]);
                 setReviewedHospitals([
                   ...reviewedHospitals,
-                  // 여기 들어오는 hospitalId는 "병원 id"라서,
-                  // 진료내역 id와 연결하려면 나중에 구조 바꿀 수 있음.
                   reviewData.hospitalId,
                 ]);
               }
