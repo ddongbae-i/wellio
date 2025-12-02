@@ -1376,33 +1376,11 @@ export function CommunityPage({
                                           trimmed,
                                         );
                                       }}
-                                      onFocus={() => {
-                                        setCurrentPostId(post.id);
-
-                                        const container = scrollContainerRef.current;
-                                        const el = postRefs.current[post.id];
-                                        if (!container || !el) return;
-
-                                        // 컨테이너 안에서의 현재 스크롤 위치
-                                        const containerRect = container.getBoundingClientRect();
-                                        const elRect = el.getBoundingClientRect();
-
-                                        const currentScrollTop = container.scrollTop;
-                                        const offsetInContainer = elRect.top - containerRect.top;
-
-                                        // 이 값이 "헤더에서 얼마나 떨어지게 할지"야
-                                        const HEADER_OFFSET = 20; // 60~140 사이에서 조절해보면 딱 느낌 잡힐 거야
-
-                                        const targetTop = Math.max(
-                                          currentScrollTop + offsetInContainer - HEADER_OFFSET,
-                                          0,
-                                        );
-
-                                        container.scrollTo({
-                                          top: targetTop,
-                                          behavior: "smooth",
-                                        });
-                                      }}
+                                      onFocus={() =>
+                                        setCurrentPostId(
+                                          post.id,
+                                        )
+                                      }
 
                                       onKeyDown={(e) => {
                                         if (
