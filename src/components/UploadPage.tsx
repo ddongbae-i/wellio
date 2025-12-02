@@ -825,7 +825,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                               setShowTextInput(false);
                             }}
                             placeholder="텍스트를 입력하세요"
-                            className="w-full text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] outline-none focus:ring-2 focus:ring-[#36D2C5] placeholder:text-gray-500/70"
+                            className="w-full text-[#555555] text-[15px] bg-white/80 backdrop-blur-sm px-5 py-2 rounded-[50px] outline-none placeholder:text-gray-[#aeaeae] border border-[#ffffff]"
                           />
                         ) : textInput ? (
                           <button
@@ -838,7 +838,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 80,
                               );
                             }}
-                            className="w-full text-left text-black text-lg bg-white/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+                            className="w-full text-left text-[#555555] text-[15px] bg-white/80 backdrop-blur-sm px-5 py-2 rounded-[50px] "
                           >
                             {textInput}
                           </button>
@@ -994,8 +994,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       {({ isActive }) => (
                         <button
                           className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                              ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                              : "bg-[#EEEEEE] text-gray-400 scale-95"
+                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
+                            : "bg-[#EEEEEE] text-gray-400 scale-95"
                             }`}
                         >
                           {filter.name.toUpperCase()}
