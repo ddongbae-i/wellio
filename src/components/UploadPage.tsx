@@ -1274,7 +1274,7 @@ export function UploadPage({
                             `${emoji}`,
                           )
                         }
-                        className="w-11 h-11 flex items-center justify-center bg-[#555555] rounded-full text-2xl shrink-0 hover:bg-[#444444] transition-colors"
+                        className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
                       >
                         {emoji}
                       </button>
