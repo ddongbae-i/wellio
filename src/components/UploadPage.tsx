@@ -728,11 +728,20 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
         {/* 가운데 카드 영역 – 커뮤니티처럼 flex-1 중앙 정렬 + 키보드 시 위로 */}
         <div
-          className={`flex-1 flex px-5 xs:px-6 sm:px-8 transition-all duration-300 ${isKeyboardVisible ? "items-start pt-[110px]" : "items-center pt-[96px]"
-            }`}
+          className="flex justify-center px-5 xs:px-6 sm:px-8 transition-transform duration-300"
+          style={{
+            // 화면 전체에서 헤더(80px) + 하단 컨트롤(120px)을 뺀 높이
+            height: "calc(100vh - 80px - 120px)",
+            // 헤더만큼 아래에서 시작
+            marginTop: 80,
+            // 키보드 올라오면 카드 묶음 전체를 위로 살짝 올리기
+            transform: isKeyboardVisible
+              ? `translateY(-${keyboardHeight / 2}px)`
+              : "translateY(0)",
+          }}
         >
-          <div className="relative w-full max-w-[500px] mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
-            <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50">
+          <div className="relative w-full max-w-[500px] mx-auto flex items-center justify-center">
+            <div className="relative w-full aspect-[335/400] max-h-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50">
               {/* 카메라 비디오 */}
               {!isUploadMode && (
                 <video
@@ -926,12 +935,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       size={48}
                       className="text-gray-400 mx-auto mb-4"
                     />
-                    <p className="text-white mb-2">
-                      {cameraError}
-                    </p>
+                    <p className="text-white mb-2">{cameraError}</p>
                     <p className="text-[#aeaeae] text-sm">
-                      갤러리 버튼을 눌러 사진을 업로드할 수
-                      있습니다.
+                      갤러리 버튼을 눌러 사진을 업로드할 수 있습니다.
                     </p>
                   </div>
                 </div>
@@ -997,8 +1003,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       {({ isActive }) => (
                         <button
                           className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                              ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                              : "bg-[#EEEEEE] text-gray-400 scale-95"
+                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
+                            : "bg-[#EEEEEE] text-gray-400 scale-95"
                             }`}
                         >
                           {filter.name.toUpperCase()}
