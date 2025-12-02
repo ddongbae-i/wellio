@@ -882,7 +882,7 @@ export function CommunityPage({
         ) : (
           <div
             ref={scrollContainerRef}
-            className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide snap-y snap-mandatory ${isKeyboardVisible ? "pb-30" : ""
+            className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide snap-y snap-mandatory ${isKeyboardVisible ? "pb-40" : ""
               }`}
           >
             {filteredPosts.map((post) => {
