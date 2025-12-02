@@ -20,7 +20,7 @@ import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
 import Search from "../assets/images/icon_search.svg";
 import LayoutGrid from "../assets/images/Icon_View.svg";
-import Calendar from "../assets/images/icon_calendar.svg";
+import Calendar from "../assets/images/icon_com_calendar.svg";
 import { patientMap, type PatientId } from "./userProfiles";
 
 interface CommunityPageProps {
@@ -901,14 +901,13 @@ export function CommunityPage({
                     }
   `}
                   key={post.id}
-                  style={
-                    !isKeyboardVisible
-                      ? { height: cardHeight, minHeight: cardHeight } // 스냅 모드일 때만 한 화면 높이
-                      : undefined                                      // 키보드 올라오면 auto 높이
-                  }
+                  style={{
+                    height: cardHeight,
+                    minHeight: cardHeight,   // ✅ 키보드 떠도 항상 같은 카드 높이 유지
+                  }}
                 >
                   <div>
-                    <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
+                    <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400]">
                       {post.userName === currentUser.userName &&
                         isDragging && (
                           <div className="absolute inset-y-0 -right-8 w-24 flex items-center justify-start z-0 pr-4">
