@@ -549,26 +549,6 @@ export function CommunityPage({
     };
   }, []);
 
-  useEffect(() => {
-    if (!isKeyboardVisible || currentPostId == null) return;
-
-    const container = scrollContainerRef.current;
-    const el = postRefs.current[currentPostId];
-    if (!container || !el) return;
-
-    // 이 값이 "얼마나 위로 올릴지"를 정하는 값
-    // 숫자 줄이면 -> 카드가 화면에서 더 아래에 위치
-    // 숫자 늘리면 -> 카드가 헤더 가까이 더 올라감
-    const HEADER_OFFSET = 60; // 120~160 사이에서 취향대로 조절해봐
-
-    const targetTop = Math.max(el.offsetTop - HEADER_OFFSET, 0);
-
-    container.scrollTo({
-      top: targetTop,
-      behavior: "smooth",
-    });
-  }, [isKeyboardVisible, currentPostId]);
-
   // 처음 화면 높이 (없으면 800 fallback)
   const baseHeight = screenHeight ?? 800;
 
@@ -1379,11 +1359,34 @@ export function CommunityPage({
                                           trimmed,
                                         );
                                       }}
-                                      onFocus={() =>
-                                        setCurrentPostId(
-                                          post.id,
-                                        )
-                                      }
+                                      onFocus={() => {
+                                        setCurrentPostId(post.id);
+
+                                        const container = scrollContainerRef.current;
+                                        const el = postRefs.current[post.id];
+                                        if (!container || !el) return;
+
+                                        // 컨테이너 안에서의 현재 스크롤 위치
+                                        const containerRect = container.getBoundingClientRect();
+                                        const elRect = el.getBoundingClientRect();
+
+                                        const currentScrollTop = container.scrollTop;
+                                        const offsetInContainer = elRect.top - containerRect.top;
+
+                                        // 이 값이 "헤더에서 얼마나 떨어지게 할지"야
+                                        const HEADER_OFFSET = 80; // 60~140 사이에서 조절해보면 딱 느낌 잡힐 거야
+
+                                        const targetTop = Math.max(
+                                          currentScrollTop + offsetInContainer - HEADER_OFFSET,
+                                          0,
+                                        );
+
+                                        container.scrollTo({
+                                          top: targetTop,
+                                          behavior: "smooth",
+                                        });
+                                      }}
+
                                       onKeyDown={(e) => {
                                         if (
                                           e.key === "Enter" &&
