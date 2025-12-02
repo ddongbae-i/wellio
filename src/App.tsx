@@ -1362,8 +1362,8 @@ export default function App() {
         emoji: "❤️",
         users: [
           {
-            userName: USERS.seunghee.name,
-            userAvatar: USERS.seunghee.avatar,
+            userName: USERS.wellie.name,
+            userAvatar: USERS.wellie.avatar,
           }],
       },
       ]
