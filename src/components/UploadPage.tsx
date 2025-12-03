@@ -1045,7 +1045,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
                         <img
                           src={Clock}
-                          alt="날짜"
+                          alt="시간"
                           className="w-[22px] h-[22px]"
                         />
                       </div>
@@ -1055,7 +1055,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
                         <img
                           src={Heart}
-                          alt="텍스트"
+                          alt="데이터"
                           className="w-[22px] h-[22px]"
                         />
                       </div>
@@ -1076,7 +1076,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-between max-w-md mx-auto px-6">
+            <div className="flex items-center justify-between max-w-md mx-auto px-6 mt-5">
               <button
                 onClick={
                   isUploadMode
@@ -1102,7 +1102,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
               <button
                 onClick={handleCapture}
-                className="w-[70px] h-[70px] rounded-full border-[4px] border-[#2ECACA] bg-white hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
               >
                 {isUploadMode ? (
                   <img
