@@ -937,7 +937,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             </button>
           )}
 
-          <h1 className="text-xl font-bold text-[#1A1A1A] text-center">
+          <h1 className="text-[19px] font-semibold text-[#202020] text-center">
             {isFilterMode
               ? "필터"
               : isDetailEditMode
