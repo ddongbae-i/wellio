@@ -559,29 +559,53 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const { latitude, longitude } = position.coords;
+        try {
+          const { latitude, longitude } = position.coords;
 
-        // ✅ 카카오 또는 구글 Geocoding API 필요
-        const res = await fetch(
-          `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${longitude}&y=${latitude}`,
-          {
-            headers: {
-              Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_REST_KEY}`,
+          const res = await fetch(
+            `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${longitude}&y=${latitude}&input_coord=WGS84`,
+            {
+              headers: {
+                Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_REST_KEY}`,
+              },
             },
-          },
-        );
+          );
 
-        const data = await res.json();
-        const address =
-          data.documents?.[0]?.address?.address_name ?? "위치 확인 실패";
+          if (!res.ok) {
+            const text = await res.text();
+            console.error("Kakao API 오류 상태:", res.status, text);
+            alert("카카오 주소 API 호출에 실패했습니다.");
+            return;
+          }
 
-        setLocationInput(address);
+          const data = await res.json();
+          console.log("Kakao 응답:", data);
+
+          const doc = data.documents?.[0];
+
+          if (!doc) {
+            alert("주소 데이터를 찾지 못했습니다.");
+            return;
+          }
+
+          const address =
+            doc.road_address?.address_name ??
+            doc.address?.address_name ??
+            "주소를 찾지 못했습니다.";
+
+          setLocationInput(address);
+        } catch (err) {
+          console.error("주소 변환 중 오류:", err);
+          alert("주소를 불러오는 중 문제가 발생했습니다.");
+        }
       },
-      () => {
-        alert("위치 접근이 거부되었습니다.");
+      (error) => {
+        console.error("위치 접근 오류:", error);
+        alert("위치 접근이 거부되었거나 실패했습니다.");
       },
     );
   };
+
 
   const handleWeatherInput = () =>
     setWeatherInput("10°C");
