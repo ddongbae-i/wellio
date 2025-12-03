@@ -703,7 +703,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 <img
                                   src={MapPin}
                                   alt="위치"
-                                  className="w-[22px] h-[22px]"
+                                  className="w-[18px] h-[18px]"
                                 />
                                 <span className="text-[#555555] text-[15px]">
                                   {locationInput}
@@ -711,84 +711,84 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 <button
                                   type="button"
                                   onClick={() => setLocationInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                  className="ml-1 flex items-center justify-center w-4 h-4"
                                 >
                                   <img
                                     src={X}
                                     alt="삭제"
-                                    className="w-2 h-2"
+                                    className="w-3 h-3"
                                   />
                                 </button>
                               </div>
                             )}
 
                             {weatherInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
                                 <img
                                   src={Cloud}
                                   alt="날씨"
-                                  className="w-[22px] h-[22px]"
+                                  className="w-[18px] h-[18px]"
                                 />
-                                <span className="text-white text-sm">
+                                <span className="text-[#555555] text-[15px]">
                                   {weatherInput}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setWeatherInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                  className="ml-1 flex items-center justify-center w-4 h-4"
                                 >
                                   <img
                                     src={X}
                                     alt="삭제"
-                                    className="w-2 h-2"
+                                    className="w-3 h-3"
                                   />
                                 </button>
                               </div>
                             )}
 
                             {timeInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
                                 <img
                                   src={Clock}
                                   alt="시간"
-                                  className="w-[22px] h-[22px]"
+                                  className="w-[18px] h-[18px]"
                                 />
-                                <span className="text-white text-sm">
+                                <span className="text-[#555555] text-[15px]">
                                   {timeInput}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setTimeInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                  className="ml-1 flex items-center justify-center w-4 h-4"
                                 >
                                   <img
                                     src={X}
                                     alt="삭제"
-                                    className="w-2 h-2"
+                                    className="w-3 h-3"
                                   />
                                 </button>
                               </div>
                             )}
 
                             {healthInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
                                 <img
                                   src={Heart}
                                   alt="데이터"
-                                  className="w-[22px] h-[22px]"
+                                  className="w-[18px] h-[18px]"
                                 />
-                                <span className="text-white text-sm">
+                                <span className="text-[#555555] text-[15px]">
                                   {healthInput}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setHealthInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                  className="ml-1 flex items-center justify-center w-4 h-4"
                                 >
                                   <img
                                     src={X}
                                     alt="삭제"
-                                    className="w-2 h-2"
+                                    className="w-3 h-3"
                                   />
                                 </button>
                               </div>
