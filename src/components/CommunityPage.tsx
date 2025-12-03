@@ -505,26 +505,10 @@ export function CommunityPage({
 
   // 캘린더에서 넘어왔을 때 해당 포스트로 스크롤
   useEffect(() => {
-    if (
-      initialPostId &&
-      postRefs.current[initialPostId] &&
-      scrollContainerRef.current &&
-      !isGridView &&
-      !isReactionView
-    ) {
-      const postElement = postRefs.current[initialPostId];
-      const container = scrollContainerRef.current;
+    if (!initialPostId) return;
+    if (isGridView || isReactionView) return;
 
-      setTimeout(() => {
-        if (postElement && container) {
-          const postTop = postElement.offsetTop;
-          container.scrollTo({
-            top: postTop,
-            behavior: "smooth",
-          });
-        }
-      }, 100);
-    }
+    scrollToPost(initialPostId);
   }, [initialPostId, isGridView, isReactionView]);
 
   // 모바일 키보드 감지 (레이아웃 높이는 처음 값 기준으로 고정)

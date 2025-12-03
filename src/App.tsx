@@ -1733,7 +1733,7 @@ export default function App() {
             onNotificationClick={() => navigateTo("notifications")}
             posts={posts}
             currentUserId={"kim-welly"}
-            initialPostId={selectedPostId ?? undefined}  // ✅ 이름 맞추기
+            initialPostId={selectedPostId}
             onPageChange={(page) => {
               if (page === "calendar") navigateTo("calendar");
             }}

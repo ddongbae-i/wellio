@@ -9,16 +9,6 @@ import {
   useCallback,
 } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "./ui/alert-dialog";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { toast } from "sonner";
@@ -36,8 +26,79 @@ import RefreshCw from "../assets/images/icon_com_change.svg";
 import ImageIcon from "../assets/images/icon_com_gallery.svg";
 import Sparkles from "../assets/images/icon_com_filter.svg";
 
-// 원본 필터 목록
+// 커스텀 알럿 컴포넌트
+interface CustomAlertProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm?: () => void;
+  title: string;
+  description: string;
+  cancelText?: string;
+  confirmText?: string;
+}
 
+const CustomAlert: React.FC<CustomAlertProps> = ({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  description,
+  cancelText = "취소",
+  confirmText = "확인",
+}) => {
+  if (!open) return null;
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        {/* 배경 오버레이 */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="absolute inset-0 bg-black/50"
+          onClick={onClose}
+        />
+
+        {/* 모달 컨텐츠 */}
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="relative w-full max-w-[340px] bg-white rounded-[16px] p-6 shadow-lg"
+        >
+          <h2 className="text-[19px] font-semibold text-[#202020] mb-2">
+            {title}
+          </h2>
+          <p className="text-[15px] text-[#555555] mb-6 leading-relaxed">
+            {description}
+          </p>
+
+          <div className="flex gap-2">
+            <button
+              onClick={onClose}
+              className="flex-1 h-12 rounded-[12px] border border-[#e8e8e8] bg-white text-[#555555] text-[15px] font-medium hover:bg-gray-50 transition-colors"
+            >
+              {cancelText}
+            </button>
+            {onConfirm && (
+              <button
+                onClick={onConfirm}
+                className="flex-1 h-12 rounded-[12px] bg-[#2ECACA] text-white text-[15px] font-medium hover:bg-[#00C2B3] transition-colors"
+              >
+                {confirmText}
+              </button>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+};
+
+// 원본 필터 목록
 const ORIGINAL_FILTERS = [
   { name: "Normal", filter: "none" },
   {
@@ -232,11 +293,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }
 
       const base = initialViewportHeight.current || vv.height;
-      const diff = base - vv.height; // 키보드로 줄어든 높이
+      const diff = base - vv.height;
 
       if (diff > 80) {
         setKeyboardHeight(diff);
-        // 👉 뷰포트를 키보드 위까지만 보이게
         document.body.style.height = `${vv.height}px`;
       } else {
         setKeyboardHeight(0);
@@ -260,17 +320,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   ]);
 
   const getControlsBottom = () => {
-    if (isKeyboardVisible) return 0;      // 키보드 떠 있을 때는 화면 맨 아래
-
-    // ✅ 세부조정 모드(텍스트/위치/날씨 버튼 + 업로드 버튼 분리)
-    // → 업로드 버튼은 원래처럼 아래에 붙여두고 싶으니까 0이나 16 정도
+    if (isKeyboardVisible) return 0;
     if (isDetailEditMode) return 50;
-
-    // ✅ 기본 촬영/업로드 모드
-    // → 카메라 컨트롤 묶음을 사진 쪽으로 끌어올리기
-    return 120; // 숫자 마음에 안 들면 64, 80 이런 식으로 조정 가능
+    return 120;
   };
-
 
   // 카메라 스트림 시작
   useEffect(() => {
@@ -614,46 +667,69 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
   return (
     <>
-      {/* 카메라/갤러리 권한 다이얼로그 */}
-      <AlertDialog open={showCameraPermission}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>카메라 권한 허용</AlertDialogTitle>
-            <AlertDialogDescription>
-              사진을 촬영하려면 카메라 접근 권한이 필요합니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handlePermissionDeny}>
-              거부
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleCameraPermissionAllow}>
-              허용
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* 커스텀 알럿들 */}
+      <CustomAlert
+        open={showCameraPermission}
+        onClose={handlePermissionDeny}
+        onConfirm={handleCameraPermissionAllow}
+        title="카메라 권한 허용"
+        description="사진을 촬영하려면 카메라 접근 권한이 필요합니다."
+        cancelText="거부"
+        confirmText="허용"
+      />
 
-      <AlertDialog open={showGalleryPermission}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>갤러리 권한 허용</AlertDialogTitle>
-            <AlertDialogDescription>
-              사진을 업로드하려면 갤러리 접근 권한이 필요합니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handlePermissionDeny}>
-              거부
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleGalleryPermissionAllow}
-            >
-              허용
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CustomAlert
+        open={showGalleryPermission}
+        onClose={handlePermissionDeny}
+        onConfirm={handleGalleryPermissionAllow}
+        title="갤러리 권한 허용"
+        description="사진을 업로드하려면 갤러리 접근 권한이 필요합니다."
+        cancelText="거부"
+        confirmText="허용"
+      />
+
+      <CustomAlert
+        open={showNoImageAlert}
+        onClose={() => setShowNoImageAlert(false)}
+        title="이미지 선택 필요"
+        description="사진을 선택하거나 촬영한 후 업로드할 수 있습니다."
+        cancelText="닫기"
+      />
+
+      <CustomAlert
+        open={showLeaveDetailAlert}
+        onClose={() => setShowLeaveDetailAlert(false)}
+        onConfirm={() => {
+          setShowLeaveDetailAlert(false);
+          handleCloseDetailEdit();
+        }}
+        title="세부조정을 종료할까요?"
+        description="입력한 내용은 그대로 유지되지만 세부조정 화면을 닫습니다."
+        cancelText="취소"
+        confirmText="종료"
+      />
+
+      <CustomAlert
+        open={showLeaveUploadAlert}
+        onClose={() => setShowLeaveUploadAlert(false)}
+        onConfirm={() => {
+          setShowLeaveUploadAlert(false);
+          setSelectedImage(null);
+          setTextInput("");
+          setLocationInput("");
+          setWeatherInput("");
+          setTimeInput("");
+          setHealthInput("");
+          setIsUploadMode(false);
+          setIsDetailEditMode(false);
+          setShowTextInput(false);
+          onBack();
+        }}
+        title="작성을 취소할까요?"
+        description="지금까지 작성한 내용이 모두 사라집니다."
+        cancelText="계속 작성"
+        confirmText="취소하고 나가기"
+      />
 
       {/* 메인 래퍼 */}
       <div className="relative w-full min-h-screen bg-[#f7f7f7] overflow-hidden">
@@ -1014,7 +1090,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     ${isActive ? "bg-white border-[4px] border-[#2ECACA]" : "bg-[#EEEEEE]"}
                   `}
                           >
-                            {/* ✅ 비선택 상태: 흐린 사진 */}
                             {!isActive && selectedImage && (
                               <ImageWithFallback
                                 src={selectedImage}
@@ -1022,12 +1097,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 className="absolute inset-0 w-full h-full object-cover"
                                 style={{
                                   filter: filter.filter,
-                                  opacity: 0.3,   // 🔥 흐린 사진
+                                  opacity: 0.3,
                                 }}
                               />
                             )}
 
-                            {/* ✅ 모든 상태에서 항상 텍스트는 위에 */}
                             <span
                               className={`relative z-10 text-[10px] font-medium tracking-wide ${isActive ? "text-[#555555]" : "text-[#555555]"
                                 }`}
@@ -1293,25 +1367,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         )}
       </AnimatePresence>
 
-      {/* 이미지 선택 안 했을 때 경고 */}
-      <AlertDialog open={showNoImageAlert}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>이미지 선택 필요</AlertDialogTitle>
-            <AlertDialogDescription>
-              사진을 선택하거나 촬영한 후 업로드할 수 있습니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => setShowNoImageAlert(false)}
-            >
-              닫기
-            </AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       {/* AI 추천 캡션 바 */}
       <AnimatePresence>
         {selectedImage &&
@@ -1319,74 +1374,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           showTextInput &&
           isTextInputFocused && <AICaptionToolbar />}
       </AnimatePresence>
-
-      {/* 세부조정 종료 확인 */}
-      <AlertDialog open={showLeaveDetailAlert}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              세부조정을 종료할까요?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              입력한 내용은 그대로 유지되지만 세부조정 화면을
-              닫습니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => setShowLeaveDetailAlert(false)}
-            >
-              취소
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setShowLeaveDetailAlert(false);
-                handleCloseDetailEdit();
-              }}
-            >
-              종료
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* 업로드 작성 취소 확인 */}
-      <AlertDialog open={showLeaveUploadAlert}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              작성을 취소할까요?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              지금까지 작성한 내용이 모두 사라집니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => setShowLeaveUploadAlert(false)}
-            >
-              계속 작성
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setShowLeaveUploadAlert(false);
-                setSelectedImage(null);
-                setTextInput("");
-                setLocationInput("");
-                setWeatherInput("");
-                setTimeInput("");
-                setHealthInput("");
-                setIsUploadMode(false);
-                setIsDetailEditMode(false);
-                setShowTextInput(false);
-                onBack();
-              }}
-            >
-              취소하고 나가기
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
