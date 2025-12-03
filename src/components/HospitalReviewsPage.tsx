@@ -276,7 +276,7 @@ export function HospitalReviewsPage({
                         )
                       }
                       className={`flex items-center gap-1 text-xs transition-colors active:scale-100 ${review.liked
-                        ? "text-[#36D2C5]"
+                        ? "text-[#2ECACA]"
                         : "text-[#aeaeae]"
                         }`}
                     >
@@ -305,7 +305,7 @@ export function HospitalReviewsPage({
                   )}
 
                   {/* 내용 */}
-                  <p className="text-[15px] text-gray-700 leading-relaxed whitespace-pre-line">
+                  <p className="text-[15px] text-[#555555] leading-[1.4] whitespace-pre-line">
                     {review.content}
                   </p>
                 </div>
