@@ -264,11 +264,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
     // ✅ 세부조정 모드(텍스트/위치/날씨 버튼 + 업로드 버튼 분리)
     // → 업로드 버튼은 원래처럼 아래에 붙여두고 싶으니까 0이나 16 정도
-    if (isDetailEditMode) return 20;
+    if (isDetailEditMode) return 140;
 
     // ✅ 기본 촬영/업로드 모드
     // → 카메라 컨트롤 묶음을 사진 쪽으로 끌어올리기
-    return 20; // 숫자 마음에 안 들면 64, 80 이런 식으로 조정 가능
+    return 140; // 숫자 마음에 안 들면 64, 80 이런 식으로 조정 가능
   };
 
 
