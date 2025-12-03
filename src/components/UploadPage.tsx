@@ -37,6 +37,13 @@ import ImageIcon from "../assets/images/icon_com_gallery.svg";
 import Sparkles from "../assets/images/icon_com_filter.svg";
 
 // 원본 필터 목록
+
+const getControlsBottom = () => {
+  if (isKeyboardVisible) return 0;      // 키보드 뜰 때는 그냥 바닥에 붙이기
+  if (isDetailEditMode) return 24;      // 세부조정 모드: 업로드 버튼을 아래로
+  return 88;                            // 기본 업로드 모드: 3개 버튼을 사진에 좀 더 가깝게
+};
+
 const ORIGINAL_FILTERS = [
   { name: "Normal", filter: "none" },
   {
@@ -257,6 +264,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     isMobile,
     isTextInputFocused,
   ]);
+
+
 
   // 카메라 스트림 시작
   useEffect(() => {
@@ -953,8 +962,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           className="absolute left-0 right-0 z-10 px-5 xs:px-6 sm:px-8 bg-[#f7f7f7] max-w-[500px] mx-auto"
           style={{
             // 살짝 띄워서 위로 올리기 (원하면 숫자 더 키워도 됨)
-            bottom: isKeyboardVisible ? 0 : 40,
-            paddingBottom: isKeyboardVisible ? 10 : 20,
+            bottom: getControlsBottom(),
           }}
         >
           <input
@@ -1251,7 +1259,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                         onClick={() =>
                           handleHealthRecordSelect(`${challenge}`)
                         }
-                        className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
+                        className="px-5 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
                       >
                         {challenge}
                       </button>
