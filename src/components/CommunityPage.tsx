@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Heart
+  Heart,
   Plus,
   Smile,
   Trash2,
