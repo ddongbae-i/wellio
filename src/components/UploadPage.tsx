@@ -653,7 +653,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             <div
               className="absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300"
               style={{
-                top: isKeyboardVisible ? "96px" : "50%",
+                top: isKeyboardVisible ? "86px" : "42%",
                 transform: isKeyboardVisible
                   ? "translateY(0)"
                   : "translateY(-50%)",
@@ -949,7 +949,14 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         </header>
 
         {/* 하단 컨트롤 (카메라/필터 버튼) */}
-        <div className="absolute left-0 right-0 z-10 px-5 xs:px-6 sm:px-8 pb-10 bg-[#f7f7f7] max-w-[500px] mx-auto bottom-0">
+        <div
+          className="absolute left-0 right-0 z-10 px-5 xs:px-6 sm:px-8 bg-[#f7f7f7] max-w-[500px] mx-auto"
+          style={{
+            // 살짝 띄워서 위로 올리기 (원하면 숫자 더 키워도 됨)
+            bottom: isKeyboardVisible ? 0 : 32,
+            paddingBottom: isKeyboardVisible ? 10 : 20,
+          }}
+        >
           <input
             ref={fileInputRef}
             type="file"
@@ -1076,7 +1083,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-between max-w-md mx-auto px-6 mt-5">
+            <div className="flex items-center justify-between max-w-md mx-auto px-6 mt-3">
               <button
                 onClick={
                   isUploadMode
