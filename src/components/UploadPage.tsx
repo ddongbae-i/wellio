@@ -25,6 +25,11 @@ import Upload from "../assets/images/icon_com_up.svg";
 import RefreshCw from "../assets/images/icon_com_change.svg";
 import ImageIcon from "../assets/images/icon_com_gallery.svg";
 import Sparkles from "../assets/images/icon_com_filter.svg";
+import WalkIcon from "../assets/images/WalkIcon.svg"
+import TogetherIcon from "../assets/images/TogetherIcon.svg"
+import HabitIcon from "../assets/images/HabitIcon.svg"
+import TrophyIcon from "../assets/images/TrophyIcon.svg"
+
 
 // 커스텀 알럿 컴포넌트
 interface CustomAlertProps {
@@ -1342,21 +1347,24 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   <h3 className="text-[17px] font-bold text-[#202020]">
                     진행중인 챌린지
                   </h3>
-                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
+                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm">
                     {[
-                      "다시 15만보 걷기",
-                      "주 1회 함께 걷기",
-                      "건강한 습관 만들기",
-                      "가족 건강 상위 10%",
-                    ].map((challenge, idx) => (
+                      { text: "월 15만보 걷기", icon: WalkIcon },
+                      { text: "주 1회 함께 걷기", icon: TogetherIcon },
+                      { text: "건강한 습관 만들기", icon: HabitIcon },
+                      { text: "가족 건강 상위 10%", icon: TrophyIcon },
+                    ].map((item, idx) => (
                       <button
                         key={idx}
-                        onClick={() =>
-                          handleHealthRecordSelect(`${challenge}`)
-                        }
-                        className="px-5 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
+                        onClick={() => handleHealthRecordSelect(item.text)}
+                        className="px-4 py-2 flex items-center gap-2 bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
                       >
-                        {challenge}
+                        <img
+                          src={item.icon}
+                          alt=""
+                          className="w-4 h-4 object-contain"
+                        />
+                        <span>{item.text}</span>
                       </button>
                     ))}
                   </div>
