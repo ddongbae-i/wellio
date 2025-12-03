@@ -84,7 +84,7 @@ interface UploadPageProps {
   }) => void;
 }
 
-export function UploadPage({ onBack, onUpload }: UploadPageProps) {
+export function CommunityPage({ onBack, onUpload }: UploadPageProps) {
   const [showCameraPermission, setShowCameraPermission] =
     useState(false);
   const [showGalleryPermission, setShowGalleryPermission] =
