@@ -551,10 +551,40 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     }
   };
 
-  const handleLocationInput = () =>
-    setLocationInput("서울시 강남구");
+  const handleLocationInput = () => {
+    if (!navigator.geolocation) {
+      alert("이 브라우저는 위치를 지원하지 않습니다.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        // ✅ 카카오 또는 구글 Geocoding API 필요
+        const res = await fetch(
+          `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${longitude}&y=${latitude}`,
+          {
+            headers: {
+              Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_REST_KEY}`,
+            },
+          },
+        );
+
+        const data = await res.json();
+        const address =
+          data.documents?.[0]?.address?.address_name ?? "위치 확인 실패";
+
+        setLocationInput(address);
+      },
+      () => {
+        alert("위치 접근이 거부되었습니다.");
+      },
+    );
+  };
+
   const handleWeatherInput = () =>
-    setWeatherInput("맑음 • 22°C");
+    setWeatherInput("10°C");
   const handleTimeInput = () => {
     const now = new Date();
     setTimeInput(
