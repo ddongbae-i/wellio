@@ -970,9 +970,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
           {isFilterMode ? (
             <div className="w-full h-28 relative flex items-center justify-center">
+              {/* 가운데 선택 가이드 */}
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
                 <div className="w-[68px] h-[68px] rounded-full border-[3px] border-[#36D2C5]" />
               </div>
+
               <div className="w-full h-full z-20">
                 <Swiper
                   spaceBetween={14}
@@ -986,9 +988,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   onRealIndexChange={(swiper) => {
                     const realIndex =
                       swiper.realIndex % ORIGINAL_FILTERS.length;
-                    setSelectedFilter(
-                      ORIGINAL_FILTERS[realIndex].name,
-                    );
+                    setSelectedFilter(ORIGINAL_FILTERS[realIndex].name);
                   }}
                 >
                   {loopFilters.map((filter, index) => (
@@ -1003,12 +1003,42 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     >
                       {({ isActive }) => (
                         <button
-                          className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                            : "bg-[#EEEEEE] text-gray-400 scale-95"
+                          type="button"
+                          onClick={() => setSelectedFilter(filter.name)}
+                          className={`flex items-center justify-center select-none transition-all duration-200 ${isActive ? "scale-105" : "scale-95"
                             }`}
                         >
-                          {filter.name.toUpperCase()}
+                          <div
+                            className={`
+                    relative
+                    w-16 h-16 rounded-full overflow-hidden
+                    flex items-center justify-center
+                    shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]
+                    transition-all duration-200
+                    ${isActive ? "bg-white border-[4px] border-[#2ECACA]" : "bg-[#EEEEEE]"}
+                  `}
+                          >
+                            {/* ✅ 비선택 상태: 흐린 사진 */}
+                            {!isActive && selectedImage && (
+                              <ImageWithFallback
+                                src={selectedImage}
+                                alt={filter.name}
+                                className="absolute inset-0 w-full h-full object-cover"
+                                style={{
+                                  filter: filter.filter,
+                                  opacity: 0.3,   // 🔥 흐린 사진
+                                }}
+                              />
+                            )}
+
+                            {/* ✅ 모든 상태에서 항상 텍스트는 위에 */}
+                            <span
+                              className={`relative z-10 text-[10px] font-medium tracking-wide ${isActive ? "text-[#555555]" : "text-[#555555]"
+                                }`}
+                            >
+                              {filter.name.toUpperCase()}
+                            </span>
+                          </div>
                         </button>
                       )}
                     </SwiperSlide>
