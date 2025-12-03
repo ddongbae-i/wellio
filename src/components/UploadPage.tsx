@@ -721,19 +721,19 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             )}
 
                             {weatherInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
                                 <img
                                   src={Cloud}
                                   alt="날씨"
-                                  className="w-[22px] h-[22px]"
+                                  className="w-[18px] h-[18px]"
                                 />
-                                <span className="text-white text-sm">
+                                <span className="text-[#555555] text-[15px]">
                                   {weatherInput}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setWeatherInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full "
                                 >
                                   <img
                                     src={X}
@@ -745,19 +745,19 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             )}
 
                             {timeInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
                                 <img
                                   src={Clock}
                                   alt="시간"
-                                  className="w-[22px] h-[22px]"
+                                  className="w-[18px] h-[18px]"
                                 />
-                                <span className="text-white text-sm">
+                                <span className="text-[#555555] text-[15px]">
                                   {timeInput}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setTimeInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full"
                                 >
                                   <img
                                     src={X}
@@ -769,19 +769,19 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             )}
 
                             {healthInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
                                 <img
                                   src={Heart}
                                   alt="데이터"
-                                  className="w-[22px] h-[22px]"
+                                  className="w-[18px] h-[18px]"
                                 />
-                                <span className="text-white text-sm">
+                                <span className="text-[#555555] text-[15px]">
                                   {healthInput}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setHealthInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full"
                                 >
                                   <img
                                     src={X}
@@ -888,7 +888,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
               </button>
               <button
                 onClick={() => setIsFilterMode(false)}
-                className="absolute right-4 px-4 py-2 text-[#36D2C5] font-semibold"
+                className="absolute right-5 xs:right-6 sm:right-8 px-4 py-2 text-[#555555] font-medium"
               >
                 완료
               </button>
@@ -913,7 +913,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   textInputRef.current?.blur();
                   setIsDetailEditMode(false);
                 }}
-                className="absolute right-4 px-4 py-2 text-[#36D2C5] font-semibold"
+                className="absolute right-5 xs:right-6 sm:right-8 px-4 py-2 text-[#555555] font-medium"
               >
                 완료
               </button>
