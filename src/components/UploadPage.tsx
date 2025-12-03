@@ -552,9 +552,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   };
 
   const handleLocationInput = () =>
-    setLocationInput("소래산");
+    setLocationInput("서울시 강남구");
   const handleWeatherInput = () =>
-    setWeatherInput("-10°C");
+    setWeatherInput("맑음 • 22°C");
   const handleTimeInput = () => {
     const now = new Date();
     setTimeInput(
@@ -786,11 +786,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
                             {healthInput && (
                               <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
-                                <img
-                                  src={Heart}
-                                  alt="데이터"
-                                  className="w-[18px] h-[18px]"
-                                />
+                                <span className="text-[#555555] text-[15px]">
+                                  {healthInput}
+                                </span>
                                 <button
                                   type="button"
                                   onClick={() => setHealthInput("")}

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, Star } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { toast } from "sonner";
 import { motion } from "motion/react";
@@ -83,6 +83,10 @@ export function ReviewWritePage({
     editingReview?.reviewText || "",
   );
 
+  // 스크롤 영역 & textarea 참조
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
   const handleKeywordClick = (keyword: string) => {
     if (selectedKeywords.includes(keyword)) {
       setSelectedKeywords(selectedKeywords.filter((k) => k !== keyword));
@@ -125,9 +129,27 @@ export function ReviewWritePage({
 
   const isEditMode = !!editingReview;
 
+  // textarea가 전체 보이도록 스크롤
+  const scrollTextareaIntoView = () => {
+    const container = contentRef.current;
+    const textarea = textareaRef.current;
+    if (!container || !textarea) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const textareaRect = textarea.getBoundingClientRect();
+
+    const diff = textareaRect.bottom - containerRect.bottom;
+    if (diff > 0) {
+      container.scrollBy({
+        top: diff + 24,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
     <motion.div
-      className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto h-dvh" // h-screen 대신 h-dvh 써줘도 좋아
+      className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto h-dvh"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
@@ -151,7 +173,10 @@ export function ReviewWritePage({
       </header>
 
       {/* 스크롤 영역 */}
-      <div className="flex-1 overflow-y-auto px-5 xs:px-6 sm:px-8 pt-5 space-y-3 pb-[140px]">
+      <div
+        ref={contentRef}
+        className="flex-1 overflow-y-auto px-5 xs:px-6 sm:px-8 pt-5 space-y-3 pb-[140px]"
+      >
         {/* 병원 정보 카드 */}
         <div className="flex items-center bg-white rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] px-5 py-4">
           <div className="w-[48px] h-[48px] rounded-[8px] overflow-hidden border border-[#f0f0f0] flex-shrink-0 mr-4">
@@ -171,7 +196,6 @@ export function ReviewWritePage({
 
         {/* 별점 선택 영역 */}
         <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] text-center">
-          {/* ↑ pb:[26px] → pb-[26px] 수정 */}
           <h3 className="text-[#202020] mb-3 text-[17px] font-medium">
             별점을 선택해 주세요.
           </h3>
@@ -225,11 +249,18 @@ export function ReviewWritePage({
         {/* 리뷰 텍스트 영역 */}
         <div className="relative">
           <textarea
+            ref={textareaRef}
             value={reviewText}
             onChange={(e) => {
               if (e.target.value.length <= 400) {
                 setReviewText(e.target.value);
+                // 입력하면서도 계속 위로 따라오게
+                setTimeout(scrollTextareaIntoView, 0);
               }
+            }}
+            onFocus={() => {
+              // 키보드가 뜨는 시간을 조금 기다렸다가 스크롤
+              setTimeout(scrollTextareaIntoView, 250);
             }}
             placeholder="선택하신 키워드를 바탕으로 후기를 작성해주세요."
             className="w-full h-[150px] px-5 pt-[22px] pb-[26px] rounded-[16px] resize-none text-sm 
@@ -238,9 +269,7 @@ export function ReviewWritePage({
 
           {/* 글자수 카운트 */}
           <span className="absolute bottom-[26px] right-5 text-[12px]">
-            <span className="text-[#777777]">
-              {reviewText.length}
-            </span>
+            <span className="text-[#777777]">{reviewText.length}</span>
             <span className="text-[#aeaeae]"> / 400</span>
           </span>
         </div>
