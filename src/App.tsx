@@ -234,7 +234,7 @@ const createInitialPosts = (): Post[] => {
       caption: "챌린지 시작!",
       userName: USERS.wellie.name,
       textOverlay: "챌린지 첫 시작!",
-      createdAt: getDateNDaysAgo(0), // 오늘
+      createdAt: getDateNDaysAgo(1), // 오늘
       comments: [
         {
           userName: USERS.dongseok.name,
@@ -272,7 +272,7 @@ const createInitialPosts = (): Post[] => {
       caption: "혈압관리를 응원",
       userName: USERS.dongseok.name,
       textOverlay: "님의 혈압관리를 응원해 주세요!",
-      createdAt: getDateNDaysAgo(1), // 1일 전
+      createdAt: getDateNDaysAgo(2), // 1일 전
       comments: [],
       reactions: [
         {
@@ -297,7 +297,7 @@ const createInitialPosts = (): Post[] => {
       caption: "오늘도 혈당방어 성공!",
       userName: USERS.wellie.name,
       textOverlay: "오늘도 혈당방어 성공!",
-      createdAt: getDateNDaysAgo(2),
+      createdAt: getDateNDaysAgo(3),
       comments: [],
       reactions: [
         {
@@ -318,7 +318,7 @@ const createInitialPosts = (): Post[] => {
       caption: "오운완",
       userName: USERS.dongseok.name,
       textOverlay: "오늘도 친구놈 버리고 오운완!",
-      createdAt: getDateNDaysAgo(4),
+      createdAt: getDateNDaysAgo(5),
       comments: [],
       reactions: [
         {
