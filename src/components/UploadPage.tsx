@@ -667,7 +667,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             <div
               className="absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300"
               style={{
-                top: isKeyboardVisible ? "180px" : "46%",
+                top: isKeyboardVisible ? "220px" : "46%",
                 transform: isKeyboardVisible
                   ? "translateY(0)"
                   : "translateY(-50%)",
