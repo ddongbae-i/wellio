@@ -31,6 +31,7 @@ interface DayData {
   inChallenge?: boolean;
 }
 
+
 // 🔹 날짜 포맷 유틸: 항상 YYYY-MM-DD
 const formatDateKey = (date: Date): string => {
   const year = date.getFullYear();
@@ -254,7 +255,7 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
       </div>
 
       {/* Swiper 영역 */}
-      <div className="flex-1 overflow-hidden bg-gray-100">
+      <div className="flex-1 overflow-hidden bg-[#f7f7f7]">
         <Swiper
           onSwiper={(swiper) => {
             swiperRef.current = swiper;
@@ -274,8 +275,8 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
                 key={`${year}-${month}`}
                 className="h-auto"
               >
-                <div className="px-5 py-5 bg-white">
-                  <div className="text-center text-lg font-bold mb-6">
+                <div className="px-5 xs:px-6 xs:px-8 py-5 bg-white">
+                  <div className="text-center text-[19px] font-semibold mb-6">
                     {year}년 {month}월
                   </div>
 
