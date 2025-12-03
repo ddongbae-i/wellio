@@ -137,15 +137,15 @@ export function OnboardingPage({
             {currentStep === 1 && (
               <CommunityPage
                 onBack={dummyAction}
-                onUploadClick={dummyAction}
-                onNotificationClick={dummyAction}
-                onDeletePost={dummyAction}
-                initialPostId={undefined}          // ✅ 추가
-                posts={posts}
-                currentUserName={userName}
-                currentUserAvatar={""}             // ✅ 추가 (더미 아바타)
-                currentPage="community"            // ✅ 추가
-                onPageChange={handlePageChange}    // ✅ 추가
+                onUpload={dummyAction}
+              // onNotificationClick={dummyAction}
+              // onDeletePost={dummyAction}
+              // initialPostId={undefined}          // ✅ 추가
+              // posts={posts}
+              // currentUserName={userName}
+              // currentUserAvatar={""}             // ✅ 추가 (더미 아바타)
+              // currentPage="community"            // ✅ 추가
+              // onPageChange={handlePageChange}    // ✅ 추가
               />
             )}
 
