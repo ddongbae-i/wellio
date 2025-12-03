@@ -1010,7 +1010,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     handleCloseDetailEdit();
                   }
                 }}
-                className="absolute left-5 xs:left-6 sm:left-8 p-1"
+                className="absolute left-5 xs:left-6 sm:left-8"
               >
                 <img src={X} alt="닫기" className="w-6 h-6" />
               </button>
@@ -1034,7 +1034,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   onBack();
                 }
               }}
-              className="absolute left-5 xs:left-6 sm:left-8 p-1"
+              className="absolute left-5 xs:left-6 sm:left-8"
             >
               <img
                 src={ChevronLeft}
