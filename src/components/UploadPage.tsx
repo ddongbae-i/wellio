@@ -483,9 +483,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         reader.onloadend = async () => {
           const capturedImage = reader.result as string;
           try {
-            const resizedImage =
-              await resizeAndCropImage(capturedImage);
-            setSelectedImage(resizedImage);
+            setSelectedImage(capturedImage);
           } catch (error) {
             console.error("이미지 리사이즈 실패:", error);
             setSelectedImage(capturedImage);
@@ -516,9 +514,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     reader.onloadend = async () => {
       const originalImage = reader.result as string;
       try {
-        const resizedImage =
-          await resizeAndCropImage(originalImage);
-        setSelectedImage(resizedImage);
+        setSelectedImage(originalImage);
       } catch (error) {
         console.error("이미지 리사이즈 실패:", error);
         setSelectedImage(originalImage);
