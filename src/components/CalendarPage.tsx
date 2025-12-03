@@ -1,4 +1,4 @@
-import { Target, Trophy } from "lucide-react";
+
 import { useEffect, useMemo, useRef } from "react";
 
 // 💡 Swiper 라이브러리 임포트
@@ -9,6 +9,7 @@ import "swiper/css";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
+import Target from "../assets/images/icon_com_call.svg"
 
 interface Post {
   id: number;
@@ -171,7 +172,7 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
     const isChallengeStart = currentDay.challengeStart;
     const isChallengeEnd = currentDay.challengeEnd;
 
-    const challengeBgClass = `absolute top-0 bottom-0 left-0 right-0 bg-[#e0f8f8] z-0 ${isChallengeStart && !isChallengeEnd
+    const challengeBgClass = `absolute top-0 bottom-0 left-0 right-0 bg-[#E2F7F7] z-0 ${isChallengeStart && !isChallengeEnd
       ? "rounded-l-full"
       : isChallengeEnd && !isChallengeStart
         ? "rounded-r-full"
@@ -188,9 +189,13 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
 
         {isChallengeStart ? (
           // 챌린지 시작일: 아이콘 표시
-          <div className="w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center text-white shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] bg-[#36D2C5]">
-            <Target size={20} className="relative z-10 text-white" />
-            <span className="absolute bottom-0.5 text-[9px] font-bold z-10">
+          <div className="w-[35px] h-[35px] rounded-full relative overflow-hidden flex justify-center items-center text-white ">
+            <img
+              src={Target}
+              alt="뒤로가기"
+              className="w-10 h-10 relative z-10 text-white "
+            />
+            <span className="absolute text-[17px] font-medium z-10 ">
               {currentDay.date}
             </span>
           </div>
@@ -198,7 +203,7 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
           // 피드가 있는 날짜: 피드 이미지 작게 표시 (클릭 가능)
           <button
             onClick={() => onPostClick?.(currentDay.posts![0].id)}
-            className="w-10 h-10 rounded-full relative overflow-hidden flex justify-center items-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:scale-110 transition-transform"
+            className="w-[35px] h-[35px] rounded-full relative overflow-hidden flex justify-center items-center hover:scale-110 transition-transform"
           >
             <ImageWithFallback
               src={currentDay.posts[0].image}
@@ -212,7 +217,7 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
           </button>
         ) : (
           // 일반 날짜
-          <span className="relative z-10 text-gray-700">
+          <span className="relative z-10 text-[17px] text-[#777777]">
             {currentDay.date}
           </span>
         )}
@@ -232,12 +237,12 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
       `}</style>
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] relative">
+      <div className="sticky top-0 z-10 bg-white px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
         <button onClick={onBack} className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6">
           <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>
         <div className="flex items-center gap-1">
-          <span className="text-[19px] font-semibold text-gray-800">
+          <span className="text-[19px] font-semibold text-[#202020]">
             캘린더
           </span>
           <img
@@ -269,7 +274,7 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
                 key={`${year}-${month}`}
                 className="h-auto"
               >
-                <div className="px-4 py-4 bg-white">
+                <div className="px-5 py-5 bg-white">
                   <div className="text-center text-lg font-bold mb-6">
                     {year}년 {month}월
                   </div>
@@ -278,7 +283,7 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
                     {weekDays.map((day, idx) => (
                       <div
                         key={idx}
-                        className="text-sm text-gray-400 font-medium"
+                        className="text-sm text-[#2b2b2b]"
                       >
                         {day}
                       </div>
