@@ -1728,14 +1728,14 @@ export default function App() {
 
         {currentPage === "community" && (
           <CommunityPage
-            // ⬇⬇⬇ 여기! 첫 피드의 ChevronLeft = 홈으로
-            onBack={() => setCurrentPage("home")}
-            onUploadClick={() => setCurrentPage("upload")}
-            onNotificationClick={() => setCurrentPage("notification")}
+            onBack={() => navigateTo("home")}
+            onUploadClick={() => navigateTo("upload")}
+            onNotificationClick={() => navigateTo("notifications")}
             posts={posts}
-            currentUserId={"kim-welly"} // 예시
+            currentUserId={"kim-welly"}
+            initialPostId={selectedPostId ?? undefined}  // ✅ 이름 맞추기
             onPageChange={(page) => {
-              if (page === "calendar") setCurrentPage("calendar");
+              if (page === "calendar") navigateTo("calendar");
             }}
           />
         )}

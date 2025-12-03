@@ -320,7 +320,7 @@ export function HospitalReviewsPage({
                       Math.min(prev + 10, TOTAL_REVIEW_COUNT)
                     )
                   }
-                  className="w-full mt-6 h-12 text-[#2b2b2b] border border-[#e8e8e8] rounded-[12px] bg-white hover:bg-gray-50"
+                  className="w-full h-12 text-[#2b2b2b] border border-[#e8e8e8] rounded-[12px] bg-white"
                 >
                   더보기 ({visibleCount} / {TOTAL_REVIEW_COUNT})
                 </button>
