@@ -593,7 +593,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        bottom: 0,
+        bottom: 24,
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
@@ -667,7 +667,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             <div
               className="absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300"
               style={{
-                top: isKeyboardVisible ? "220px" : "46%",
+                top: isKeyboardVisible ? "180px" : "46%",
                 transform: isKeyboardVisible
                   ? "translateY(0)"
                   : "translateY(-50%)",
