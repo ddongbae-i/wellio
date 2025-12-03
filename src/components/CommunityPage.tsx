@@ -933,7 +933,7 @@ export function CommunityPage({
                   ref={(el) => {
                     postRefs.current[post.id] = el;
                   }}
-                  className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 snap-start snap-always ${isKeyboardVisible ? "justify-start pt-[120px]" : "justify-center pb-3"
+                  className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 snap-start snap-always ${isKeyboardVisible ? "justify-start pt-[120px]" : "justify-start pb-3"
                     }`}
                   key={post.id}
                   style={{
