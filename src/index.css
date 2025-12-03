@@ -4605,9 +4605,26 @@ html {
   padding-left: 20px;
 } 
 
+.memo-edit[contenteditable="true"]:empty:before {
+  content: attr(data-placeholder);
+  color: #aeaeae;
+  pointer-events: none;
+  display: block;
+  white-space: pre-wrap;
+  font-weight: normal;
+}
+
+
+.custom-margin {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+
 @media (min-width: 400px) { /* xs */
   .filter-swiper-slide:first-child {
     margin-left: 24px; /* xs:pl-6 */
+    
     
   }
 
@@ -4618,6 +4635,11 @@ html {
  .filter-wrap {
   padding-left: 24px;
 } 
+
+ .custom-margin {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
 }
 
 @media (min-width: 640px) { /* sm */
@@ -4632,13 +4654,10 @@ html {
  .filter-wrap {
   padding-left: 32px;
 } 
+
+  .custom-margin {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
 }
 
-.memo-edit[contenteditable="true"]:empty:before {
-  content: attr(data-placeholder);
-  color: #aeaeae;
-  pointer-events: none;
-  display: block;
-  white-space: pre-wrap;
-  font-weight: normal;
-}

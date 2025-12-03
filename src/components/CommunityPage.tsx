@@ -35,7 +35,10 @@ interface CommunityPageProps {
   posts: Array<{
     id: number;
     image: string;
-    badge?: string;
+    badge?: {
+      text: string;
+      icon?: string; // SVG 이미지 경로
+    };
     userAvatar: string;
     caption: string;
     userName: string;

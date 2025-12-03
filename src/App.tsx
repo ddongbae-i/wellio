@@ -19,6 +19,7 @@ import { CalendarPage } from "./components/CalendarPage";
 import { Toaster } from "sonner";
 import { hospitalMap } from "./components/hospitalInfo";
 import { COMMUNITY_IMAGES } from "./components/communityImages";
+import TogetherIcon from "./assets/images/TogetherIcon.svg"
 
 type Page =
   | "home"
@@ -58,7 +59,10 @@ interface Hospital {
 interface Post {
   id: number;
   image: string;
-  badge?: string;
+  badge?: {
+    text: string;
+    icon: string;
+  };
   userAvatar: string;
   caption: string;
   userName: string;
@@ -229,7 +233,10 @@ const createInitialPosts = (): Post[] => {
     {
       id: 1,
       image: COMMUNITY_IMAGES.IMG1,
-      badge: "🏅 주 1회 함께 걷기",
+      badge: {
+        text: "주 1회 함께 걷기",
+        icon: TogetherIcon
+      },
       userAvatar: USERS.wellie.avatar,
       caption: "챌린지 시작!",
       userName: USERS.wellie.name,
@@ -363,7 +370,10 @@ const createInitialPosts = (): Post[] => {
     {
       id: 6,
       image: COMMUNITY_IMAGES.IMG6,
-      badge: "🏃 오운완",
+      badge: {
+        text: "🏃 오운완",
+        icon: ""
+      },
       userAvatar: USERS.wellie.avatar,
       caption: "딸은 출석 완료입니다",
       userName: USERS.wellie.name,

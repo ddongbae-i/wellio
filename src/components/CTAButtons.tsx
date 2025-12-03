@@ -19,7 +19,6 @@ export function CTAButtons({
 
       {/* Medicine Management Button */}
       <button
-        onClick={onCommunityClick}  // ✅ 여기서 사용
         className="border border-[#e8e8e8] bg-[#f0f0f0] text-[#555555] rounded-2xl flex items-center justify-center transition-colors h-15 xs:h-20 font-medium xs:text-[19px]"
       >
         복약관리

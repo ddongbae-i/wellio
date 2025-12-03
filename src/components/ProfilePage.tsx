@@ -80,7 +80,7 @@ export function ProfilePage({
         variants={staggerContainer}
       >
         {/* User Info Section */}
-        <motion.div className="py-5 px-5 relative" variants={itemVariants}>
+        <motion.div className="py-5 px-5 xs:px-6 sm:px-8 relative" variants={itemVariants}>
           {/* 프로필 정보 컨테이너 */}
           <div className="flex items-center">
             {/* 1. 프로필 이미지 영역 (100px로 수정됨) */}
@@ -126,7 +126,7 @@ export function ProfilePage({
         </motion.div>
 
         {/* Point Section */}
-        <motion.div className="bg-white mx-5 px-5 py-[22px] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] flex items-center justify-between" variants={itemVariants}>
+        <motion.div className="custom-margin bg-white px-5 py-[22px] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] flex items-center justify-between" variants={itemVariants}>
           <span className="text-[#555555] font-medium text-[17px]">
             보유포인트
           </span>
@@ -139,7 +139,7 @@ export function ProfilePage({
         </motion.div>
 
         {/* Activity Buttons */}
-        <motion.div className="flex bg-white mx-5 xs:mx-6 sm:mx-8 rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] mt-3 overflow-hidden" variants={itemVariants}>
+        <motion.div className="custom-margin  flex bg-white mx-5 xs:mx-6 sm:mx-8 rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] mt-3 overflow-hidden" variants={itemVariants}>
           <button
             className="flex-1 flex items-center justify-center py-3 text-[#555555] font-medium text-[17px] cursor-pointer"
             onClick={onMyReviewsClick}

@@ -16,6 +16,8 @@ export function PromoBanner() {
       image:
         bannerOne,
       bgColor: "#FFDD80",
+      titleColor: "#D75200",
+      descColor: "#555555",
     },
     {
       id: 2,
@@ -87,7 +89,7 @@ export function PromoBanner() {
             className="min-w-full h-full relative overflow-hidden"
             style={{ backgroundColor: banner.bgColor }}
           >
-            <div className="relative z-10 h-full flex items-center justify-between pl-5 pr-5">
+            <div className="relative z-10 h-full flex items-center justify-between px-5 xs:px-6 sm:px-8">
               <div className="flex-1">
                 <h3
                   className="mb-1 text-[17px] font-semibold"
