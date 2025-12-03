@@ -311,11 +311,9 @@ export function HospitalReviewsPage({
                 </div>
               ))}
             </div>
-
-            {/* 더보기 버튼 */}
             {/* 더보기 버튼 */}
             {visibleCount < TOTAL_REVIEW_COUNT && (
-              <div className="px-4 xs:px-6 sm:px-8 py-6">
+              <div className="px-5 xs:px-6 sm:px-8 py-6">
                 <button
                   onClick={() =>
                     setVisibleCount((prev) =>
