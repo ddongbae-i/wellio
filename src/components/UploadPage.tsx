@@ -551,64 +551,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     }
   };
 
-  const handleLocationInput = () => {
-    if (!navigator.geolocation) {
-      alert("이 브라우저는 위치를 지원하지 않습니다.");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-
-          const res = await fetch(
-            `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${longitude}&y=${latitude}&input_coord=WGS84`,
-            {
-              headers: {
-                Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_REST_KEY}`,
-              },
-            },
-          );
-
-          if (!res.ok) {
-            const text = await res.text();
-            console.error("Kakao API 오류 상태:", res.status, text);
-            alert("카카오 주소 API 호출에 실패했습니다.");
-            return;
-          }
-
-          const data = await res.json();
-          console.log("Kakao 응답:", data);
-
-          const doc = data.documents?.[0];
-
-          if (!doc) {
-            alert("주소 데이터를 찾지 못했습니다.");
-            return;
-          }
-
-          const address =
-            doc.road_address?.address_name ??
-            doc.address?.address_name ??
-            "주소를 찾지 못했습니다.";
-
-          setLocationInput(address);
-        } catch (err) {
-          console.error("주소 변환 중 오류:", err);
-          alert("주소를 불러오는 중 문제가 발생했습니다.");
-        }
-      },
-      (error) => {
-        console.error("위치 접근 오류:", error);
-        alert("위치 접근이 거부되었거나 실패했습니다.");
-      },
-    );
-  };
-
-
+  const handleLocationInput = () =>
+    setLocationInput("소래산");
   const handleWeatherInput = () =>
-    setWeatherInput("10°C");
+    setWeatherInput("12°C");
   const handleTimeInput = () => {
     const now = new Date();
     setTimeInput(
