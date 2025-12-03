@@ -889,7 +889,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   setSelectedFilter(previousFilter);
                   setIsFilterMode(false);
                 }}
-                className="absolute left-4 p-1"
+                className="absolute left-5 xs:left-6 sm:left-8 p-1"
               >
                 <img
                   src={ChevronLeft}
@@ -914,7 +914,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     handleCloseDetailEdit();
                   }
                 }}
-                className="absolute left-4 p-1"
+                className="absolute left-5 xs:left-6 sm:left-8 p-1"
               >
                 <img src={X} alt="닫기" className="w-6 h-6" />
               </button>
@@ -938,7 +938,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   onBack();
                 }
               }}
-              className="absolute left-4 p-1"
+              className="absolute left-5 xs:left-6 sm:left-8 p-1"
             >
               <img
                 src={ChevronLeft}
@@ -948,7 +948,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             </button>
           )}
 
-          <h1 className="text-xl font-bold text-[#202020] text-center">
+          <h1 className="text-[19px] font-semibold text-[#202020] text-center">
             업로드
           </h1>
         </header>
