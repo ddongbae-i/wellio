@@ -62,9 +62,7 @@ export function ReviewWritePage({
 
   const hospitalInfoFromName =
     !hospitalInfoFromId && hospitalName
-      ? Object.values(hospitalMap).find(
-        (h) => h.name === hospitalName,
-      )
+      ? Object.values(hospitalMap).find((h) => h.name === hospitalName)
       : undefined;
 
   const resolvedHospital = hospitalInfoFromId || hospitalInfoFromName;
@@ -129,7 +127,7 @@ export function ReviewWritePage({
 
   return (
     <motion.div
-      className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto h-screen"
+      className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto h-dvh" // h-screen 대신 h-dvh 써줘도 좋아
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
@@ -153,7 +151,7 @@ export function ReviewWritePage({
       </header>
 
       {/* 스크롤 영역 */}
-      <div className="flex-1 overflow-y-auto pb-[140px] px-5 xs:px-6 sm:px-8 pt-5 space-y-3">
+      <div className="flex-1 overflow-y-auto px-5 xs:px-6 sm:px-8 pt-5 space-y-3 pb-[140px]">
         {/* 병원 정보 카드 */}
         <div className="flex items-center bg-white rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] px-5 py-4">
           <div className="w-[48px] h-[48px] rounded-[8px] overflow-hidden border border-[#f0f0f0] flex-shrink-0 mr-4">
@@ -167,14 +165,13 @@ export function ReviewWritePage({
             <p className="text-[#2b2b2b] mb-[2px] text-[19px] font-semibold">
               {finalHospitalName}
             </p>
-            <p className="text-[15px] text-[#555555]">
-              {visitDate}
-            </p>
+            <p className="text-[15px] text-[#555555]">{visitDate}</p>
           </div>
         </div>
 
         {/* 별점 선택 영역 */}
         <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] text-center">
+          {/* ↑ pb:[26px] → pb-[26px] 수정 */}
           <h3 className="text-[#202020] mb-3 text-[17px] font-medium">
             별점을 선택해 주세요.
           </h3>
@@ -190,8 +187,8 @@ export function ReviewWritePage({
                 <Star
                   size={35}
                   className={`${star <= (hoveredRating || rating)
-                    ? "fill-[#FFB800] text-[#FFB800]"
-                    : "fill-[#e8e8e8] text-[#e8e8e8]"
+                      ? "fill-[#FFB800] text-[#FFB800]"
+                      : "fill-[#e8e8e8] text-[#e8e8e8]"
                     } transition-colors`}
                 />
               </button>
@@ -202,7 +199,9 @@ export function ReviewWritePage({
         {/* 키워드 선택 영역 */}
         <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
           <div className="flex gap-1 items-center mb-3">
-            <h3 className="text-[#202020] text-[17px] font-medium">키워드 선택 </h3>
+            <h3 className="text-[#202020] text-[17px] font-medium">
+              키워드 선택
+            </h3>
             <span className="text-[#202020]">
               {selectedKeywords.length}/3
             </span>
@@ -213,8 +212,8 @@ export function ReviewWritePage({
                 key={keyword}
                 onClick={() => handleKeywordClick(keyword)}
                 className={`px-3 py-2 rounded-[8px] text-sm transition-all ${selectedKeywords.includes(keyword)
-                  ? "bg-[#E2F7F7] text-[#2b2b2b] border border-[#BCEEEE]"
-                  : "bg-white text-[#777777] border border-[#e8e8e8] hover:border-[#E2F7F7]"
+                    ? "bg-[#E2F7F7] text-[#2b2b2b] border border-[#BCEEEE]"
+                    : "bg-white text-[#777777] border border-[#e8e8e8] hover:border-[#E2F7F7]"
                   }`}
               >
                 {keyword}
@@ -247,9 +246,9 @@ export function ReviewWritePage({
         </div>
       </div>
 
-      {/* 하단 고정 버튼 (flex 레이아웃으로 화면 하단 고정) */}
-      <div className="fixed inset-x-0 bottom-0 z-40 bg-transparent">
-        <div className="mx-auto max-w-[500px] px-5 pb-[46px] pt-3 bg-white shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px]">
+      {/* 하단 고정 버튼 */}
+      <div className="fixed inset-x-0 bottom-0 z-40">
+        <div className="mx-auto max-w-[500px] w-full p-5 pb-[46px] bg-white shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px]">
           <button
             onClick={handleSubmit}
             disabled={!isFormValid}
