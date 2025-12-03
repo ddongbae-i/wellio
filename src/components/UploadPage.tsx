@@ -697,7 +697,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                         healthInput) && (
                           <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
                             {locationInput && (
-                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-2 rounded-full">
                                 <img
                                   src={MapPin}
                                   alt="위치"
@@ -709,12 +709,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 <button
                                   type="button"
                                   onClick={() => setLocationInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full "
+                                  className="ml-1 flex items-center justify-center w-4 h-4 "
                                 >
                                   <img
                                     src={X}
                                     alt="삭제"
-                                    className="w-2 h-2"
+                                    className="w-3 h-3"
                                   />
                                 </button>
                               </div>
