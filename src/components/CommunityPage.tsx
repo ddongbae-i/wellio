@@ -1,935 +1,610 @@
 "use client";
 
-import { Camera } from "lucide-react";
 import {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  useCallback,
-} from "react";
+  Plus,
+  Smile,
+  Trash2,
+} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "./ui/alert-dialog";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { motion, AnimatePresence } from "motion/react";
+import confetti from "canvas-confetti";
 import "swiper/css";
-import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
-import MapPin from "../assets/images/icon_com_map.svg";
-import Cloud from "../assets/images/icon_com_sun.svg";
-import Clock from "../assets/images/icon_com_time.svg";
-import Type from "../assets/images/icon_com_text.svg";
-import Heart from "../assets/images/icon_com_data.svg";
+import Bell from "../assets/images/icon_alarm.svg";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
-import Edit from "../assets/images/icon_com_edit.svg";
-import X from "../assets/images/icon_com_x.svg";
-import Upload from "../assets/images/icon_com_up.svg";
-import RefreshCw from "../assets/images/icon_com_change.svg";
-import ImageIcon from "../assets/images/icon_com_gallery.svg";
-import Sparkles from "../assets/images/icon_com_filter.svg";
+import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
+import Search from "../assets/images/icon_search.svg";
+import LayoutGrid from "../assets/images/Icon_View.svg";
+import Calendar from "../assets/images/icon_com_calendar.svg";
+import { patientMap, type PatientId } from "./userProfiles";
+import Reaction from "../assets/images/icon_reaction.svg";
+import SearchColor from "../assets/images/icon_search_color.svg"
+import MapPin from "../assets/images/icon_com_map.svg"
+import Cloud from "../assets/images/icon_com_sun.svg"
+import Clock from "../assets/images/icon_com_time.svg"
+import Type from "../assets/images/icon_com_text.svg"
+import Heart from "../assets/images/icon_com_data.svg"
+import X from "../assets/images/icon_com_x.svg"
 
-// 원본 필터 목록
-const ORIGINAL_FILTERS = [
-  { name: "Normal", filter: "none" },
-  {
-    name: "Kilda",
-    filter:
-      "brightness(1.0) contrast(1.2) saturate(1.25) hue-rotate(-5deg)",
-  },
-  {
-    name: "Still",
-    filter:
-      "brightness(1.0) contrast(1.0) saturate(0.5) grayscale(0.3)",
-  },
-  {
-    name: "Fade",
-    filter:
-      "brightness(1.1) contrast(0.85) saturate(0.9) sepia(0.05)",
-  },
-  {
-    name: "Paris",
-    filter:
-      "brightness(1.15) contrast(0.95) saturate(1.0) sepia(0.08) blur(0.3px)",
-  },
-  {
-    name: "Lapis",
-    filter:
-      "brightness(1.0) contrast(1.08) saturate(1.1) hue-rotate(10deg)",
-  },
-  {
-    name: "Simple",
-    filter: "brightness(1.08) contrast(1.0) saturate(1.0)",
-  },
-];
-
-interface UploadPageProps {
+interface CommunityPageProps {
   onBack: () => void;
-  onUpload: (post: {
+  onUploadClick: () => void;
+  onNotificationClick?: () => void;
+  onDeletePost?: (postId: number) => void;
+  initialPostId?: number; // 캘린더에서 클릭한 포스트 ID
+  posts: Array<{
+    id: number;
     image: string;
+    badge?: string;
+    userAvatar: string;
     caption: string;
+    userName: string;
     textOverlay?: string;
     location?: string;
     weather?: string;
     time?: string;
     health?: string;
-    createdAt?: string;
-  }) => void;
+    comments?: Array<{
+      userName: string;
+      userAvatar: string;
+      text: string;
+      timestamp: string;
+    }>;
+    reactions?: Array<{
+      emoji: string;
+      users: Array<{
+        userName: string;
+        userAvatar: string;
+      }>;
+    }>;
+  }>;
+  currentUserId: PatientId;
+  currentUserAvatar?: string;
+  currentPage?: string;
+  onPageChange?: (page: any) => void;
 }
 
-export function CommunityPage({ onBack, onUpload }: UploadPageProps) {
-  const [showCameraPermission, setShowCameraPermission] =
-    useState(false);
-  const [showGalleryPermission, setShowGalleryPermission] =
-    useState(false);
-  const [permissionsGranted, setPermissionsGranted] =
-    useState(false);
-  const [isTextInputFocused, setIsTextInputFocused] =
-    useState(false);
+// === 드롭다운 메뉴용 가족 구성원 ===
+const familyMembers = [
+  { id: "all", name: "우리가족" },
+  { id: "me", name: "김웰리" },
+  { id: "mom", name: "엄마" },
+  { id: "dad", name: "아빠" },
+];
 
-  const [isFrontCamera, setIsFrontCamera] = useState(true);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [cameraError, setCameraError] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(
-    null,
-  );
-  const [isUploadMode, setIsUploadMode] = useState(false);
-  const [hasCameraDevice, setHasCameraDevice] = useState<boolean | null>(
-    null,
-  );
-  const [isDetailEditMode, setIsDetailEditMode] = useState(false);
+// === 드롭다운 컴포넌트 ===
+const FamilyDropdown = ({
+  showFamilyDropdown,
+  setShowFamilyDropdown,
+  selectedFamilyMember,
+  setSelectedFamilyMember,
+  currentUserName,
+}: {
+  showFamilyDropdown: boolean;
+  setShowFamilyDropdown: (show: boolean) => void;
+  selectedFamilyMember: string | null;
+  setSelectedFamilyMember: (member: string | null) => void;
+  currentUserName: string;
+}) => (
+  <AnimatePresence>
+    {showFamilyDropdown && (
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.2 }}
+        className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-fit bg-white rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50 overflow-hidden border border-gray-100"
+      >
+        <div className="p-2 min-w-[140px]">
+          {familyMembers.map((member) => {
+            const memberName =
+              member.id === "me" ? currentUserName : member.name;
+            const isSelected =
+              (member.id === "all" && !selectedFamilyMember) ||
+              selectedFamilyMember === memberName;
 
-  // 세부 입력 state
-  const [textInput, setTextInput] = useState("");
-  const [locationInput, setLocationInput] = useState("");
-  const [weatherInput, setWeatherInput] = useState("");
-  const [timeInput, setTimeInput] = useState("");
-  const [healthInput, setHealthInput] = useState("");
-  const [showTextInput, setShowTextInput] = useState(false);
-  const [showHealthModal, setShowHealthModal] = useState(false);
-  const [showNoImageAlert, setShowNoImageAlert] = useState(false);
-  const textInputRef = useRef<HTMLInputElement>(null);
+            return (
+              <button
+                key={member.id}
+                onClick={() => {
+                  if (member.id === "all") {
+                    setSelectedFamilyMember(null);
+                  } else {
+                    setSelectedFamilyMember(memberName);
+                  }
+                  setShowFamilyDropdown(false);
+                }}
+                className={`w-full flex items-center px-6 py-3 rounded-[12px] transition-colors text-[15px] font-medium whitespace-nowrap justify-start
+                  ${isSelected
+                    ? "text-[#2b2b2b] bg-white"
+                    : "text-[#2b2b2b] hover:bg-gray-50"
+                  }`}
+              >
+                <span
+                  className={`${isSelected ? "text-[#2b2b2b] font-medium" : "text-[#aeaeae] font-normal"
+                    } leading-[1.3]`}
+                >
+                  {memberName}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
 
-  const [showLeaveDetailAlert, setShowLeaveDetailAlert] =
-    useState(false);
-  const [showLeaveUploadAlert, setShowLeaveUploadAlert] =
-    useState(false);
+export function CommunityPage({
+  onBack,
+  onUploadClick,
+  onNotificationClick,
+  onDeletePost,
+  initialPostId,
+  posts,
+  currentUserId,
+  currentPage,
+  onPageChange,
+}: CommunityPageProps) {
+  const [selectedFamilyMember, setSelectedFamilyMember] =
+    useState<string | null>(null);
+  const [showFamilyDropdown, setShowFamilyDropdown] = useState(false);
+  const [isGridView, setIsGridView] = useState(false);
+  const [isReactionView, setIsReactionView] = useState(false);
 
-  const hasDraft =
-    !!selectedImage ||
-    !!textInput ||
-    !!locationInput ||
-    !!weatherInput ||
-    !!timeInput ||
-    !!healthInput;
+  const [reactionFilter, setReactionFilter] = useState("ALL");
 
-  // 키보드 높이 감지 상태 및 Ref
-  const initialViewportHeight = useRef(0);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [selectedPostForReaction, setSelectedPostForReaction] =
+    useState<number | null>(null);
+  const [newComment, setNewComment] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [currentPostId, setCurrentPostId] = useState<number | null>(null);
+  const [emojiAnimation, setEmojiAnimation] = useState<{
+    emoji: string;
+    active: boolean;
+  } | null>(null);
 
-  // 필터 모드 state
-  const [isFilterMode, setIsFilterMode] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState("Normal");
-  const [previousFilter, setPreviousFilter] = useState("Normal");
+  // 라이트박스 상태
+  const [expandedPostId, setExpandedPostId] = useState<number | null>(null);
+  const [lastExpandedId, setLastExpandedId] = useState<number | null>(null);
 
-  // 모바일 감지 state
-  const [isMobile, setIsMobile] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [dragStartX, setDragStartX] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<number | null>(null);
 
-  // AI 추천 캡션 데이터
-  const aiCaptions = [
-    { text: "오랫동안 ❤️" },
-    { text: "오운완 💪" },
-    { text: "우리 가족 건강의 발걸음 👣" },
-    { text: "좋은 날 좋은 시간 ☀️" },
-    { text: "갓 수확한 채소 🥬" },
-  ];
+  const [isScrolling, setIsScrolling] = useState(false);
+  const blurByClickRef = useRef(false);
 
-  // ✅ 글자 수 제한 함수 (한글 28, 그 외 33)
-  const applyTextLimit = (value: string) => {
-    const hasKorean = /[ㄱ-ㅎ가-힣]/.test(value);
-    const limit = hasKorean ? 28 : 33;
-    return value.slice(0, limit);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const postRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+
+  // 키보드 & 뷰포트 높이
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [screenHeight, setScreenHeight] = useState<number | null>(null);
+
+  // === 유저 프로필 (없으면 김웰리로 기본값) ===
+  const currentUserProfile =
+    patientMap[currentUserId as PatientId] ?? patientMap["kim-welly"];
+
+  const fallbackAvatar =
+    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80";
+
+  const currentUserName = currentUserProfile.name;
+  const currentUserAvatar =
+    currentUserProfile.avatar || fallbackAvatar;
+
+  const currentUser = {
+    userName: currentUserName,
+    userAvatar: currentUserAvatar,
   };
 
-  const handleCaptionClick = useCallback(
-    (caption: string) =>
-      (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        const combined = textInput.trim()
-          ? `${textInput.trim()} ${caption}`
-          : caption;
-        const newText = applyTextLimit(combined);
-        setTextInput(newText);
-        if (textInputRef.current) {
-          textInputRef.current.focus();
-        }
-      },
-    [textInput],
+  // === 이름 → 아바타 매핑 (프로필/댓글/리액션 통일) ===
+  const userAvatarFromProfile: Record<string, string> = Object.fromEntries(
+    Object.values(patientMap).map((p) => [p.name, p.avatar]),
   );
 
-  const loopFilters = useMemo(
-    () => [
-      ...ORIGINAL_FILTERS,
-      ...ORIGINAL_FILTERS,
-      ...ORIGINAL_FILTERS,
-    ],
-    [],
-  );
+  const getAvatarForUserName = (name: string, fallback?: string) =>
+    userAvatarFromProfile[name] || fallback || fallbackAvatar;
 
-  const isKeyboardVisible =
-    keyboardHeight > 0 &&
-    showTextInput &&
-    isDetailEditMode &&
-    isMobile &&
-    isTextInputFocused;
+  const [addedComments, setAddedComments] = useState<{
+    [postId: number]: Array<{
+      userName: string;
+      userAvatar: string;
+      text: string;
+      timestamp: string;
+    }>;
+  }>({});
 
-  // 권한은 디자인 상 이미 허용된 상태로 가정
-  useEffect(() => {
-    setPermissionsGranted(true);
-  }, []);
+  const [addedReactions, setAddedReactions] = useState<{
+    [postId: number]: Array<{
+      emoji: string;
+      users: Array<{
+        userName: string;
+        userAvatar: string;
+      }>;
+    }>;
+  }>({});
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  const emojis = ["❤️", "🔥", "👍", "🎉"];
 
-  // ✅ 키보드 높이 감지 + body 높이 조절
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
+  // 이모지 떠오르는 애니메이션
+  const [floatingEmojis, setFloatingEmojis] = useState<
+    Array<{
+      id: number;
+      emoji: string;
+      x: number;
+      size: number;
+      wobble: number;
+      delay: number;
+    }>
+  >([]);
 
-    if (initialViewportHeight.current === 0) {
-      initialViewportHeight.current = vv.height;
-    }
+  function getMaxCommentLength(value: string) {
+    const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(value);
+    return hasKorean ? 28 : 33;
+  }
 
-    const handleResize = () => {
-      if (
-        !(
-          showTextInput &&
-          isDetailEditMode &&
-          isMobile &&
-          isTextInputFocused
-        )
-      ) {
-        setKeyboardHeight(0);
-        document.body.style.height = "";
-        return;
-      }
-
-      const base = initialViewportHeight.current || vv.height;
-      const diff = base - vv.height; // 키보드로 줄어든 높이
-
-      if (diff > 80) {
-        setKeyboardHeight(diff);
-        // 👉 뷰포트를 키보드 위까지만 보이게
-        document.body.style.height = `${vv.height}px`;
-      } else {
-        setKeyboardHeight(0);
-        document.body.style.height = "";
-      }
-    };
-
-    vv.addEventListener("resize", handleResize);
-    vv.addEventListener("scroll", handleResize);
-
-    return () => {
-      vv.removeEventListener("resize", handleResize);
-      vv.removeEventListener("scroll", handleResize);
-      document.body.style.height = "";
-    };
-  }, [
-    showTextInput,
-    isDetailEditMode,
-    isMobile,
-    isTextInputFocused,
-  ]);
-
-  // 카메라 스트림 시작
-  useEffect(() => {
-    if (!permissionsGranted || isUploadMode) return;
-
-    const startCamera = async () => {
-      try {
-        if (stream) {
-          stream.getTracks().forEach((track) => track.stop());
-        }
-
-        const devices =
-          await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(
-          (device) => device.kind === "videoinput",
-        );
-
-        if (videoDevices.length === 0) {
-          setCameraError("사용 가능한 카메라가 없습니다.");
-          setHasCameraDevice(false);
-          return;
-        } else {
-          setHasCameraDevice(true);
-        }
-
-        const constraints: MediaStreamConstraints = {
-          video:
-            videoDevices.length > 1
-              ? {
-                facingMode: isFrontCamera
-                  ? "user"
-                  : "environment",
-              }
-              : true,
-          audio: false,
-        };
-
-        const newStream =
-          await navigator.mediaDevices.getUserMedia(
-            constraints,
-          );
-        setStream(newStream);
-        setCameraError(null);
-        if (videoRef.current) {
-          videoRef.current.srcObject = newStream;
-        }
-      } catch (error) {
-        console.error("카메라 접근 실패:", error);
-        setCameraError("카메라를 시작할 수 없습니다.");
-      }
-    };
-
-    startCamera();
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [permissionsGranted, isFrontCamera, isUploadMode]);
-
-  const handleCameraPermissionAllow = () => {
-    setShowCameraPermission(false);
-    setShowGalleryPermission(true);
-  };
-
-  const handleGalleryPermissionAllow = () => {
-    setShowGalleryPermission(false);
-    setPermissionsGranted(true);
-  };
-
-  const handlePermissionDeny = () => {
-    setShowCameraPermission(false);
-    setShowGalleryPermission(false);
-    onBack();
-  };
-
-  // 이미지를 335x400 크기로 크롭/리사이즈
-  const resizeAndCropImage = (imageSrc: string): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const targetWidth = 335;
-        const targetHeight = 400;
-        const targetRatio = targetWidth / targetHeight;
-
-        canvas.width = targetWidth;
-        canvas.height = targetHeight;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          reject(new Error("Canvas context not available"));
-          return;
-        }
-
-        const imgRatio = img.width / img.height;
-        let drawWidth, drawHeight, offsetX, offsetY;
-
-        if (imgRatio > targetRatio) {
-          drawHeight = targetHeight;
-          drawWidth = img.width * (targetHeight / img.height);
-          offsetX = -(drawWidth - targetWidth) / 2;
-          offsetY = 0;
-        } else {
-          drawWidth = targetWidth;
-          drawHeight = img.height * (targetWidth / img.width);
-          offsetX = 0;
-          offsetY = -(drawHeight - targetHeight) / 2;
-        }
-
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0, 0, targetWidth, targetHeight);
-        ctx.drawImage(
-          img,
-          offsetX,
-          offsetY,
-          drawWidth,
-          drawHeight,
-        );
-        resolve(canvas.toDataURL("image/jpeg", 0.95));
-      };
-
-      img.onerror = () => reject(new Error("Image load failed"));
-      img.src = imageSrc;
-    });
-
-  // Canvas 필터 적용
-  const applyFilterToImage = (
-    imageSrc: string,
-    filterString: string,
-  ): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          reject(new Error("Canvas context not available"));
-          return;
-        }
-
-        ctx.filter = filterString;
-        ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL("image/jpeg", 0.95));
-      };
-
-      img.onerror = () => reject(new Error("Image load failed"));
-      img.src = imageSrc;
-    });
-
-  const handleCapture = async () => {
-    // 업로드 모드일 때: 최종 업로드
-    if (isUploadMode) {
-      if (!selectedImage) {
-        setShowNoImageAlert(true);
-        return;
-      }
-
-      let finalImage = selectedImage;
-
-      const currentFilter = ORIGINAL_FILTERS.find(
-        (f) => f.name === selectedFilter,
-      );
-      if (currentFilter && currentFilter.filter !== "none") {
-        try {
-          finalImage = await applyFilterToImage(
-            finalImage,
-            currentFilter.filter,
-          );
-        } catch (error) {
-          console.error("필터 적용 실패:", error);
-        }
-      }
-
-      const today = new Date();
-      const createdAt = `${today.getFullYear()}-${today.getMonth() + 1
-        }-${today.getDate()}`;
-
-      onUpload({
-        image: finalImage,
-        caption: textInput,
-        textOverlay: textInput,
-        location: locationInput,
-        weather: weatherInput,
-        time: timeInput,
-        health: healthInput,
-        createdAt,
+  const triggerReactionAnimation = (emoji: string) => {
+    if (emoji === "🎉") {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
       });
-      toast.success("업로드 되었습니다!");
       return;
     }
 
-    // 카메라 캡처
-    if (hasCameraDevice && videoRef.current && stream) {
-      const canvas = document.createElement("canvas");
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+    const count = Math.floor(Math.random() * 9) + 4;
+    const newEmojis = Array.from({ length: count }, (_, i) => ({
+      id: Date.now() + i,
+      emoji: emoji,
+      x: (Math.random() - 0.5) * 480,
+      size: Math.random() * 90 + 30,
+      wobble: (Math.random() - 0.5) * 60,
+      delay: Math.random() * 2,
+    }));
+    setFloatingEmojis((prev) => [...prev, ...newEmojis]);
 
-      ctx.drawImage(videoRef.current, 0, 0);
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const capturedImage = reader.result as string;
-          try {
-            const resizedImage =
-              await resizeAndCropImage(capturedImage);
-            setSelectedImage(resizedImage);
-          } catch (error) {
-            console.error("이미지 리사이즈 실패:", error);
-            setSelectedImage(capturedImage);
-          }
-          setIsUploadMode(true);
-          if (stream) {
-            stream.getTracks().forEach((track) => track.stop());
-            setStream(null);
-          }
-        };
-        reader.readAsDataURL(blob);
-      }, "image/jpeg");
-    } else {
-      toast.error("카메라를 사용할 수 없습니다.");
-    }
+    setTimeout(() => {
+      setFloatingEmojis((prev) =>
+        prev.filter((e) => !newEmojis.some((ne) => ne.id === e.id)),
+      );
+    }, 5000);
   };
 
-  const handleCameraSwitch = () =>
-    setIsFrontCamera((prev) => !prev);
+  const handleAddComment = (postId: number) => {
+    if (!newComment.trim()) return;
 
-  const handleImageSelect = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const originalImage = reader.result as string;
-      try {
-        const resizedImage =
-          await resizeAndCropImage(originalImage);
-        setSelectedImage(resizedImage);
-      } catch (error) {
-        console.error("이미지 리사이즈 실패:", error);
-        setSelectedImage(originalImage);
-      }
-      setIsUploadMode(true);
-      setCameraError(null);
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-        setStream(null);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleEdit = () => setIsDetailEditMode(true);
-  const handleCloseDetailEdit = () => {
-    setIsDetailEditMode(false);
-    setShowTextInput(false);
-  };
-
-  const handleTextInputToggle = () => {
-    if (showTextInput) {
-      setShowTextInput(false);
-      setIsTextInputFocused(false);
-      textInputRef.current?.blur();
-    } else {
-      setShowTextInput(true);
-      setIsTextInputFocused(true);
-      setTimeout(() => textInputRef.current?.focus(), 80);
-    }
-  };
-
-  const handleLocationInput = () =>
-    setLocationInput("서울시 강남구");
-  const handleWeatherInput = () =>
-    setWeatherInput("맑음 • 22°C");
-  const handleTimeInput = () => {
     const now = new Date();
-    setTimeInput(
-      `${now.getFullYear()}.${String(
-        now.getMonth() + 1,
-      ).padStart(2, "0")}.${String(now.getDate()).padStart(
-        2,
-        "0",
-      )}`,
+    const timeString = `${now.getHours()}:${now
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`;
+
+    const newCommentObj = {
+      userName: currentUser.userName,
+      userAvatar: currentUser.userAvatar,
+      text: newComment,
+      timestamp: timeString,
+    };
+
+    setAddedComments((prev) => ({
+      ...prev,
+      [postId]: [...(prev[postId] || []), newCommentObj],
+    }));
+
+    setNewComment("");
+    setSelectedPostForReaction(postId);
+  };
+
+  const handleEmojiReaction = (emoji: string, postId: number) => {
+    setEmojiAnimation({ emoji, active: true });
+
+    setAddedReactions((prev) => {
+      const existingReactions = prev[postId] || [];
+      const existingReactionIndex = existingReactions.findIndex(
+        (r) => r.emoji === emoji,
+      );
+
+      if (existingReactionIndex >= 0) {
+        const updatedReactions = [...existingReactions];
+        const userExists = updatedReactions[existingReactionIndex].users.some(
+          (u) => u.userName === currentUser.userName,
+        );
+
+        if (!userExists) {
+          updatedReactions[existingReactionIndex] = {
+            ...updatedReactions[existingReactionIndex],
+            users: [...updatedReactions[existingReactionIndex].users, currentUser],
+          };
+        }
+
+        return {
+          ...prev,
+          [postId]: updatedReactions,
+        };
+      } else {
+        return {
+          ...prev,
+          [postId]: [
+            ...existingReactions,
+            {
+              emoji,
+              users: [currentUser],
+            },
+          ],
+        };
+      }
+    });
+
+    setTimeout(() => {
+      setEmojiAnimation(null);
+    }, 2000);
+  };
+
+  const getAllComments = (postId: number, originalComments?: Array<any>) => {
+    const original = originalComments || [];
+    const added = addedComments[postId] || [];
+    return [...original, ...added];
+  };
+
+  const getAllReactions = (postId: number, originalReactions?: Array<any>) => {
+    const original = originalReactions || [];
+    const added = addedReactions[postId] || [];
+
+    const merged: { [emoji: string]: Array<any> } = {};
+
+    [...original, ...added].forEach((reaction) => {
+      if (merged[reaction.emoji]) {
+        const existingUsers = merged[reaction.emoji];
+        const newUsers = reaction.users.filter(
+          (newUser: any) =>
+            !existingUsers.some(
+              (existingUser: any) =>
+                existingUser.userName === newUser.userName,
+            ),
+        );
+        merged[reaction.emoji] = [...existingUsers, ...newUsers];
+      } else {
+        merged[reaction.emoji] = [...reaction.users];
+      }
+    });
+
+    return Object.entries(merged).map(([emoji, users]) => ({
+      emoji,
+      users,
+    }));
+  };
+
+  const getFilteredReactionPosts = () => {
+    const myReactedPosts = posts.filter((post) => {
+      if (!post.image) return false;
+
+      const hasMyComment = addedComments[post.id]?.some(
+        (comment) => comment.userName === currentUser.userName,
+      );
+
+      const hasMyAddedReaction = addedReactions[post.id]?.some((reaction) =>
+        reaction.users.some((user) => user.userName === currentUser.userName),
+      );
+
+      const hasMyOriginalReaction = post.reactions?.some((reaction) =>
+        reaction.users.some((user) => user.userName === currentUser.userName),
+      );
+
+      const hasMyReaction =
+        hasMyComment || hasMyAddedReaction || hasMyOriginalReaction;
+
+      if (selectedFamilyMember) {
+        const isMe = selectedFamilyMember === currentUserName;
+        if (isMe) {
+          return hasMyReaction && post.userName === currentUserName;
+        } else {
+          const nameMapping: { [key: string]: string } = {
+            엄마: "박승희",
+            아빠: "김동석",
+          };
+          const actualName =
+            nameMapping[selectedFamilyMember] || selectedFamilyMember;
+          return hasMyReaction && post.userName === actualName;
+        }
+      }
+
+      return hasMyReaction;
+    });
+
+    if (reactionFilter === "ALL") {
+      return myReactedPosts;
+    }
+
+    return myReactedPosts.filter((post) => {
+      const hasAddedReaction = addedReactions[post.id]?.some(
+        (reaction) =>
+          reaction.emoji === reactionFilter &&
+          reaction.users.some((u) => u.userName === currentUser.userName),
+      );
+
+      const hasOriginalReaction = post.reactions?.some(
+        (reaction) =>
+          reaction.emoji === reactionFilter &&
+          reaction.users.some((u) => u.userName === currentUser.userName),
+      );
+
+      return hasAddedReaction || hasOriginalReaction;
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (postToDelete && onDeletePost) {
+      onDeletePost(postToDelete);
+    }
+    setShowDeleteModal(false);
+    setPostToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setPostToDelete(null);
+  };
+
+  const handleCloseLightbox = () => {
+    setLastExpandedId(expandedPostId);
+    setExpandedPostId(null);
+  };
+
+  const filteredPosts = posts.filter((post) => {
+    if (selectedFamilyMember) {
+      const isMe = selectedFamilyMember === currentUserName;
+      if (isMe) {
+        if (post.userName !== currentUser.userName) {
+          return false;
+        }
+      } else {
+        const nameMapping: { [key: string]: string } = {
+          엄마: "박승희",
+          아빠: "김동석",
+        };
+        const actualName =
+          nameMapping[selectedFamilyMember] || selectedFamilyMember;
+        if (post.userName !== actualName) {
+          return false;
+        }
+      }
+    }
+
+    if (!searchQuery.trim()) return true;
+
+    const query = searchQuery.toLowerCase();
+    const caption = post.caption?.toLowerCase() || "";
+    const textOverlay = post.textOverlay?.toLowerCase() || "";
+    const health = post.health?.toLowerCase() || "";
+    const userName = post.userName?.toLowerCase() || "";
+
+    return (
+      caption.includes(query) ||
+      textOverlay.includes(query) ||
+      health.includes(query) ||
+      userName.includes(query)
     );
-  };
-  const handleHealthInput = () => setShowHealthModal(true);
-  const handleHealthRecordSelect = (record: string) => {
-    setHealthInput(record);
-    setShowHealthModal(false);
-  };
-  const handleFilter = () => {
-    setIsFilterMode(true);
-    setPreviousFilter(selectedFilter);
+  });
+
+  const expandedPost = posts.find((p) => p.id === expandedPostId);
+
+  // 초기 currentPostId
+  useEffect(() => {
+    if (filteredPosts.length > 0 && !currentPostId) {
+      setCurrentPostId(filteredPosts[0].id);
+    }
+  }, [filteredPosts, currentPostId]);
+
+  // 캘린더에서 넘어왔을 때 해당 포스트로 스크롤
+  useEffect(() => {
+    if (
+      initialPostId &&
+      postRefs.current[initialPostId] &&
+      scrollContainerRef.current &&
+      !isGridView &&
+      !isReactionView
+    ) {
+      const postElement = postRefs.current[initialPostId];
+      const container = scrollContainerRef.current;
+
+      setTimeout(() => {
+        if (postElement && container) {
+          const postTop = postElement.offsetTop;
+          container.scrollTo({
+            top: postTop,
+            behavior: "smooth",
+          });
+        }
+      }, 100);
+    }
+  }, [initialPostId, isGridView, isReactionView]);
+
+  // 모바일 키보드 감지 (레이아웃 높이는 처음 값 기준으로 고정)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const initial = window.innerHeight;   // 앱 처음 켰을 때 높이
+    setScreenHeight(initial);
+
+    const viewport = window.visualViewport;
+
+    const handleResize = () => {
+      if (!viewport) return;
+      // viewport 높이가 처음 높이의 75%보다 작아지면 키보드가 떴다고 판단
+      const isKeyboard = viewport.height < initial * 0.75;
+      setIsKeyboardVisible(isKeyboard);
+    };
+
+    if (viewport) {
+      viewport.addEventListener("resize", handleResize);
+      viewport.addEventListener("scroll", handleResize);
+    }
+
+    return () => {
+      if (!viewport) return;
+      viewport.removeEventListener("resize", handleResize);
+      viewport.removeEventListener("scroll", handleResize);
+    };
+  }, []);
+
+  // 처음 화면 높이 (없으면 800 fallback)
+  const baseHeight = screenHeight ?? 800;
+
+  const HEADER_HEIGHT = 110; // 헤더 + 위 여유
+  const GNB_HEIGHT = 80;
+
+  // 콘텐츠 영역 높이 (키보드 떠도 처음 높이 기준은 유지)
+  const contentHeight =
+    isGridView || isReactionView
+      ? baseHeight - HEADER_HEIGHT          // 그리드/리액션: GNB 없음
+      : isKeyboardVisible
+        ? baseHeight - HEADER_HEIGHT        // 키보드 있을 때도 레이아웃은 그대로, GNB만 숨김
+        : baseHeight - HEADER_HEIGHT - GNB_HEIGHT; // 기본: 헤더 + GNB 제외
+
+  // 카드 한 묶음 높이: 항상 일정(키보드 여부 상관 X)
+  // 160이 너무 크거나 작으면 숫자만 살짝 조절해서 본인 폰에 맞춰봐
+  const cardHeight = baseHeight - 160;
+
+  const scrollToPost = (postId: number) => {
+    // 피드가 렌더된 다음에 스크롤해야 해서 살짝 딜레이
+    setTimeout(() => {
+      const container = scrollContainerRef.current;
+      const target = postRefs.current[postId];
+
+      if (container && target) {
+        container.scrollTo({
+          top: target.offsetTop,
+          behavior: "auto", // ← 바로 점프 (쫘르륵 말고)
+        });
+      }
+    }, 50);
   };
 
-  // 텍스트 인풋/캡슐 bottom 위치 (카드 안에서 12px)
-  const getTextBottom = () => 12;
-
-  // ✅ 캡션 바: 항상 "현재 뷰포트"의 바닥 (키보드 위) 에 고정
-  const AICaptionToolbar: React.FC = () => (
-    <motion.div
-      key="ai-caption-toolbar"
-      initial={{ y: "100%", opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: "100%", opacity: 0 }}
-      transition={{
-        type: "spring",
-        damping: 24,
-        stiffness: 260,
-      }}
-      className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
-      style={{
-        bottom: 0,
-        paddingBottom: "env(safe-area-inset-bottom)",
-      }}
-    >
-      <div className="px-6 pt-6 pb-2">
-        <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2">
-          AI 추천 캡션
-        </p>
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {aiCaptions.map((caption, index) => (
-            <button
-              key={index}
-              onMouseDown={handleCaptionClick(caption.text)}
-              className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
-            >
-              {caption.text}
-            </button>
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
 
   return (
-    <>
-      {/* 카메라/갤러리 권한 다이얼로그 */}
-      <AlertDialog open={showCameraPermission}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>카메라 권한 허용</AlertDialogTitle>
-            <AlertDialogDescription>
-              사진을 촬영하려면 카메라 접근 권한이 필요합니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handlePermissionDeny}>
-              거부
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleCameraPermissionAllow}>
-              허용
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={showGalleryPermission}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>갤러리 권한 허용</AlertDialogTitle>
-            <AlertDialogDescription>
-              사진을 업로드하려면 갤러리 접근 권한이 필요합니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handlePermissionDeny}>
-              거부
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleGalleryPermissionAllow}
-            >
-              허용
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* 메인 래퍼 */}
-      <div className="relative w-full min-h-screen bg-[#f7f7f7] overflow-hidden">
-        <div className="absolute inset-0 flex justify-center overflow-visible">
-          <div className="relative w-full max-w-[500px] h-full">
-            {/* 이미지 카드 컨테이너 */}
-            <div
-              className="absolute left-0 right-0 flex flex-col items-center w-full justify-center px-5 xs:px-6 sm:px-8 transition-all duration-300"
-              style={{
-                top: isKeyboardVisible ? "96px" : "50%",
-                transform: isKeyboardVisible
-                  ? "translateY(0)"
-                  : "translateY(-50%)",
-              }}
-            >
-              <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400] max-h-[calc(100vh-280px)]">
-                <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50">
-                  {/* 카메라 비디오 */}
-                  {!isUploadMode && (
-                    <video
-                      ref={videoRef}
-                      autoPlay
-                      playsInline
-                      muted
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  )}
-
-                  {/* 선택된 이미지 */}
-                  {selectedImage && (
-                    <div className="absolute inset-0 bg-white">
-                      <ImageWithFallback
-                        src={selectedImage}
-                        alt="Selected Image"
-                        className="w-full h-full object-cover"
-                        style={{
-                          filter:
-                            ORIGINAL_FILTERS.find(
-                              (f) => f.name === selectedFilter,
-                            )?.filter || "none",
-                        }}
-                      />
-
-                      {/* 텍스트 모드일 때 이미지 어둡게 */}
-                      {showTextInput && (
-                        <div className="absolute inset-0 bg-black/35" />
-                      )}
-
-                      {/* 위치 / 날씨 / 시간 / 건강 캡슐들 */}
-                      {(locationInput ||
-                        weatherInput ||
-                        timeInput ||
-                        healthInput) && (
-                          <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
-                            {locationInput && (
-                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
-                                <img
-                                  src={MapPin}
-                                  alt="위치"
-                                  className="w-[22px] h-[22px]"
-                                />
-                                <span className="text-[#555555] text-[15px]">
-                                  {locationInput}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => setLocationInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                                >
-                                  <img
-                                    src={X}
-                                    alt="삭제"
-                                    className="w-2 h-2"
-                                  />
-                                </button>
-                              </div>
-                            )}
-
-                            {weatherInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                <img
-                                  src={Cloud}
-                                  alt="날씨"
-                                  className="w-[22px] h-[22px]"
-                                />
-                                <span className="text-white text-sm">
-                                  {weatherInput}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => setWeatherInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                                >
-                                  <img
-                                    src={X}
-                                    alt="삭제"
-                                    className="w-2 h-2"
-                                  />
-                                </button>
-                              </div>
-                            )}
-
-                            {timeInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                <img
-                                  src={Clock}
-                                  alt="시간"
-                                  className="w-[22px] h-[22px]"
-                                />
-                                <span className="text-white text-sm">
-                                  {timeInput}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => setTimeInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                                >
-                                  <img
-                                    src={X}
-                                    alt="삭제"
-                                    className="w-2 h-2"
-                                  />
-                                </button>
-                              </div>
-                            )}
-
-                            {healthInput && (
-                              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                <img
-                                  src={Heart}
-                                  alt="데이터"
-                                  className="w-[22px] h-[22px]"
-                                />
-                                <span className="text-white text-sm">
-                                  {healthInput}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => setHealthInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
-                                >
-                                  <img
-                                    src={X}
-                                    alt="삭제"
-                                    className="w-2 h-2"
-                                  />
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                      {/* 텍스트 입력 / 캡슐 */}
-                      <div
-                        className="absolute left-4 right-4 transition-all duration-200 ease-out"
-                        style={{ bottom: getTextBottom() }}
-                      >
-                        {showTextInput ? (
-                          <input
-                            ref={textInputRef}
-                            type="text"
-                            value={textInput}
-                            onChange={(e) =>
-                              setTextInput(
-                                applyTextLimit(e.target.value),
-                              )
-                            }
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                setShowTextInput(false);
-                                setIsTextInputFocused(false);
-                                textInputRef.current?.blur();
-                              }
-                            }}
-                            onFocus={() => setIsTextInputFocused(true)}
-                            onBlur={() => {
-                              setIsTextInputFocused(false);
-                              setShowTextInput(false);
-                            }}
-                            placeholder="텍스트를 입력하세요"
-                            className="w-full text-[#555555] text-[15px] bg-white/80 backdrop-blur-sm px-5 py-2 rounded-[50px] outline-none placeholder:text-[#aeaeae] border border-[#ffffff]"
-                          />
-                        ) : textInput ? (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowTextInput(true);
-                              setIsTextInputFocused(true);
-                              setTimeout(
-                                () => textInputRef.current?.focus(),
-                                80,
-                              );
-                            }}
-                            className="w-full text-left text-[#555555] text-[15px] bg-white/80 backdrop-blur-sm px-5 py-2 rounded-[50px]"
-                          >
-                            {textInput}
-                          </button>
-                        ) : null}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 카메라 에러 (업로드 모드 아닐 때만) */}
-                  {cameraError && !isUploadMode && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm rounded-[16px] z-20">
-                      <div className="text-center px-6">
-                        <Camera
-                          size={48}
-                          className="text-gray-400 mx-auto mb-4"
-                        />
-                        <p className="text-white mb-2">
-                          {cameraError}
-                        </p>
-                        <p className="text-[#aeaeae] text-sm">
-                          갤러리 버튼을 눌러 사진을 업로드할 수
-                          있습니다.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 헤더 */}
-        <header className="fixed top-0 left-0 right-0 z-40 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full bg-[#f7f7f7]/80 backdrop-blur-xs relative max-w-[500px] mx-auto min-h-[80px]">
-          {isFilterMode ? (
-            <>
-              <button
-                onClick={() => {
-                  setSelectedFilter(previousFilter);
-                  setIsFilterMode(false);
-                }}
-                className="absolute left-4 p-1"
-              >
-                <img
-                  src={ChevronLeft}
-                  alt="뒤로가기"
-                  className="w-6 h-6"
-                />
-              </button>
-              <button
-                onClick={() => setIsFilterMode(false)}
-                className="absolute right-4 px-4 py-2 text-[#36D2C5] font-semibold"
-              >
-                완료
-              </button>
-            </>
-          ) : isDetailEditMode ? (
-            <>
-              <button
-                onClick={() => {
-                  if (hasDraft) {
-                    setShowLeaveDetailAlert(true);
-                  } else {
-                    handleCloseDetailEdit();
-                  }
-                }}
-                className="absolute left-4 p-1"
-              >
-                <img src={X} alt="닫기" className="w-6 h-6" />
-              </button>
-              <button
-                onClick={() => {
-                  setShowTextInput(false);
-                  textInputRef.current?.blur();
-                  setIsDetailEditMode(false);
-                }}
-                className="absolute right-4 px-4 py-2 text-[#36D2C5] font-semibold"
-              >
-                완료
-              </button>
-            </>
-          ) : (
+    <div
+      className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto h-screen overflow-hidden"
+      onPointerDownCapture={() => {
+        blurByClickRef.current = true;
+        setTimeout(() => {
+          blurByClickRef.current = false;
+        }, 0);
+      }}
+    >
+      {/* 헤더 */}
+      <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 flex flex-col justify-center w-full max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
+        {isSearchActive ? (
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => {
-                if (hasDraft) {
-                  setShowLeaveUploadAlert(true);
-                } else {
-                  onBack();
-                }
-              }}
-              className="absolute left-4 p-1"
+              onClick={onBack}
+              className="w-6 h-6 flex items-center justify-center flex-shrink-0"
             >
               <img
                 src={ChevronLeft}
@@ -937,420 +612,919 @@ export function CommunityPage({ onBack, onUpload }: UploadPageProps) {
                 className="w-6 h-6"
               />
             </button>
-          )}
+            <div
+              className={`bg-white rounded-[12px] px-4 py-2 h-10 flex items-center gap-2 transition-all border-[1.6px] flex-1 ${isSearchFocused
+                ? "border-[#2ECACA]"
+                : "border-[#2ECACA]"
+                }`}
+            >
+              <img
+                src={SearchColor}
+                alt="검색"
+                className="w-6 h-6"
+              />
+              <input
+                type="text"
+                placeholder="어떤 사진을 찾으시나요?"
+                className="flex-1 bg-transparent outline-none text-[#202020] placeholder:text-[#aeaeae] placeholder:font-normal"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                autoFocus
+              />
+            </div>
+            <button
+              className="text-[#777777] text-[17px] font-normal flex-shrink-0"
+              onClick={() => {
+                setIsSearchActive(false);
+                setSearchQuery("");
+                setIsSearchFocused(false);
+              }}
+            >
+              취소
+            </button>
+          </div>
+        ) : isReactionView ? (
+          <div className="w-full flex items-center justify-center relative">
+            <button
+              onClick={() => setIsReactionView(false)}
+              className="absolute left-0 w-6 h-6 flex items-center justify-center"
+            >
+              <img
+                src={ChevronLeft}
+                alt="뒤로가기"
+                className="w-6 h-6"
+              />
+            </button>
+            <span className="text-[19px] font-semibold text-[#202020]">
+              리액션 모아보기
+            </span>
+          </div>
+        ) : isGridView ? (
+          <div className="w-full flex items-center justify-center relative">
+            <button
+              onClick={() => setIsGridView(false)}
+              className="absolute left-0 w-6 h-6 flex items-center justify-center"
+            >
+              <img
+                src={ChevronLeft}
+                alt="뒤로가기"
+                className="w-6 h-6"
+              />
+            </button>
 
-          <h1 className="text-xl font-bold text-[#1A1A1A] text-center">
-            {isFilterMode
-              ? "필터"
-              : isDetailEditMode
-                ? "세부조정"
-                : "업로드"}
-          </h1>
-        </header>
+            {/* Grid View - 드롭다운 Anchor */}
+            <div className="relative z-50">
+              <button
+                className="flex items-center gap-1"
+                onClick={() =>
+                  setShowFamilyDropdown(!showFamilyDropdown)
+                }
+              >
+                <span className="text-[19px] font-semibold text-[#202020]">
+                  {selectedFamilyMember
+                    ? familyMembers.find(
+                      (m) =>
+                        (m.id === "me"
+                          ? currentUserName
+                          : m.name) === selectedFamilyMember,
+                    )?.name || "모아보기"
+                    : "모아보기"}
+                </span>
+                <img
+                  src={ChevronDown}
+                  alt="뒤로가기"
+                  className="w-6 h-6 ml-1"
+                />
+              </button>
+              <FamilyDropdown
+                showFamilyDropdown={showFamilyDropdown}
+                setShowFamilyDropdown={setShowFamilyDropdown}
+                selectedFamilyMember={selectedFamilyMember}
+                setSelectedFamilyMember={setSelectedFamilyMember}
+                currentUserName={currentUserName}
+              />
+            </div>
 
-        {/* 하단 컨트롤 (카메라/필터 버튼) */}
-        <div className="absolute left-0 right-0 z-10 px-5 xs:px-6 sm:px-8 pb-10 bg-[#f7f7f7] max-w-[500px] mx-auto bottom-0">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageSelect}
-            className="hidden"
-          />
+            <button
+              onClick={() => setIsReactionView(true)}
+              className="absolute right-0 w-10 h-10 flex items-center justify-center rounded-full bg-[#F5F5F5]/80 backdrop-blur-md text-gray-500 hover:text-gray-800 transition-colors"
+            >
+              <img src={Reaction} alt="뒤로가기" className="w-6 h-6" />
+            </button>
+          </div>
+        ) : (
+          <div className="w-full flex items-center justify-center relative">
+            <button
+              onClick={onBack}
+              className="absolute left-0 w-6 h-6 flex items-center justify-center"
+            >
+              <img
+                src={ChevronLeft}
+                alt="뒤로가기"
+                className="w-6 h-6"
+              />
+            </button>
 
-          {isFilterMode ? (
-            <div className="w-full h-28 relative flex items-center justify-center">
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
-                <div className="w-[68px] h-[68px] rounded-full border-[3px] border-[#36D2C5]" />
-              </div>
-              <div className="w-full h-full z-20">
-                <Swiper
-                  spaceBetween={14}
-                  slidesPerView="auto"
-                  className="w-full h-full"
-                  loop={true}
-                  centeredSlides={true}
-                  slideToClickedSlide={true}
-                  threshold={10}
-                  speed={400}
-                  onRealIndexChange={(swiper) => {
-                    const realIndex =
-                      swiper.realIndex % ORIGINAL_FILTERS.length;
-                    setSelectedFilter(
-                      ORIGINAL_FILTERS[realIndex].name,
-                    );
-                  }}
+            {/* Default View - 드롭다운 Anchor */}
+            <div className="relative z-50">
+              <button
+                className="flex items-center gap-1"
+                onClick={() =>
+                  setShowFamilyDropdown(!showFamilyDropdown)
+                }
+              >
+                <span className="text-[19px] font-semibold text-[#202020]">
+                  {selectedFamilyMember
+                    ? familyMembers.find(
+                      (m) =>
+                        (m.id === "me"
+                          ? currentUserName
+                          : m.name) === selectedFamilyMember,
+                    )?.name || "우리가족"
+                    : "우리가족"}
+                </span>
+                <img
+                  src={ChevronDown}
+                  alt="드롭다운"
+                  className="w-6 h-6 ml-1"
+                />
+              </button>
+              <FamilyDropdown
+                showFamilyDropdown={showFamilyDropdown}
+                setShowFamilyDropdown={setShowFamilyDropdown}
+                selectedFamilyMember={selectedFamilyMember}
+                setSelectedFamilyMember={setSelectedFamilyMember}
+                currentUserName={currentUserName}
+              />
+            </div>
+
+            <div className="absolute right-0 flex items-center gap-4">
+              <button
+                className="w-6 h-6 flex items-center justify-center"
+                onClick={() => {
+                  setIsSearchActive(true);
+                  setIsSearchFocused(true);
+                }}
+              >
+                <img
+                  src={Search}
+                  alt="검색"
+                  className="w-6 h-6"
+                />
+              </button>
+              <button
+                className="w-6 h-6 flex items-center justify-center"
+                onClick={onNotificationClick}
+              >
+                <img src={Bell} alt="알림" className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Content Area */}
+      <div
+        className="w-full overflow-hidden"
+        style={{
+          height: contentHeight,
+        }}
+      >
+        {isReactionView ? (
+          <div className="pb-20">
+            {/* 리액션 필터 바 */}
+            <div className="px-5 py-4 flex gap-3 overflow-x-auto scrollbar-hide sticky top-0 z-20 justify-center">
+              <button
+                onClick={() => setReactionFilter("ALL")}
+                className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-normal transition-all border-[1px] ${reactionFilter === "ALL"
+                  ? "bg-[#BCEEEE] text-[#202020] border-[#BCEEEE] border-[2px]"
+                  : "bg-[#F0F0F0] text-[#2b2b2b] border-[#e8e8e8] border-[1px]"
+                  }`}
+              >
+                ALL
+              </button>
+
+              {emojis.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => setReactionFilter(emoji)}
+                  className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-[22px] font-normal transition-all border-[1px] ${reactionFilter === emoji
+                    ? "bg-[#BCEEEE] text-[#202020] border-[#BCEEEE] border-[2px]"
+                    : "bg-[#F0F0F0] text-[#2b2b2b] border-[#e8e8e8] border-[1px]"
+                    }`}
                 >
-                  {loopFilters.map((filter, index) => (
-                    <SwiperSlide
-                      key={`${filter.name}-${index}`}
+                  {emoji}
+                </button>
+              ))}
+            </div>
+
+            <div className="px-4">
+              {getFilteredReactionPosts().length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <Heart
+                    size={48}
+                    className="text-gray-300 mb-4"
+                  />
+                  <p className="text-gray-500">
+                    {reactionFilter === "ALL"
+                      ? "아직 리액션한 게시물이 없습니다"
+                      : `${reactionFilter} 반응을 남긴 게시물이 없습니다`}
+                  </p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    댓글이나 이모지를 남겨보세요!
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-1">
+                  {getFilteredReactionPosts().map((post) => (
+                    <motion.div
+                      key={post.id}
+                      layoutId={`post-${post.id}`}
+                      className="aspect-square relative overflow-hidden rounded-[12px] cursor-pointer hover:opacity-80 transition-opacity"
                       style={{
-                        width: "auto",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
+                        zIndex:
+                          expandedPostId === post.id ||
+                            lastExpandedId === post.id
+                            ? 50
+                            : 0,
+                      }}
+                      onLayoutAnimationComplete={() => {
+                        if (lastExpandedId === post.id) {
+                          setLastExpandedId(null);
+                        }
+                      }}
+                      onClick={() => {
+                        // 리액션 뷰 끄고
+                        setIsReactionView(false);
+                        // 그리드 뷰도 강제로 끔 → 바로 피드로
+                        setIsGridView(false);
+
+                        // 피드가 뜬 뒤에 해당 포스트로 점프
+                        scrollToPost(post.id);
                       }}
                     >
-                      {({ isActive }) => (
-                        <button
-                          className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                            : "bg-[#EEEEEE] text-gray-400 scale-95"
-                            }`}
-                        >
-                          {filter.name.toUpperCase()}
-                        </button>
+                      <ImageWithFallback
+                        src={post.image}
+                        alt="Community post"
+                        className="w-full h-full object-cover bg-gray-100 pointer-events-none"
+                      />
+                      {reactionFilter !== "ALL" && (
+                        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]">
+                          {reactionFilter}
+                        </div>
                       )}
-                    </SwiperSlide>
+                    </motion.div>
                   ))}
-                </Swiper>
-              </div>
-            </div>
-          ) : isDetailEditMode ? (
-            <div className="flex flex-col items-center gap-5 max-w-md mx-auto px-4">
-              {!showTextInput && (
-                <>
-                  <div className="flex items-center justify-center mt-4 gap-4">
-                    <button onClick={handleTextInputToggle}>
-                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <img
-                          src={Type}
-                          alt="텍스트"
-                          className="w-[22px] h-[22px]"
-                        />
-                      </div>
-                    </button>
-
-                    <button onClick={handleLocationInput}>
-                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <img
-                          src={MapPin}
-                          alt="위치"
-                          className="w-[22px] h-[22px]"
-                        />
-                      </div>
-                    </button>
-
-                    <button onClick={handleWeatherInput}>
-                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <img
-                          src={Cloud}
-                          alt="날씨"
-                          className="w-[22px] h-[22px]"
-                        />
-                      </div>
-                    </button>
-
-                    <button onClick={handleTimeInput}>
-                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <img
-                          src={Clock}
-                          alt="날짜"
-                          className="w-[22px] h-[22px]"
-                        />
-                      </div>
-                    </button>
-
-                    <button onClick={handleHealthInput}>
-                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8] transition-colors hover:bg-[#D0F0ED]">
-                        <img
-                          src={Heart}
-                          alt="텍스트"
-                          className="w-[22px] h-[22px]"
-                        />
-                      </div>
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={handleCapture}
-                    className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
-                  >
-                    <img
-                      src={Upload}
-                      alt="업로드"
-                      className="w-[35px] h-[35px]"
-                    />
-                  </button>
-                </>
+                </div>
               )}
             </div>
-          ) : (
-            <div className="flex items-center justify-between max-w-md mx-auto px-6">
-              <button
-                onClick={
-                  isUploadMode
-                    ? handleEdit
-                    : () => fileInputRef.current?.click()
-                }
-                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder-[#e8e8e8] bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
-              >
-                {isUploadMode ? (
-                  <img
-                    src={Edit}
-                    alt="꾸미기"
-                    className="w-[24px] h-[24px]"
-                  />
-                ) : (
-                  <img
-                    src={ImageIcon}
-                    alt="꾸미기"
-                    className="w-[30px] h-[30px]"
-                  />
-                )}
-              </button>
+          </div>
+        ) : isGridView ? (
+          <div className="px-5 xs:px-6 sm:px-8 py-4 pb-10 h-full overflow-y-auto">
+            <div className="grid grid-cols-3 gap-1">
+              {filteredPosts
+                .filter((post) => post.image)
+                .map((post) => (
+                  <motion.div
+                    key={post.id}
+                    layoutId={`post-${post.id}`}
+                    className="aspect-square relative overflow-hidden rounded-[12px] cursor-pointer hover:opacity-80 transition-opacity"
+                    style={{
+                      zIndex:
+                        expandedPostId === post.id ||
+                          lastExpandedId === post.id
+                          ? 50
+                          : 0,
+                    }}
+                    onLayoutAnimationComplete={() => {
+                      if (lastExpandedId === post.id) {
+                        setLastExpandedId(null);
+                      }
+                    }}
+                    onClick={() => {
+                      // 모아보기 끄고 피드로
+                      setIsGridView(false);
 
-              <button
-                onClick={handleCapture}
-                className="w-[70px] h-[70px] rounded-full border-[4px] border-[#2ECACA] bg-white hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
-              >
-                {isUploadMode ? (
-                  <img
-                    src={Upload}
-                    alt="업로드"
-                    className="w-[35px] h-[35px]"
-                  />
-                ) : (
-                  <div className="w-[70px] h-[70px] rounded-full" />
-                )}
-              </button>
-
-              <button
-                onClick={
-                  isUploadMode ? handleFilter : handleCameraSwitch
-                }
-                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder- bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
-              >
-                {isUploadMode ? (
-                  <img
-                    src={Sparkles}
-                    alt="효과"
-                    className="w-[32px] h-[32px]"
-                  />
-                ) : (
-                  <img
-                    src={RefreshCw}
-                    alt="카메라전환"
-                    className="w-[27px] h-[27px]"
-                  />
-                )}
-              </button>
+                      // 피드 렌더 후 해당 카드 위치로 점프
+                      scrollToPost(post.id);
+                    }}
+                  >
+                    <ImageWithFallback
+                      src={post.image}
+                      alt={post.caption}
+                      className="w-full h-full object-cover"
+                    />
+                  </motion.div>
+                ))}
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div
+            ref={scrollContainerRef}
+            className={`w-full px-5 xs:px-6 sm:px-8 overflow-y-auto h-full scrollbar-hide snap-y snap-mandatory snap-always ${isKeyboardVisible ? "pb-5" : ""
+              }`}
+          >
+            {filteredPosts.map((post) => {
+              const isDeleting = postToDelete === post.id;
+              return (
+                <div
+                  ref={(el) => {
+                    postRefs.current[post.id] = el;
+                  }}
+                  className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 snap-start snap-always ${isKeyboardVisible ? "justify-start pt-[120px]" : "justify-center"
+                    }`}
+                  key={post.id}
+                  style={{
+                    height: cardHeight,
+                    minHeight: cardHeight, // 카드 높이는 그대로 유지
+                  }}
+                >
+
+                  <div>
+                    <div className="relative w-full mx-auto overflow-visible flex-shrink-0 aspect-[335/400]">
+                      {post.userName === currentUser.userName &&
+                        isDragging && (
+                          <div className="absolute inset-y-0 -right-8 w-24 flex items-center justify-start z-0 pr-4">
+                            <Trash2
+                              size={32}
+                              className="text-[#555555]"
+                            />
+                          </div>
+                        )}
+                      <motion.div
+                        className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] touch-none"
+                        drag={
+                          !isScrolling &&
+                            post.userName === currentUser.userName
+                            ? "x"
+                            : false
+                        }
+                        dragConstraints={{
+                          left: -120,
+                          right: 0,
+                        }}
+                        dragElastic={0.1}
+                        dragMomentum={false}
+                        dragSnapToOrigin={!isDeleting}
+                        animate={{ x: isDeleting ? -200 : 0 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 30,
+                        }}
+                        whileDrag={{ scale: 0.98 }}
+                        onDragStart={(event, info) => {
+                          setDragStartX(info.point.x);
+                          setIsDragging(true);
+                        }}
+                        onDragEnd={(event, info) => {
+                          if (info.offset.x < -100) {
+                            setPostToDelete(post.id);
+                            setShowDeleteModal(true);
+                          }
+                          setDragStartX(null);
+                          setIsDragging(false);
+                        }}
+                        onClick={(e) => {
+                          if (!dragStartX)
+                            setSelectedPostForReaction(post.id);
+                        }}
+                      >
+                        <ImageWithFallback
+                          src={post.image}
+                          alt="Community post"
+                          className="w-full h-full object-cover bg-gray-100 pointer-events-none"
+                        />
+                        {selectedPostForReaction === post.id && (
+                          <div
+                            className="absolute inset-0 bg-black/70 z-10 flex flex-col cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedPostForReaction(null);
+                            }}
+                          >
+                            {/* 리액션 묶음 표시 */}
+                            {getAllReactions(
+                              post.id,
+                              post.reactions,
+                            ).length > 0 && (
+                                <div className="absolute top-4 right-4 flex flex-wrap gap-2 justify-end max-w-[60%] z-20">
+                                  {getAllReactions(
+                                    post.id,
+                                    post.reactions,
+                                  ).map((reaction) => (
+                                    <div
+                                      key={reaction.emoji}
+                                      className="rounded-full pl-2 pr-3 py-1.5 flex items-center gap-2"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        triggerReactionAnimation(
+                                          reaction.emoji,
+                                        );
+                                      }}
+                                    >
+                                      <span className="text-base">
+                                        {reaction.emoji}
+                                      </span>
+
+                                      <div className="flex -space-x-3">
+                                        {reaction.users
+                                          .slice(0, 3)
+                                          .map(
+                                            (
+                                              user,
+                                              userIdx,
+                                            ) => (
+                                              <ImageWithFallback
+                                                key={`${reaction.emoji}-${user.userName}-${userIdx}`}
+                                                src={getAvatarForUserName(
+                                                  user.userName,
+                                                  user.userAvatar,
+                                                )}
+                                                alt={
+                                                  user.userName
+                                                }
+                                                className={`w-6 h-6 rounded-full object-cover border border-[#f0f0f0] transition-all duration-300 ${userIdx === 0
+                                                  ? "ml-0"
+                                                  : ""
+                                                  }`}
+                                                style={{
+                                                  zIndex:
+                                                    reaction
+                                                      .users
+                                                      .length -
+                                                    userIdx,
+                                                }}
+                                              />
+                                            ),
+                                          )}
+
+                                        {reaction.users.length >
+                                          3 && (
+                                            <div
+                                              className="w-7 h-7 rounded-full bg-gray-500/80 backdrop-blur-sm flex items-center justify-center text-white text-xs font-semibold border-2 border-white relative"
+                                              style={{
+                                                zIndex: 0,
+                                              }}
+                                            >
+                                              +
+                                              {reaction.users
+                                                .length - 3}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                            {/* Pressed 상태의 프로필 캡슐 */}
+                            {(post.textOverlay ||
+                              post.userName) && (
+                                <div className="absolute bottom-5 left-5 flex items-center gap-3 z-20 max-w-[90%]">
+                                  <div className="inline-flex items-center bg-white/90 backdrop-blur-sm rounded-full pl-1 pr-4 py-2 gap-2">
+                                    <ImageWithFallback
+                                      src={getAvatarForUserName(
+                                        post.userName,
+                                        post.userAvatar,
+                                      )}
+                                      alt={post.userName}
+                                      className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0] -my-4 -ml-2"
+                                    />
+                                    <p className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink">
+                                      {post.textOverlay ||
+                                        post.userName}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+
+                            {getAllComments(
+                              post.id,
+                              post.comments,
+                            ).length > 0 && (
+                                <div className="absolute bottom-[60px] right-0 flex flex-col gap-5 items-end max-w-[70%] max-h-[50vh] overflow-y-auto z-20 p-4 scrollbar-hide">
+                                  {getAllComments(
+                                    post.id,
+                                    post.comments,
+                                  ).map(
+                                    (comment, idx) => (
+                                      <div
+                                        key={`comment-${post.id}-${idx}-${comment.userName}-${comment.timestamp}`}
+                                        className="inline-flex flex-row-reverse items-center bg-[#f0f0f0]/70 backdrop-blur-sm rounded-full pl-4 pr-[1px] py-2"
+                                      >
+                                        <ImageWithFallback
+                                          src={getAvatarForUserName(
+                                            comment.userName,
+                                            comment.userAvatar,
+                                          )}
+                                          alt={
+                                            comment.userName
+                                          }
+                                          className="w-[35px] h-[35px] border border-[#f0f0f0] rounded-full object-cover -my-4 -mr-5"
+                                        />
+                                        <p className="text-[15px] text-[#202020] font-medium leading-[1.4] max-w-[85%] truncate flex-shrink mr-1">
+                                          {comment.text}
+                                        </p>
+                                      </div>
+                                    ),
+                                  )}
+                                </div>
+                              )}
+                          </div>
+                        )}
+
+                        {selectedPostForReaction !== post.id && (
+                          <>
+                            <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
+                              {post.location && (
+                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                  <img src={MapPin} alt="위치" className="w-[22px] h-[22px]" />
+                                  <span className="text-white text-sm">
+                                    {post.location}
+                                  </span>
+                                </div>
+                              )}
+                              {post.weather && (
+                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                  <img src={Cloud} alt="날씨" className="w-[22px] h-[22px]" />
+                                  <span className="text-white text-sm">
+                                    {post.weather}
+                                  </span>
+                                </div>
+                              )}
+                              {post.time && (
+                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                  <img src={Clock} alt="시간" className="w-[22px] h-[22px]" />
+                                  <span className="text-white text-sm">
+                                    {post.time}
+                                  </span>
+                                </div>
+                              )}
+                              {post.health && (
+                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+                                  <img src={Heart} alt="데이터" className="w-[22px] h-[22px]" />
+                                  <span className="text-white text-sm">
+                                    {post.health}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            {post.badge &&
+                              !post.location &&
+                              !post.weather &&
+                              !post.time &&
+                              !post.health && (
+                                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1 text-sm font-medium">
+                                  <span>{post.badge}</span>
+                                </div>
+                              )}
+
+                            {/* 하단 프로필 캡슐 및 댓글 카운트 */}
+                            <div className="absolute bottom-5 left-5 flex items-center gap-2 z-10 max-w-[90%]">
+                              <div className="inline-flex items-center bg-[#f0f0f0]/70 backdrop-blur-sm rounded-full pl-1 pr-4 py-2 gap-2">
+                                <ImageWithFallback
+                                  src={getAvatarForUserName(
+                                    post.userName,
+                                    post.userAvatar,
+                                  )}
+                                  alt={post.userName}
+                                  className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0] -my-4 -ml-2 "
+                                />
+                                <span className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink">
+                                  {post.textOverlay ||
+                                    post.userName}
+                                </span>
+                              </div>
+
+                              <div className="bg-[#f0f0f0]/70 backdrop-blur-sm rounded-full px-[9.5px] py-[7px] font-medium flex items-center justify-center shrink-0 relative text-[15px]">
+                                +
+                                {
+                                  getAllComments(
+                                    post.id,
+                                    post.comments,
+                                  ).length
+                                }
+                                {getAllComments(
+                                  post.id,
+                                  post.comments,
+                                ).length > 0 && (
+                                    <span className="absolute top-[1px] right-[1px] w-[8px] h-[8px] bg-[#FF3333] rounded-full"></span>
+                                  )}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </motion.div>
+
+                      {/* 댓글 입력창 */}
+                      <div className="z-40 pointer-events-none">
+                        <div className="relative w-full h-[48px] pointer-events-auto px-1">
+                          <div className="flex items-center gap-2 w-full mx-auto h-full mt-4">
+                            <button
+                              className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-colors overflow-hidden relative"
+                              onClick={() => {
+                                setCurrentPostId(post.id);
+                                setShowEmojiPicker(!showEmojiPicker);
+                              }}
+                            >
+                              <AnimatePresence mode="wait" initial={false}>
+                                {showEmojiPicker && currentPostId === post.id ? (
+                                  // X 아이콘
+                                  <motion.div
+                                    key="close-icon"
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    transition={{ duration: 0.18 }}
+                                    className="absolute inset-0 flex items-center justify-center rounded-full bg-[#f0f0f0] border border-[#e8e8e8]"
+                                  >
+                                    <img src={X} alt="삭제" className="w-6 h-6" />
+                                  </motion.div>
+                                ) : (
+                                  // 스마일 이미지
+                                  <motion.div
+                                    key="smile-icon"
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    transition={{ duration: 0.18 }}
+                                    className="absolute inset-0 flex items-center justify-center rounded-full"
+                                  >
+                                    <img
+                                      src={Reaction}
+                                      alt="emoji"
+                                      className="w-[29px] h-[29px] object-contain"
+                                    />
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </button>
+                            <div className="flex-1 h-full relative flex items-center">
+                              <AnimatePresence
+                                mode="wait"
+                                initial={false}
+                              >
+                                {showEmojiPicker &&
+                                  currentPostId === post.id ? (
+                                  <motion.div
+                                    key="emoji-list"
+                                    initial={{ opacity: 0, x: -20, scaleX: 0.6, originX: 0 }}
+                                    animate={{ opacity: 1, x: 0, scaleX: 1, originX: 0 }}
+                                    exit={{ opacity: 0, x: 20, scaleX: 0.6, originX: 0 }}
+                                    transition={{ duration: 0.25 }}
+                                    className="absolute inset-y-0 left-0 right-0 flex items-center justify-start gap-2 pl-1 overflow-x-auto no-scrollbar"
+                                  >
+                                    {emojis.map((emoji) => (
+                                      <button
+                                        key={emoji}
+                                        onClick={() => {
+                                          handleEmojiReaction(emoji, post.id);
+                                          triggerReactionAnimation(emoji);
+                                        }}
+                                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-[#f0f0f0] rounded-full transition-colors border border-[#e8e8e8] text-[20px]"
+                                      >
+                                        {emoji}
+                                      </button>
+                                    ))}
+                                  </motion.div>
+                                ) : (
+                                  <motion.form
+                                    key="comment-input"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.25 }}
+                                    className="absolute inset-y-1 inset-x-0 flex items-center bg-[#f0f0f0] border border-[#777777] backdrop-blur-md rounded-[16px] px-4"
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      if (currentPostId === post.id && newComment.trim()) {
+                                        handleAddComment(post.id);
+                                      }
+                                    }}
+                                  >
+                                    <input
+                                      type="text"
+                                      placeholder="댓글을 작성해주세요"
+                                      className="w-full bg-transparent outline-none text-[#2b2b2b] placeholder:text-[#aeaeae]"
+                                      enterKeyHint="send"   // iOS 키보드에 '전송' 느낌
+                                      value={currentPostId === post.id ? newComment : ""}
+                                      onChange={(e) => {
+                                        if (currentPostId !== post.id) return;
+
+                                        const value = e.target.value;
+                                        const maxLen = getMaxCommentLength(value);
+                                        const trimmed =
+                                          value.length <= maxLen ? value : value.slice(0, maxLen);
+                                        setNewComment(trimmed);
+                                      }}
+                                      onFocus={(e) => {
+                                        setCurrentPostId(post.id);
+                                        e.preventDefault();
+                                        if (scrollContainerRef.current) {
+                                          const currentScroll = scrollContainerRef.current.scrollTop;
+                                          setTimeout(() => {
+                                            if (scrollContainerRef.current) {
+                                              scrollContainerRef.current.scrollTop = currentScroll;
+                                            }
+                                          }, 0);
+                                        }
+                                      }}
+                                      onBlur={() => {
+                                        // 👇 여기서 '완료' / '밖 클릭' 구분
+                                        const blurredByClick = blurByClickRef.current;
+
+                                        // 1) 밖 탭해서 포커스 빠진 경우 → 등록 X, 텍스트 유지
+                                        if (blurredByClick) {
+                                          return;
+                                        }
+
+                                        // 2) 키보드 위 '완료' 버튼으로 포커스 빠진 경우 → 등록 O
+                                        if (currentPostId === post.id && newComment.trim()) {
+                                          handleAddComment(post.id);
+                                        }
+                                      }}
+                                      onKeyDown={(e) => {
+                                        // 한글 조합 중 Enter는 무시
+                                        const nativeEvent = e.nativeEvent as KeyboardEvent & {
+                                          isComposing?: boolean;
+                                        };
+                                        if (nativeEvent.isComposing) return;
+
+                                        // 키보드의 '전송' / Enter 눌렀을 때
+                                        if (e.key === "Enter" && !e.shiftKey) {
+                                          e.preventDefault();
+                                          if (currentPostId === post.id && newComment.trim()) {
+                                            handleAddComment(post.id);
+                                          }
+                                        }
+                                      }}
+                                    />
+                                  </motion.form>
+
+
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* 건강 기록 모달 */}
+      {/* 삭제 모달 */}
       <AnimatePresence>
-        {showHealthModal && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center">
+        {showDeleteModal && (
+          <>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0 bg-black/30"
-              onClick={() => setShowHealthModal(false)}
+              className="fixed inset-0 bg-black/50 z-50"
+              onClick={handleCancelDelete}
             />
             <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{
-                type: "spring",
-                damping: 30,
-                stiffness: 300,
-              }}
-              className="relative w-full max-w-[500px] bg-white rounded-t-2xl p-6 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] bg-white rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50 overflow-hidden"
             >
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <h3 className="text-[17px] font-bold text-[#202020]">
-                    오늘 운동 기록
-                  </h3>
-                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
-                    <button
-                      onClick={() =>
-                        handleHealthRecordSelect("👟 8,542보")
-                      }
-                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
-                    >
-                      <span className="text-[15px] font-medium">
-                        👟 걸음수
-                      </span>
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleHealthRecordSelect("🔥 450kcal")
-                      }
-                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
-                    >
-                      <span className="text-[15px] font-medium">
-                        🔥 소모칼로리
-                      </span>
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleHealthRecordSelect("🪜 12층")
-                      }
-                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
-                    >
-                      <span className="text-[15px] font-medium">
-                        🪜 오른층수
-                      </span>
-                    </button>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-[17px] font-bold text-[#202020]">
-                    오늘 감정 기록
-                  </h3>
-                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1">
-                    {[
-                      "😄",
-                      "😊",
-                      "🙂",
-                      "😐",
-                      "🙁",
-                      "🥲",
-                      "😭",
-                      "😤",
-                    ].map((emoji, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() =>
-                          handleHealthRecordSelect(`${emoji}`)
-                        }
-                        className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-[17px] font-bold text-[#202020]">
-                    진행중인 챌린지
-                  </h3>
-                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
-                    {[
-                      "다시 15만보 걷기",
-                      "주 1회 함께 걷기",
-                      "건강한 습관 만들기",
-                      "가족 건강 상위 10%",
-                    ].map((challenge, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() =>
-                          handleHealthRecordSelect(`${challenge}`)
-                        }
-                        className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
-                      >
-                        {challenge}
-                      </button>
-                    ))}
-                  </div>
+              <div className="px-[32px] pt-[22px] pb-[26px] ">
+                <h3 className="text-[19px] font-semibold mb-1 text-[#202020]">
+                  알림을 삭제하시겠습니까?
+                </h3>
+                <p className="text-sm text-[#777777] mb-3 font-normal">
+                  삭제한 알림은 복구할 수 없습니다.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCancelDelete}
+                    className="flex-1 px-4 py-3 bg-[#e8e8e8] text-[17px] text-[#555] rounded-[12px] transition-colors font-medium"
+                  >
+                    취소
+                  </button>
+                  <button
+                    onClick={handleConfirmDelete}
+                    className="flex-1 px-4 py-3 bg-[#2ECACA] text-[17px] text-white rounded-[12px] transition-colors font-medium"
+                  >
+                    삭제
+                  </button>
                 </div>
               </div>
             </motion.div>
-          </div>
+          </>
         )}
       </AnimatePresence>
 
-      {/* 이미지 선택 안 했을 때 경고 */}
-      <AlertDialog open={showNoImageAlert}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>이미지 선택 필요</AlertDialogTitle>
-            <AlertDialogDescription>
-              사진을 선택하거나 촬영한 후 업로드할 수 있습니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => setShowNoImageAlert(false)}
-            >
-              닫기
-            </AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* AI 추천 캡션 바 */}
+      {/* 이미지 확대 라이트박스 */}
       <AnimatePresence>
-        {selectedImage &&
-          isDetailEditMode &&
-          showTextInput &&
-          isTextInputFocused && <AICaptionToolbar />}
+        {expandedPostId && expandedPost && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={handleCloseLightbox}
+          >
+            <motion.div
+              layoutId={`post-${expandedPostId}`}
+              className="relative w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ImageWithFallback
+                src={expandedPost.image}
+                alt={expandedPost.caption}
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
-      {/* 세부조정 종료 확인 */}
-      <AlertDialog open={showLeaveDetailAlert}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              세부조정을 종료할까요?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              입력한 내용은 그대로 유지되지만 세부조정 화면을
-              닫습니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => setShowLeaveDetailAlert(false)}
-            >
-              취소
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setShowLeaveDetailAlert(false);
-                handleCloseDetailEdit();
-              }}
-            >
-              종료
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* 하단 GNB – 키보드 올라올 때는 숨김 */}
+      {!isGridView && !isReactionView && !isKeyboardVisible && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[500px] mx-auto bg-white">
+          <div className="relative px-4 pt-2 pb-4 shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] h-[80px]">
+            <div className="flex items-center justify-around">
+              <button
+                onClick={() => setIsGridView(true)}
+                className="flex flex-col items-center gap-1 text-[#aeaeae]"
+              >
 
-      {/* 업로드 작성 취소 확인 */}
-      <AlertDialog open={showLeaveUploadAlert}>
-        <AlertDialogContent className="max-w-[340px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              작성을 취소할까요?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              지금까지 작성한 내용이 모두 사라집니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => setShowLeaveUploadAlert(false)}
+                <img src={LayoutGrid} alt="모아보기" className="w-6 h-6" />
+                <span className="text-[12px] font-normal">
+                  모아보기
+                </span>
+              </button>
+              <div className="w-16" />
+              <button
+                className="flex flex-col items-center gap-1 text-[#aeaeae]"
+                onClick={() => onPageChange?.("calendar")}
+              >
+                <img src={Calendar} alt="캘린더" className="w-6 h-6" />
+                <span className="text-[12px] font-normal">캘린더</span>
+              </button>
+            </div>
+            <button
+              className="absolute left-1/2 -translate-x-1/2 -top-[16px] w-14 h-14 bg-[#36D2C5] rounded-full flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:bg-[#00C2B3] transition-colors"
+              onClick={onUploadClick}
             >
-              계속 작성
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setShowLeaveUploadAlert(false);
-                setSelectedImage(null);
-                setTextInput("");
-                setLocationInput("");
-                setWeatherInput("");
-                setTimeInput("");
-                setHealthInput("");
-                setIsUploadMode(false);
-                setIsDetailEditMode(false);
-                setShowTextInput(false);
-                onBack();
-              }}
-            >
-              취소하고 나가기
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+              <Plus size={28} className="text-white" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 이모지 떠오르는 애니메이션 */}
+      <AnimatePresence>
+        {floatingEmojis.map((item) => (
+          <motion.div
+            key={item.id}
+            initial={{
+              y: 0,
+              x: item.x,
+              opacity: 0,
+              scale: 0.3,
+              rotate: 0,
+            }}
+            animate={{
+              y: -window.innerHeight - 100,
+              x: [
+                item.x,
+                item.x + item.wobble,
+                item.x - item.wobble / 2,
+                item.x + item.wobble / 3,
+                item.x,
+              ],
+              opacity: [0, 1, 1, 0.8, 0],
+              scale: [0.3, 1, 1.05, 1, 0.9],
+              rotate: [0, 10, -10, 5, 0],
+            }}
+            transition={{
+              duration: 5,
+              delay: item.delay,
+              ease: "easeOut",
+              times: [0, 0.1, 0.5, 0.8, 1],
+            }}
+            className="fixed pointer-events-none z-[100]"
+            style={{
+              fontSize: `${item.size}px`,
+              left: "50%",
+              bottom: 80,
+            }}
+          >
+            {item.emoji}
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
   );
 }
