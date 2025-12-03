@@ -20,6 +20,8 @@ import { Toaster } from "sonner";
 import { hospitalMap } from "./components/hospitalInfo";
 import { COMMUNITY_IMAGES } from "./components/communityImages";
 import TogetherIcon from "./assets/images/TogetherIcon.svg"
+import MapPin from "./assets/images/icon_com_map.svg"
+import WalkIcon from "./assets/images/WalkIcon.svg"
 
 type Page =
   | "home"
@@ -404,7 +406,10 @@ const createInitialPosts = (): Post[] => {
     {
       id: 7,
       image: COMMUNITY_IMAGES.IMG7,
-      badge: "올림픽공원",
+      badge: {
+        text: "올림픽공원",
+        icon: MapPin
+      },
       userAvatar: USERS.seunghee.avatar,
       caption: "가을이 오나보다",
       userName: USERS.seunghee.name,
@@ -439,7 +444,10 @@ const createInitialPosts = (): Post[] => {
     {
       id: 8,
       image: COMMUNITY_IMAGES.IMG8,
-      badge: "📍 타이베이시",
+      badge: {
+        text: "타이베이시",
+        icon: MapPin
+      },
       userAvatar: USERS.wellie.avatar,
       caption: "자전거",
       userName: USERS.wellie.name,
@@ -525,7 +533,10 @@ const createInitialPosts = (): Post[] => {
     {
       id: 11,
       image: COMMUNITY_IMAGES.IMG11,
-      badge: "🏅 9월 누적 15만보 걷기",
+      badge: {
+        text: "9월 누적 15만보 걷기",
+        icon: WalkIcon
+      },
       userAvatar: USERS.wellie.avatar,
       caption: "챌린지 완료",
       userName: USERS.wellie.name,
@@ -564,7 +575,10 @@ const createInitialPosts = (): Post[] => {
     {
       id: 12,
       image: COMMUNITY_IMAGES.IMG12,
-      badge: "🏅 9월 누적 15만보 걷기",
+      badge: {
+        text: "9월 누적 15만보 걷기",
+        icon: WalkIcon
+      },
       userAvatar: USERS.wellie.avatar,
       caption: "오챌완",
       userName: USERS.wellie.name,
@@ -651,7 +665,10 @@ const createInitialPosts = (): Post[] => {
     {
       id: 15,
       image: COMMUNITY_IMAGES.IMG15,
-      badge: "🏅 9월 누적 15만보 걷기",
+      badge: {
+        text: "9월 누적 15만보 걷기",
+        icon: WalkIcon
+      },
       userAvatar: USERS.wellie.avatar,
       caption: "오챌완",
       userName: USERS.wellie.name,
@@ -663,7 +680,10 @@ const createInitialPosts = (): Post[] => {
     {
       id: 16,
       image: COMMUNITY_IMAGES.IMG16,
-      badge: "🏅 9월 누적 15만보 걷기",
+      badge: {
+        text: "9월 누적 15만보 걷기",
+        icon: WalkIcon
+      },
       userAvatar: USERS.seunghee.avatar,
       caption: "오챌완",
       userName: USERS.seunghee.name,

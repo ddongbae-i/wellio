@@ -1164,8 +1164,15 @@ export function CommunityPage({
                               !post.weather &&
                               !post.time &&
                               !post.health && (
-                                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1 text-sm font-medium">
-                                  <span>{post.badge}</span>
+                                <div className="absolute top-5 left-5 bg-white/70 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1 text-[15px] font-medium">
+                                  {post.badge.icon && (
+                                    <img
+                                      src={post.badge.icon}
+                                      alt=""
+                                      className="w-4 h-4 object-contain"
+                                    />
+                                  )}
+                                  <span>{post.badge.text}</span>
                                 </div>
                               )}
 
