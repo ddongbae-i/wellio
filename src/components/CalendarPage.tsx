@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronDown, Target, Trophy } from "lucide-react";
+import { Target, Trophy } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 
 // 💡 Swiper 라이브러리 임포트
@@ -7,6 +7,8 @@ import SwiperCore from "swiper";
 import "swiper/css";
 
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
+import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
 
 interface Post {
   id: number;
@@ -170,10 +172,10 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
     const isChallengeEnd = currentDay.challengeEnd;
 
     const challengeBgClass = `absolute top-0 bottom-0 left-0 right-0 bg-[#e0f8f8] z-0 ${isChallengeStart && !isChallengeEnd
-        ? "rounded-l-full"
-        : isChallengeEnd && !isChallengeStart
-          ? "rounded-r-full"
-          : ""
+      ? "rounded-l-full"
+      : isChallengeEnd && !isChallengeStart
+        ? "rounded-r-full"
+        : ""
       }`;
 
     return (
@@ -232,13 +234,17 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] relative">
         <button onClick={onBack} className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6">
-          <ChevronLeft size={24} className="text-gray-800" />
+          <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>
         <div className="flex items-center gap-1">
           <span className="text-[19px] font-semibold text-gray-800">
             캘린더
           </span>
-          <ChevronDown size={18} className="text-gray-800" />
+          <img
+            src={ChevronDown}
+            alt="뒤로가기"
+            className="w-6 h-6 ml-1"
+          />
         </div>
       </div>
 
