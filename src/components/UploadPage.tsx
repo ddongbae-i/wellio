@@ -564,9 +564,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const getTextBottom = () => 12;
 
   // ✅ AI 캡션 바 컴포넌트 (실제 위치: document.body로 portal)
-  const AICaptionToolbar: React.FC<{ keyboardHeight: number }> = ({
-    keyboardHeight,
-  }) => (
+  const AICaptionToolbar: React.FC = () => (
     <motion.div
       key="ai-caption-toolbar"
       initial={{ y: "100%", opacity: 0 }}
@@ -577,7 +575,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         damping: 24,
         stiffness: 260,
       }}
-      className="fixed left-1/2 -translate-x-1/2 z-[1000] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
+      className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
         bottom: keyboardHeight > 0 ? keyboardHeight : 0,
         paddingBottom: "env(safe-area-inset-bottom)",
@@ -994,8 +992,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       {({ isActive }) => (
                         <button
                           className={`w-16 h-16 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide select-none transition-all duration-200 ${isActive
-                              ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
-                              : "bg-[#EEEEEE] text-gray-400 scale-95"
+                            ? "bg-white text-gray-900 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] scale-100"
+                            : "bg-[#EEEEEE] text-gray-400 scale-95"
                             }`}
                         >
                           {filter.name.toUpperCase()}
