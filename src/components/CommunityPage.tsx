@@ -1141,33 +1141,33 @@ export function CommunityPage({
                           <>
                             <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
                               {post.location && (
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <img src={MapPin} alt="위치" className="w-[22px] h-[22px]" />
-                                  <span className="text-white text-sm">
+                                <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
+                                  <img src={MapPin} alt="위치" className="w-[18px] h-[18px]" />
+                                  <span className="text-[#555555] text-[15px]">
                                     {post.location}
                                   </span>
                                 </div>
                               )}
                               {post.weather && (
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <img src={Cloud} alt="날씨" className="w-[22px] h-[22px]" />
-                                  <span className="text-white text-sm">
+                                <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
+                                  <img src={Cloud} alt="날씨" className="w-[18px] h-[18px]" />
+                                  <span className="text-[#555555] text-[15px]">
                                     {post.weather}
                                   </span>
                                 </div>
                               )}
                               {post.time && (
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <img src={Clock} alt="시간" className="w-[22px] h-[22px]" />
-                                  <span className="text-white text-sm">
+                                <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
+                                  <img src={Clock} alt="시간" className="w-[18px] h-[18px]" />
+                                  <span className="text-[#555555] text-[15px]">
                                     {post.time}
                                   </span>
                                 </div>
                               )}
                               {post.health && (
-                                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <img src={Data} alt="데이터" className="w-[22px] h-[22px]" />
-                                  <span className="text-white text-sm">
+                                <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
+                                  <img src={Data} alt="데이터" className="w-[18px] h-[18px]" />
+                                  <span className="text-[#555555] text-[15px]">
                                     {post.health}
                                   </span>
                                 </div>
@@ -1451,38 +1451,40 @@ export function CommunityPage({
       </AnimatePresence>
 
       {/* 하단 GNB – 키보드 올라올 때는 숨김 */}
-      {!isGridView && !isReactionView && !isKeyboardVisible && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[500px] mx-auto bg-white">
-          <div className="relative px-4 pt-2 pb-4 shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] h-[80px]">
-            <div className="flex items-center justify-around">
-              <button
-                onClick={() => setIsGridView(true)}
-                className="flex flex-col items-center gap-1 text-[#aeaeae]"
-              >
+      {
+        !isGridView && !isReactionView && !isKeyboardVisible && (
+          <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[500px] mx-auto bg-white">
+            <div className="relative px-4 pt-2 pb-4 shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] h-[80px]">
+              <div className="flex items-center justify-around">
+                <button
+                  onClick={() => setIsGridView(true)}
+                  className="flex flex-col items-center gap-1 text-[#aeaeae]"
+                >
 
-                <img src={LayoutGrid} alt="모아보기" className="w-6 h-6" />
-                <span className="text-[12px] font-normal">
-                  모아보기
-                </span>
-              </button>
-              <div className="w-16" />
+                  <img src={LayoutGrid} alt="모아보기" className="w-6 h-6" />
+                  <span className="text-[12px] font-normal">
+                    모아보기
+                  </span>
+                </button>
+                <div className="w-16" />
+                <button
+                  className="flex flex-col items-center gap-1 text-[#aeaeae]"
+                  onClick={() => onPageChange?.("calendar")}
+                >
+                  <img src={Calendar} alt="캘린더" className="w-6 h-6" />
+                  <span className="text-[12px] font-normal">캘린더</span>
+                </button>
+              </div>
               <button
-                className="flex flex-col items-center gap-1 text-[#aeaeae]"
-                onClick={() => onPageChange?.("calendar")}
+                className="absolute left-1/2 -translate-x-1/2 -top-[16px] w-14 h-14 bg-[#36D2C5] rounded-full flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:bg-[#00C2B3] transition-colors"
+                onClick={onUploadClick}
               >
-                <img src={Calendar} alt="캘린더" className="w-6 h-6" />
-                <span className="text-[12px] font-normal">캘린더</span>
+                <Plus size={28} className="text-white" />
               </button>
             </div>
-            <button
-              className="absolute left-1/2 -translate-x-1/2 -top-[16px] w-14 h-14 bg-[#36D2C5] rounded-full flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:bg-[#00C2B3] transition-colors"
-              onClick={onUploadClick}
-            >
-              <Plus size={28} className="text-white" />
-            </button>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* 이모지 떠오르는 애니메이션 */}
       <AnimatePresence>
@@ -1526,6 +1528,6 @@ export function CommunityPage({
           </motion.div>
         ))}
       </AnimatePresence>
-    </div>
+    </div >
   );
 }
