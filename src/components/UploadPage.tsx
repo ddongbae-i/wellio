@@ -577,7 +577,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        bottom: keyboardHeight > 0 ? keyboardHeight : 0,
+        bottom: 0, // ⬅️ 키보드 높이 안 쓰고 항상 화면 하단
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
@@ -701,7 +701,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 <img
                                   src={MapPin}
                                   alt="위치"
-                                  className="w-[22px] h-[22px]"
+                                  className="w-[18px] h-[18px]"
                                 />
                                 <span className="text-[#555555] text-[15px]">
                                   {locationInput}
@@ -709,7 +709,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 <button
                                   type="button"
                                   onClick={() => setLocationInput("")}
-                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full bg-white/20"
+                                  className="ml-1 flex items-center justify-center w-4 h-4 rounded-full "
                                 >
                                   <img
                                     src={X}
@@ -1168,8 +1168,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
               isDetailEditMode &&
               showTextInput &&
               isTextInputFocused &&
-              keyboardHeight > 0 && (
-                <AICaptionToolbar keyboardHeight={keyboardHeight} />
+              keyboardHeight > 0 && ( // ⬅️ 이 조건은 그대로 두고
+                <AICaptionToolbar />  // ⬅️ props 제거
               )}
           </AnimatePresence>,
           document.body,
