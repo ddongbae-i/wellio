@@ -137,6 +137,10 @@ const ORIGINAL_FILTERS = [
   },
 ];
 
+const [healthInput, setHealthInput] = useState("");
+const [healthIcon, setHealthIcon] = useState<string | null>(null);
+
+
 interface UploadPageProps {
   onBack: () => void;
   onUpload: (post: {
@@ -621,8 +625,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     );
   };
   const handleHealthInput = () => setShowHealthModal(true);
-  const handleHealthRecordSelect = (record: string) => {
+  const handleHealthRecordSelect = (record: string, icon?: string | null) => {
     setHealthInput(record);
+    setHealthIcon(icon ?? null);
     setShowHealthModal(false);
   };
   const handleFilter = () => {
@@ -729,6 +734,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           setIsDetailEditMode(false);
           setShowTextInput(false);
           onBack();
+          setHealthIcon(null);
         }}
         title="작성을 취소할까요?"
         description="지금까지 작성한 내용이 모두 사라집니다."
@@ -863,12 +869,22 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
                             {healthInput && (
                               <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
+                                {healthIcon && (
+                                  <img
+                                    src={healthIcon}
+                                    alt=""
+                                    className="w-[18px] h-[18px]"
+                                  />
+                                )}
                                 <span className="text-[#555555] text-[15px]">
                                   {healthInput}
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() => setHealthInput("")}
+                                  onClick={() => {
+                                    setHealthInput("");
+                                    setHealthIcon(null);
+                                  }}
                                   className="ml-1 flex items-center justify-center w-4 h-4"
                                 >
                                   <img
@@ -879,6 +895,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                                 </button>
                               </div>
                             )}
+
                           </div>
                         )}
 
@@ -1356,7 +1373,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     ].map((item, idx) => (
                       <button
                         key={idx}
-                        onClick={() => handleHealthRecordSelect(item.text)}
+                        onClick={() => handleHealthRecordSelect(item.text, item.icon)}
                         className="px-4 py-2 flex items-center gap-2 bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
                       >
                         <img

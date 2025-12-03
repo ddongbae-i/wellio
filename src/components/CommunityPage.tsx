@@ -23,7 +23,6 @@ import SearchColor from "../assets/images/icon_search_color.svg"
 import MapPin from "../assets/images/icon_com_map.svg"
 import Cloud from "../assets/images/icon_com_sun.svg"
 import Clock from "../assets/images/icon_com_time.svg"
-import Type from "../assets/images/icon_com_text.svg"
 import Data from "../assets/images/icon_com_data.svg"
 import X from "../assets/images/icon_com_x.svg"
 
