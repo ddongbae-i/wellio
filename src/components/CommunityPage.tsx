@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Heart
   Plus,
   Smile,
   Trash2,
@@ -23,7 +24,7 @@ import MapPin from "../assets/images/icon_com_map.svg"
 import Cloud from "../assets/images/icon_com_sun.svg"
 import Clock from "../assets/images/icon_com_time.svg"
 import Type from "../assets/images/icon_com_text.svg"
-import Heart from "../assets/images/icon_com_data.svg"
+import Data from "../assets/images/icon_com_data.svg"
 import X from "../assets/images/icon_com_x.svg"
 
 interface CommunityPageProps {
@@ -1165,7 +1166,7 @@ export function CommunityPage({
                               )}
                               {post.health && (
                                 <div className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
-                                  <img src={Heart} alt="데이터" className="w-[22px] h-[22px]" />
+                                  <img src={Data} alt="데이터" className="w-[22px] h-[22px]" />
                                   <span className="text-white text-sm">
                                     {post.health}
                                   </span>

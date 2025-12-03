@@ -174,7 +174,7 @@ export function ReviewWritePage({
         </div>
 
         {/* 별점 선택 영역 */}
-        <div className="bg-white px-5 pt-[22px] pb:[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] text-center">
+        <div className="bg-white px-5 pt-[22px] pb-[26px] mb-3 rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] text-center">
           <h3 className="text-[#202020] mb-3 text-[17px] font-medium">
             별점을 선택해 주세요.
           </h3>
@@ -190,8 +190,8 @@ export function ReviewWritePage({
                 <Star
                   size={35}
                   className={`${star <= (hoveredRating || rating)
-                      ? "fill-[#FFB800] text-[#FFB800]"
-                      : "fill-[#e8e8e8] text-[#e8e8e8]"
+                    ? "fill-[#FFB800] text-[#FFB800]"
+                    : "fill-[#e8e8e8] text-[#e8e8e8]"
                     } transition-colors`}
                 />
               </button>
@@ -213,8 +213,8 @@ export function ReviewWritePage({
                 key={keyword}
                 onClick={() => handleKeywordClick(keyword)}
                 className={`px-3 py-2 rounded-[8px] text-sm transition-all ${selectedKeywords.includes(keyword)
-                    ? "bg-[#E2F7F7] text-[#2b2b2b] border border-[#BCEEEE]"
-                    : "bg-white text-[#777777] border border-[#e8e8e8] hover:border-[#E2F7F7]"
+                  ? "bg-[#E2F7F7] text-[#2b2b2b] border border-[#BCEEEE]"
+                  : "bg-white text-[#777777] border border-[#e8e8e8] hover:border-[#E2F7F7]"
                   }`}
               >
                 {keyword}
@@ -248,17 +248,19 @@ export function ReviewWritePage({
       </div>
 
       {/* 하단 고정 버튼 (flex 레이아웃으로 화면 하단 고정) */}
-      <div className="p-5 pb-[46px] bg-white shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px]">
-        <button
-          onClick={handleSubmit}
-          disabled={!isFormValid}
-          className={`h-[60px] w-full rounded-xl text-white transition-all ${isFormValid
-              ? "bg-[#2ECACA] hover:bg-[#239C9C] cursor-pointer"
-              : "bg-[#f0f0f0] cursor-not-allowed text-[#aeaeae]"
-            }`}
-        >
-          {isEditMode ? "수정 완료" : "작성 완료"}
-        </button>
+      <div className="fixed inset-x-0 bottom-0 z-40 bg-transparent">
+        <div className="mx-auto max-w-[500px] px-5 pb-[46px] pt-3 bg-white shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px]">
+          <button
+            onClick={handleSubmit}
+            disabled={!isFormValid}
+            className={`h-[60px] w-full rounded-xl text-white transition-all ${isFormValid
+                ? "bg-[#2ECACA] hover:bg-[#239C9C] cursor-pointer"
+                : "bg-[#f0f0f0] cursor-not-allowed text-[#aeaeae]"
+              }`}
+          >
+            {isEditMode ? "수정 완료" : "작성 완료"}
+          </button>
+        </div>
       </div>
     </motion.div>
   );
