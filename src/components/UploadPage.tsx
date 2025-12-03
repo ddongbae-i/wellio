@@ -593,7 +593,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        bottom: 24,
+        bottom: 40,
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
@@ -713,7 +713,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                         healthInput) && (
                           <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
                             {locationInput && (
-                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
                                 <img
                                   src={MapPin}
                                   alt="위치"
@@ -737,7 +737,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             )}
 
                             {weatherInput && (
-                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
                                 <img
                                   src={Cloud}
                                   alt="날씨"
@@ -761,7 +761,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             )}
 
                             {timeInput && (
-                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
                                 <img
                                   src={Clock}
                                   alt="시간"
@@ -785,7 +785,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             )}
 
                             {healthInput && (
-                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-4 py-1 rounded-full">
+                              <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
                                 <img
                                   src={Heart}
                                   alt="데이터"
