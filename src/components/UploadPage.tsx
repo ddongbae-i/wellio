@@ -137,8 +137,7 @@ const ORIGINAL_FILTERS = [
   },
 ];
 
-const [healthInput, setHealthInput] = useState("");
-const [healthIcon, setHealthIcon] = useState<string | null>(null);
+
 
 
 interface UploadPageProps {
@@ -177,6 +176,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   );
   const [isDetailEditMode, setIsDetailEditMode] = useState(false);
 
+
   // 세부 입력 state
   const [textInput, setTextInput] = useState("");
   const [locationInput, setLocationInput] = useState("");
@@ -184,6 +184,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const [timeInput, setTimeInput] = useState("");
   const [healthInput, setHealthInput] = useState("");
   const [showTextInput, setShowTextInput] = useState(false);
+  const [healthIcon, setHealthIcon] = useState<string | null>(null);
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [showNoImageAlert, setShowNoImageAlert] = useState(false);
   const textInputRef = useRef<HTMLInputElement>(null);
