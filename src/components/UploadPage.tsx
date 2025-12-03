@@ -74,28 +74,29 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           transition={{ duration: 0.2 }}
           className="relative w-full max-w-[340px] bg-white rounded-[16px] p-6 shadow-lg"
         >
-          <h2 className="text-[19px] font-semibold text-[#202020] mb-2">
+          <h2 className="text-[19px] font-semibold mb-1 text-[#202020]">
             {title}
           </h2>
-          <p className="text-[15px] text-[#555555] mb-6 leading-relaxed">
+          <p className="text-[15px] text-[#555555] mb-3 leading-[1.4]">
             {description}
           </p>
 
           <div className="flex gap-2">
-            <button
-              onClick={onClose}
-              className="flex-1 h-12 rounded-[12px] border border-[#e8e8e8] bg-white text-[#555555] text-[15px] font-medium hover:bg-gray-50 transition-colors"
-            >
-              {cancelText}
-            </button>
             {onConfirm && (
               <button
                 onClick={onConfirm}
-                className="flex-1 h-12 rounded-[12px] bg-[#2ECACA] text-white text-[15px] font-medium hover:bg-[#00C2B3] transition-colors"
+                className="              
+                flex-1 px-4 py-3 bg-[#e8e8e8] text-[17px] text-[#555] rounded-[12px] transition-colors font-medium"
               >
                 {confirmText}
               </button>
             )}
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-3 bg-[#2ECACA] text-[17px] text-white rounded-[12px] transition-colors font-medium"
+            >
+              {cancelText}
+            </button>
           </div>
         </motion.div>
       </div>
@@ -714,10 +715,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           setShowLeaveDetailAlert(false);
           handleCloseDetailEdit();
         }}
-        title="세부조정을 종료할까요?"
-        description="입력한 내용은 그대로 유지되지만 세부조정 화면을 닫습니다."
-        cancelText="취소"
-        confirmText="종료"
+        title="꾸미기를 그만두시겠습니까?"
+        description="지금까지 꾸민내용 모두 사라집니다."
+        cancelText="계속하기"
+        confirmText="그만하기"
       />
 
       <CustomAlert
@@ -740,7 +741,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         title="작성을 취소할까요?"
         description="지금까지 작성한 내용이 모두 사라집니다."
         cancelText="계속 작성"
-        confirmText="취소하고 나가기"
+        confirmText="취소"
       />
 
       {/* 메인 래퍼 */}

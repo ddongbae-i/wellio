@@ -597,7 +597,7 @@ export function CommunityPage({
               />
             </button>
             <div
-              className={`bg-white rounded-[12px] px-4 py-2 h-10 flex items-center gap-2 transition-all border-[1.6px] flex-1 ${isSearchFocused
+              className={`bg-white rounded-[12px] px-5 xs:px-6 spy-2 h-10 flex items-center gap-2 transition-all border-[1.6px] flex-1 ${isSearchFocused
                 ? "border-[#2ECACA]"
                 : "border-[#2ECACA]"
                 }`}
