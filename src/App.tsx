@@ -1602,21 +1602,14 @@ export default function App() {
 
         {currentPage === "community" && (
           <CommunityPage
-            onBack={navigateBack}
-            onUploadClick={() => navigateTo("upload")}
-            onNotificationClick={() => {
-              setPreviousPage("community");
-              navigateTo("notifications");
-            }}
-            onDeletePost={handleDeletePost}
-            initialPostId={selectedPostId || undefined}
+            // ⬇⬇⬇ 여기! 첫 피드의 ChevronLeft = 홈으로
+            onBack={() => setCurrentPage("home")}
+            onUploadClick={() => setCurrentPage("upload")}
+            onNotificationClick={() => setCurrentPage("notification")}
             posts={posts}
-            currentUserName={userName}
-            currentUserAvatar={userAvatar}
-            currentPage="community"
+            currentUserId={"kim-welly"} // 예시
             onPageChange={(page) => {
-              setSelectedPostId(null);
-              navigateTo(page as Page);
+              if (page === "calendar") setCurrentPage("calendar");
             }}
           />
         )}

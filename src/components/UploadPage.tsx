@@ -904,7 +904,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
               </button>
               <button
                 onClick={() => setIsFilterMode(false)}
-                className="absolute right-4 px-4 py-2 text-[#36D2C5] font-semibold"
+                className="absolute right-5 xs:right-6 sm:right-8 px-4 py-2 text-[#555555] font-medium text-[17px]"
               >
                 완료
               </button>
@@ -929,7 +929,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   textInputRef.current?.blur();
                   setIsDetailEditMode(false);
                 }}
-                className="absolute right-4 px-4 py-2 text-[#36D2C5] font-semibold"
+                className="absolute right-5 xs:right-6 sm:right-8 px-4 py-2 text-[#555555] font-medium text-[17px]"
               >
                 완료
               </button>
@@ -953,12 +953,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             </button>
           )}
 
-          <h1 className="text-xl font-bold text-[#1A1A1A] text-center">
-            {isFilterMode
-              ? "필터"
-              : isDetailEditMode
-                ? "세부조정"
-                : "업로드"}
+          <h1 className="text-xl font-bold text-[#202020] text-center">
+            업로드
           </h1>
         </header>
 
@@ -1180,7 +1176,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 damping: 30,
                 stiffness: 300,
               }}
-              className="relative w-full max-w-[500px] bg-white rounded-t-2xl p-6 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+              className="relative w-full max-w-[500px] bg-white rounded-t-[16px] p-6 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
             >
               <div className="space-y-6">
                 <div className="space-y-3">
