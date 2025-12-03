@@ -140,22 +140,22 @@ export function ReviewWritePage({
   const isEditMode = !!editingReview;
 
   // textarea가 전체 보이도록 스크롤
-  const scrollTextareaIntoView = () => {
-    const container = contentRef.current;
-    const textarea = textareaRef.current;
-    if (!container || !textarea) return;
+  // const scrollTextareaIntoView = () => {
+  //   const container = contentRef.current;
+  //   const textarea = textareaRef.current;
+  //   if (!container || !textarea) return;
 
-    const containerRect = container.getBoundingClientRect();
-    const textareaRect = textarea.getBoundingClientRect();
+  //   const containerRect = container.getBoundingClientRect();
+  //   const textareaRect = textarea.getBoundingClientRect();
 
-    const diff = textareaRect.bottom - containerRect.bottom;
-    if (diff > 0) {
-      container.scrollBy({
-        top: diff + 24,
-        behavior: "smooth",
-      });
-    }
-  };
+  //   const diff = textareaRect.bottom - containerRect.bottom;
+  //   if (diff > 0) {
+  //     container.scrollBy({
+  //       top: diff + 24,
+  //       behavior: "smooth",
+  //     });
+  //   }
+  // };
 
   return (
     <motion.div
