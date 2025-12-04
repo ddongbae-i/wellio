@@ -3,6 +3,9 @@
 import { ChevronLeft } from "lucide-react";
 import { HospitalCard } from "./HospitalCard";
 import { motion } from "motion/react";
+import { CustomToast } from "./CustomToast";
+import { useState } from "react";
+
 
 interface FavoriteHospitalsPageProps {
   onBack: () => void;
@@ -17,20 +20,17 @@ export function FavoriteHospitalsPage({
   onToggleFavorite,
   getHospitalReviewCount,
 }: FavoriteHospitalsPageProps) {
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08
-      }
-    }
+  const [showToast, setShowToast] = useState(false);
+
+  const handleToggleFavorite = (hospital: any) => {
+    setShowToast(true);
+    onToggleFavorite(hospital);
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         duration: 0.4,
@@ -55,14 +55,14 @@ export function FavoriteHospitalsPage({
       </header>
 
       {/* Content */}
-      <motion.div 
+      <motion.div
         className="px-4 xs:px-6 sm:px-8 pt-5 pb-20 space-y-3"
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
       >
         {favoriteHospitals.length === 0 ? (
-          <motion.div 
+          <motion.div
             className="flex flex-col items-center justify-center py-20 text-center"
             variants={itemVariants}
           >
@@ -88,7 +88,7 @@ export function FavoriteHospitalsPage({
                   reviewCount={
                     getHospitalReviewCount
                       ? getHospitalReviewCount(hospital.id)
-                    : 0
+                      : 0
                   }
                 />
               </motion.div>

@@ -1,8 +1,9 @@
 // src/components/HospitalCard.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Heart, Star } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { toast } from "sonner";
+import { CustomToast } from "./CustomToast";
 
 // 오늘 상태 타입
 export type TodayStatus = "open" | "closed" | "break";
@@ -41,6 +42,9 @@ export function HospitalCard({
   isInFavoritePage,
   reviewCount,
 }: HospitalCardProps) {
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
   const isHospitalFavorite =
     isFavorite !== undefined
       ? isFavorite
@@ -52,15 +56,15 @@ export function HospitalCard({
   const statusConfig = {
     open: {
       label: "오늘 진료",
-      className: "text-[#3685DB]", // 활성 파란색
+      className: "text-[#3685DB]",
     },
     closed: {
       label: "오늘 휴무",
-      className: "text-[#AEAEAE]", // 비활성 회색
+      className: "text-[#AEAEAE]",
     },
     break: {
       label: "휴게 시간",
-      className: "text-[#AEAEAE]", // 비활성 회색
+      className: "text-[#AEAEAE]",
     },
   } as const;
 
@@ -69,180 +73,179 @@ export function HospitalCard({
 
   const todayStatusStyle = statusConfig[hospital.todayStatus];
 
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    // 커스텀 토스트 메시지 설정
+    if (isHospitalFavorite) {
+      setToastMessage("찜 목록에서 삭제되었습니다");
+    } else {
+      setToastMessage("찜 목록에 추가되었습니다");
+    }
+
+    setShowToast(true);
+    onToggleFavorite?.(hospital);
+  };
+
   return (
-    <div
-      onClick={() => {
-        if (hospital.name === "매일건강의원") {
-          onClick?.();
-        } else {
-          toast.info("준비 중입니다.");
-        }
-      }}
-      className={hospitalCardClasses.wrapper}
-    >
-      {/* 상단: 썸네일 + 텍스트 */}
-      <div className={hospitalCardClasses.topRow}>
-        {/* 썸네일 이미지 */}
-        <div className={hospitalCardClasses.thumbnailWrapper}>
-          <ImageWithFallback
-            src={hospital.imageUrl}
-            alt={hospital.name}
-            className={hospitalCardClasses.thumbnailImage}
-          />
-        </div>
-
-        {/* 병원 정보 */}
-        <div className={hospitalCardClasses.infoWrapper}>
-          <div className={hospitalCardClasses.infoHeaderRow}>
-            <div className="flex flex-col min-w-0">
-              <h3 className={hospitalCardClasses.title}>
-                {hospital.name}
-              </h3>
-              <p className={hospitalCardClasses.specialty}>
-                {hospital.specialtyText}
-              </p>
-            </div>
-
-            {/* 찜하기 버튼 */}
-            <button
-              className={`${hospitalCardClasses.favoriteButtonBase} ${isHospitalFavorite
-                ? "text-[#FF0000]"
-                : "text-[#AEAEAE] hover:text-[#FF6666]"
-                }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (isHospitalFavorite) {
-                  toast.success("즐겨찾기에서 제거되었습니다.");
-                } else {
-                  toast.success("즐겨찾기에 추가되었습니다.");
-                }
-                onToggleFavorite?.(hospital);
-              }}
-            >
-              <Heart
-                size={22}
-                className={isHospitalFavorite ? "fill-[#FF0000]" : ""}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 하단: 진료시간, 위치, 뱃지 */}
-      <div className={hospitalCardClasses.bottomWrapper}>
-        {/* 오늘 상태 + 영업 시간 */}
-        <div className={hospitalCardClasses.statusRow}>
-          <span
-            className={`font-medium mr-2 ${todayStatusStyle.className}`}
-          >
-            {todayStatusStyle.label}
-          </span>
-          <span
-            className={
-              "font-normal " +
-              (isClosed ? "text-[#777777]" : "text-[#555555]")
-            }
-          >
-            {hospital.hours}
-          </span>
-        </div>
-
-        {/* 거리 + 주소 */}
-        <p className={hospitalCardClasses.addressRow}>
-          {hospital.distance}{" "}
-          <span className="text-[#777777] mx-1 font-medium">|</span>{" "}
-          <span className="font-normal">{hospital.address}</span>
-        </p>
-
-        {/* 뱃지 + 별점 */}
-        <div className={hospitalCardClasses.badgeRow}>
-          {hospital.todayStatus === "open" ? (
-            <span className={hospitalCardClasses.badgeImmediate}>
-              즉시 접수 가능
-            </span>
-          ) : (
-            <span className={hospitalCardClasses.badgeReserve}>
-              예약 가능
-            </span>
-          )}
-
-          <div className={hospitalCardClasses.ratingRow}>
-            <Star
-              size={16}
-              className="fill-[#FFB800] text-[#FFB800]"
+    <>
+      <div
+        onClick={() => {
+          if (hospital.name === "매일건강의원") {
+            onClick?.();
+          } else {
+            toast.info("준비 중입니다.");
+          }
+        }}
+        className={hospitalCardClasses.wrapper}
+      >
+        {/* 상단: 썸네일 + 텍스트 */}
+        <div className={hospitalCardClasses.topRow}>
+          {/* 썸네일 이미지 */}
+          <div className={hospitalCardClasses.thumbnailWrapper}>
+            <ImageWithFallback
+              src={hospital.imageUrl}
+              alt={hospital.name}
+              className={hospitalCardClasses.thumbnailImage}
             />
-            <span className="text-[#555555] font-normal">
-              {hospital.rating}
+          </div>
+
+          {/* 병원 정보 */}
+          <div className={hospitalCardClasses.infoWrapper}>
+            <div className={hospitalCardClasses.infoHeaderRow}>
+              <div className="flex flex-col min-w-0">
+                <h3 className={hospitalCardClasses.title}>
+                  {hospital.name}
+                </h3>
+                <p className={hospitalCardClasses.specialty}>
+                  {hospital.specialtyText}
+                </p>
+              </div>
+
+              {/* 찜하기 버튼 */}
+              <button
+                className={`${hospitalCardClasses.favoriteButtonBase} ${isHospitalFavorite
+                    ? "text-[#FF0000]"
+                    : "text-[#AEAEAE] hover:text-[#FF6666]"
+                  }`}
+                onClick={handleFavoriteClick}
+              >
+                <Heart
+                  size={22}
+                  className={isHospitalFavorite ? "fill-[#FF0000]" : ""}
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 하단: 진료시간, 위치, 뱃지 */}
+        <div className={hospitalCardClasses.bottomWrapper}>
+          {/* 오늘 상태 + 영업 시간 */}
+          <div className={hospitalCardClasses.statusRow}>
+            <span
+              className={`font-medium mr-2 ${todayStatusStyle.className}`}
+            >
+              {todayStatusStyle.label}
             </span>
-            <span className="text-[#555555] font-normal">
-              ({displayReviewCount})
+            <span
+              className={
+                "font-normal " +
+                (isClosed ? "text-[#777777]" : "text-[#555555]")
+              }
+            >
+              {hospital.hours}
             </span>
+          </div>
+
+          {/* 거리 + 주소 */}
+          <p className={hospitalCardClasses.addressRow}>
+            {hospital.distance}{" "}
+            <span className="text-[#777777] mx-1 font-medium">|</span>{" "}
+            <span className="font-normal">{hospital.address}</span>
+          </p>
+
+          {/* 뱃지 + 별점 */}
+          <div className={hospitalCardClasses.badgeRow}>
+            {hospital.todayStatus === "open" ? (
+              <span className={hospitalCardClasses.badgeImmediate}>
+                즉시 접수 가능
+              </span>
+            ) : (
+              <span className={hospitalCardClasses.badgeReserve}>
+                예약 가능
+              </span>
+            )}
+
+            <div className={hospitalCardClasses.ratingRow}>
+              <Star
+                size={16}
+                className="fill-[#FFB800] text-[#FFB800]"
+              />
+              <span className="text-[#555555] font-normal">
+                {hospital.rating}
+              </span>
+              <span className="text-[#555555] font-normal">
+                ({displayReviewCount})
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* 커스텀 토스트 */}
+      <CustomToast
+        show={showToast}
+        message={toastMessage}
+        onClose={() => setShowToast(false)}
+      />
+    </>
   );
 }
 
 /**
  * HospitalCard 각 영역에 쓰이는 className 정리
- * → 다른 페이지에서 그대로 참고해서 동일 스타일 유지 가능
  */
 export const hospitalCardClasses = {
-  // 카드 전체
   wrapper:
     "flex flex-col bg-white pt-[22px] pb-[26px] px-5 rounded-[16px] mb-3 " +
     "shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] cursor-pointer " +
     "hover:shadow-[0_4px_6px_0_rgba(201,208,216,0.25)] transition-shadow",
 
-  // 상단 영역: 썸네일 + 텍스트
   topRow: "flex gap-4 items-start",
 
-  // 썸네일 컨테이너
   thumbnailWrapper:
     "w-12 h-12 rounded-[8px] overflow-hidden flex-shrink-0 border border-[#f0f0f0]",
 
-  // 썸네일 이미지
   thumbnailImage: "w-full h-full object-cover",
 
-  // 텍스트 영역 전체
   infoWrapper: "flex-1 min-w-0",
 
-  // 제목 + 찜 버튼 가로 정렬
   infoHeaderRow: "flex justify-between items-start",
 
-  // 병원명
   title:
     "text-[19px] font-semibold text-[#202020] leading-[1.3] " +
     "truncate overflow-hidden text-ellipsis whitespace-nowrap",
 
-  // 진료과/설명
   specialty: "text-sm text-[#777777] mt-0.5 font-normal",
 
-  // 찜 버튼
   favoriteButtonBase: "ml-2 transition-colors",
 
-  // 하단 전체 래퍼
   bottomWrapper: "mt-2",
 
-  // 오늘 상태 + 시간 row
   statusRow:
     "flex items-center text-[15px] leading-[1.3] mb-1",
 
-  // 거리 + 주소 row
   addressRow:
     "text-[15px] text-[#777777] mb-1 truncate font-medium mr-1",
 
-  // 뱃지 + 별점 row
   badgeRow: "flex items-center gap-2 mt-1",
 
-  // '즉시 접수 가능' 뱃지
   badgeImmediate:
     "bg-[#2ECACA] text-white text-[12px] font-medium px-2 py-[4px] rounded-[20px]",
 
   badgeReserve:
     "bg-[#008ADF] text-white text-[12px] font-medium px-2 py-[4px] rounded-[20px] ",
 
-  // 별점 영역
   ratingRow: "flex items-center gap-1 text-[14px]",
 };
