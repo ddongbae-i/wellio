@@ -1206,6 +1206,22 @@ export function CommunityPage({
                           {selectedPostForReaction !== post.id && (
                             <>
                               <div className="absolute top-4 left-4 flex flex-row flex-wrap gap-2 max-w-[calc(100%-2rem)]">
+                                {/* badge를 맨 앞에 추가 */}
+                                {post.badge && (
+                                  <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
+                                    {post.badge.icon && (
+                                      <img
+                                        src={post.badge.icon}
+                                        alt=""
+                                        className="w-[18px] h-[18px] object-contain"
+                                      />
+                                    )}
+                                    <span className="text-[#555555] text-[15px]">
+                                      {post.badge.text}
+                                    </span>
+                                  </div>
+                                )}
+
                                 {post.location && (
                                   <div className="flex items-center gap-2 bg-[#f0f0f0]/70 backdrop-blur-sm px-3 py-1 rounded-full">
                                     <img src={MapPin} alt="위치" className="w-[18px] h-[18px]" />
