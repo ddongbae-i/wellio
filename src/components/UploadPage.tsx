@@ -658,11 +658,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
-      <div className="pl-5 xs:pl-6 sm:pl-8 pt-6 pb-10">
-        <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2">
+      <div className="pt-6 pb-10">
+        <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2 pl-5 xs:pl-6 sm:pl-8">
           AI 추천 캡션
         </p>
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 ml-5 xs:ml-6 sm:ml-8">
           {aiCaptions.map((caption, index) => (
             <button
               key={index}
