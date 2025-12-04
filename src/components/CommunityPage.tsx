@@ -104,7 +104,10 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
       transition={{ type: "spring", damping: 24, stiffness: 260 }}
       className="fixed left-1/2 -translate-x-1/2 z-[60] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        bottom: isKeyboardVisible ? keyboardOffset : 0, // 키보드 올라오면 살짝 위로
+        bottom: 0,
+        transform: isKeyboardVisible
+          ? `translateY(-${keyboardOffset}px)`
+          : "translateY(0)",
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
@@ -584,29 +587,17 @@ export function CommunityPage({
     const handleResize = () => {
       if (!viewport) return;
 
-      const inner = window.innerHeight;
-      const vpHeight = viewport.height;
+      // 화면에서 실제로 가려진 영역(대부분 키보드 높이)
+      const occluded =
+        window.innerHeight - (viewport.height + viewport.offsetTop);
 
-      const isKeyboard = vpHeight < initial * 0.9; // 어느 정도 줄어들면 키보드라고 판단
-      setIsKeyboardVisible(isKeyboard);
+      const occludedHeight = Math.max(0, occluded);
 
-      if (!isKeyboard) {
-        setKeyboardOffset(0);
-        return;
-      }
+      // 어느 정도 이상 가려지면 키보드가 올라온 걸로 본다
+      const keyboardShown = occludedHeight > 40;
 
-      // innerHeight와 visualViewport.height 차이
-      const diff = inner - vpHeight;
-
-      if (Math.abs(diff) < 40) {
-        // 거의 차이가 없으면: 화면 자체가 줄어든 타입 (안드로이드 WebView 등)
-        // -> 이미 레이아웃이 키보드 위까지만 보이므로 따로 올릴 필요 없음
-        setKeyboardOffset(0);
-      } else {
-        // 차이가 크면: 키보드가 화면을 덮는 타입 (iOS 등)
-        const offset = initial - vpHeight;
-        setKeyboardOffset(Math.max(0, Math.min(offset, 260)));
-      }
+      setIsKeyboardVisible(keyboardShown);
+      setKeyboardOffset(occludedHeight);
     };
 
     handleResize();
@@ -622,6 +613,7 @@ export function CommunityPage({
       viewport.removeEventListener("scroll", handleResize);
     };
   }, []);
+
 
   // 처음 화면 높이 (없으면 800 fallback)
   const baseHeight = screenHeight ?? 800;
