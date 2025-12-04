@@ -71,6 +71,7 @@ export function NotificationPage({
       setNotificationToDelete(notificationId);
       setShowDeleteModal(true);
     }
+    // 취소하면 원래 자리로 돌아감 (dragSnapToOrigin으로 처리)
   };
 
   const handleConfirmDelete = () => {
@@ -140,6 +141,7 @@ export function NotificationPage({
         <AnimatePresence mode="popLayout">
           {notifications.map((notification, index) => {
             const { icon } = getIconAndColor(notification.type);
+            const isDeleting = notificationToDelete === notification.id;
 
             return (
               <motion.div
@@ -163,6 +165,14 @@ export function NotificationPage({
                   drag="x"
                   dragConstraints={{ left: -100, right: 0 }}
                   dragElastic={0.1}
+                  dragMomentum={false}
+                  dragSnapToOrigin={!isDeleting}  // ✅ 취소하면 원래 자리로
+                  animate={{ x: isDeleting ? -200 : 0 }}  // ✅ 삭제 중일 때만 왼쪽으로
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30,
+                  }}
                   onDragEnd={(event, info) =>
                     handleDragEnd(event, info, notification.id)
                   }

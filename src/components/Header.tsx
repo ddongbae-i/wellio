@@ -39,7 +39,7 @@ export function Header({
         {showBackButton && (
           <button
             onClick={handleBack}
-            className="absolute left-5 xs:left-6 sm:left-8 p-1 flex items-center justify-center"
+            className="absolute left-5 xs:left-6 sm:left-8 flex items-center justify-center"
           >
             <img
               src={ChevronLeft}

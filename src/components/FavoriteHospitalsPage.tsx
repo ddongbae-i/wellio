@@ -21,7 +21,8 @@ export function FavoriteHospitalsPage({
 }: FavoriteHospitalsPageProps) {
   const [showToast, setShowToast] = useState(false);
 
-  const handleToggleFavorite = (hospital: any) => {
+  const handleToggleFavorite = (hospital: any, wasAdded: boolean) => {
+    // 찜한 병원 페이지에서는 항상 삭제만 가능
     setShowToast(true);
     onToggleFavorite(hospital);
   };
@@ -87,7 +88,7 @@ export function FavoriteHospitalsPage({
                 <HospitalCard
                   hospital={hospital}
                   isFavorite={true}
-                  favoriteHospitals={favoriteHospitals} // 👈 추가!
+                  favoriteHospitals={favoriteHospitals}
                   onToggleFavorite={handleToggleFavorite}
                   isInFavoritePage={true}
                   onClick={() => {
@@ -105,7 +106,7 @@ export function FavoriteHospitalsPage({
         )}
       </motion.div>
 
-      {/* 커스텀 토스트 */}
+      {/* 커스텀 토스트 - 페이지 하단 */}
       <CustomToast
         show={showToast}
         message="찜 목록에서 삭제되었습니다"

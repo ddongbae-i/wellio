@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Heart, Star } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { toast } from "sonner";
-import { CustomToast } from "./CustomToast";
 
 // 오늘 상태 타입
 export type TodayStatus = "open" | "closed" | "break";
@@ -26,10 +25,9 @@ interface HospitalCardProps {
   onClick?: () => void;
   isFavorite?: boolean;
   favoriteHospitals?: Hospital[];
-  onToggleFavorite?: (hospital: Hospital) => void;
+  onToggleFavorite?: (hospital: Hospital, wasAdded: boolean) => void;
   isInFavoritePage?: boolean;
   reviewCount?: number;
-  onNavigateToFavorites?: () => void;
 }
 
 /** 병원 카드 UI 컴포넌트 */
@@ -41,12 +39,7 @@ export function HospitalCard({
   onToggleFavorite,
   isInFavoritePage,
   reviewCount,
-  onNavigateToFavorites,
 }: HospitalCardProps) {
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [showArrow, setShowArrow] = useState(false);
-
   // ✅ 더 안전한 처리: 배열이 아니면 빈 배열로 변환
   const isHospitalFavorite =
     isFavorite !== undefined
@@ -81,142 +74,115 @@ export function HospitalCard({
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    // 커스텀 토스트 메시지 설정
-    if (isHospitalFavorite) {
-      setToastMessage("찜 목록에서 삭제되었습니다");
-      setShowArrow(false);
-    } else {
-      setToastMessage("찜 목록에 추가되었습니다");
-      setShowArrow(true);
-    }
-
-    setShowToast(true);
-    onToggleFavorite?.(hospital);
-  };
-
-  const handleToastClick = () => {
-    if (showArrow && onNavigateToFavorites) {
-      setShowToast(false);
-      onNavigateToFavorites();
-    }
+    // 부모에게 추가/삭제 여부 전달
+    const wasAdded = !isHospitalFavorite;
+    onToggleFavorite?.(hospital, wasAdded);
   };
 
   return (
-    <>
-      <div
-        onClick={() => {
-          if (hospital.name === "매일건강의원") {
-            onClick?.();
-          } else {
-            toast.info("준비 중입니다.");
-          }
-        }}
-        className={hospitalCardClasses.wrapper}
-      >
-        {/* 상단: 썸네일 + 텍스트 */}
-        <div className={hospitalCardClasses.topRow}>
-          {/* 썸네일 이미지 */}
-          <div className={hospitalCardClasses.thumbnailWrapper}>
-            <ImageWithFallback
-              src={hospital.imageUrl}
-              alt={hospital.name}
-              className={hospitalCardClasses.thumbnailImage}
-            />
-          </div>
-
-          {/* 병원 정보 */}
-          <div className={hospitalCardClasses.infoWrapper}>
-            <div className={hospitalCardClasses.infoHeaderRow}>
-              <div className="flex flex-col min-w-0">
-                <h3 className={hospitalCardClasses.title}>
-                  {hospital.name}
-                </h3>
-                <p className={hospitalCardClasses.specialty}>
-                  {hospital.specialtyText}
-                </p>
-              </div>
-
-              {/* 찜하기 버튼 */}
-              <button
-                className={`${hospitalCardClasses.favoriteButtonBase} ${isHospitalFavorite
-                  ? "text-[#FF0000]"
-                  : "text-[#AEAEAE] hover:text-[#FF6666]"
-                  }`}
-                onClick={handleFavoriteClick}
-              >
-                <Heart
-                  size={22}
-                  className={isHospitalFavorite ? "fill-[#FF0000]" : ""}
-                />
-              </button>
-            </div>
-          </div>
+    <div
+      onClick={() => {
+        if (hospital.name === "매일건강의원") {
+          onClick?.();
+        } else {
+          toast.info("준비 중입니다.");
+        }
+      }}
+      className={hospitalCardClasses.wrapper}
+    >
+      {/* 상단: 썸네일 + 텍스트 */}
+      <div className={hospitalCardClasses.topRow}>
+        {/* 썸네일 이미지 */}
+        <div className={hospitalCardClasses.thumbnailWrapper}>
+          <ImageWithFallback
+            src={hospital.imageUrl}
+            alt={hospital.name}
+            className={hospitalCardClasses.thumbnailImage}
+          />
         </div>
 
-        {/* 하단: 진료시간, 위치, 뱃지 */}
-        <div className={hospitalCardClasses.bottomWrapper}>
-          {/* 오늘 상태 + 영업 시간 */}
-          <div className={hospitalCardClasses.statusRow}>
-            <span
-              className={`font-medium mr-2 ${todayStatusStyle.className}`}
+        {/* 병원 정보 */}
+        <div className={hospitalCardClasses.infoWrapper}>
+          <div className={hospitalCardClasses.infoHeaderRow}>
+            <div className="flex flex-col min-w-0">
+              <h3 className={hospitalCardClasses.title}>
+                {hospital.name}
+              </h3>
+              <p className={hospitalCardClasses.specialty}>
+                {hospital.specialtyText}
+              </p>
+            </div>
+
+            {/* 찜하기 버튼 */}
+            <button
+              className={`${hospitalCardClasses.favoriteButtonBase} ${isHospitalFavorite
+                ? "text-[#FF0000]"
+                : "text-[#AEAEAE] hover:text-[#FF6666]"
+                }`}
+              onClick={handleFavoriteClick}
             >
-              {todayStatusStyle.label}
-            </span>
-            <span
-              className={
-                "font-normal " +
-                (isClosed ? "text-[#777777]" : "text-[#555555]")
-              }
-            >
-              {hospital.hours}
-            </span>
-          </div>
-
-          {/* 거리 + 주소 */}
-          <p className={hospitalCardClasses.addressRow}>
-            {hospital.distance}{" "}
-            <span className="text-[#777777] mx-1 font-medium">|</span>{" "}
-            <span className="font-normal">{hospital.address}</span>
-          </p>
-
-          {/* 뱃지 + 별점 */}
-          <div className={hospitalCardClasses.badgeRow}>
-            {hospital.todayStatus === "open" ? (
-              <span className={hospitalCardClasses.badgeImmediate}>
-                즉시 접수 가능
-              </span>
-            ) : (
-              <span className={hospitalCardClasses.badgeReserve}>
-                예약 가능
-              </span>
-            )}
-
-            <div className={hospitalCardClasses.ratingRow}>
-              <Star
-                size={16}
-                className="fill-[#FFB800] text-[#FFB800]"
+              <Heart
+                size={22}
+                className={isHospitalFavorite ? "fill-[#FF0000]" : ""}
               />
-              <span className="text-[#555555] font-normal">
-                {hospital.rating}
-              </span>
-              <span className="text-[#555555] font-normal">
-                ({displayReviewCount})
-              </span>
-            </div>
+            </button>
           </div>
         </div>
-        {/* 커스텀 토스트 */}
-        <CustomToast
-          show={showToast}
-          message={toastMessage}
-          onClose={() => setShowToast(false)}
-          showArrow={showArrow}
-          onClick={showArrow ? handleToastClick : undefined}
-        />
       </div>
 
+      {/* 하단: 진료시간, 위치, 뱃지 */}
+      <div className={hospitalCardClasses.bottomWrapper}>
+        {/* 오늘 상태 + 영업 시간 */}
+        <div className={hospitalCardClasses.statusRow}>
+          <span
+            className={`font-medium mr-2 ${todayStatusStyle.className}`}
+          >
+            {todayStatusStyle.label}
+          </span>
+          <span
+            className={
+              "font-normal " +
+              (isClosed ? "text-[#777777]" : "text-[#555555]")
+            }
+          >
+            {hospital.hours}
+          </span>
+        </div>
 
-    </>
+        {/* 거리 + 주소 */}
+        <p className={hospitalCardClasses.addressRow}>
+          {hospital.distance}{" "}
+          <span className="text-[#777777] mx-1 font-medium">|</span>{" "}
+          <span className="font-normal">{hospital.address}</span>
+        </p>
+
+        {/* 뱃지 + 별점 */}
+        <div className={hospitalCardClasses.badgeRow}>
+          {hospital.todayStatus === "open" ? (
+            <span className={hospitalCardClasses.badgeImmediate}>
+              즉시 접수 가능
+            </span>
+          ) : (
+            <span className={hospitalCardClasses.badgeReserve}>
+              예약 가능
+            </span>
+          )}
+
+          <div className={hospitalCardClasses.ratingRow}>
+            <Star
+              size={16}
+              className="fill-[#FFB800] text-[#FFB800]"
+            />
+            <span className="text-[#555555] font-normal">
+              {hospital.rating}
+            </span>
+            <span className="text-[#555555] font-normal">
+              ({displayReviewCount})
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

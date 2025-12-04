@@ -29,7 +29,7 @@ export function SecondaryMenu() {
               src={WellCoordinator}
               alt="웰코디"
               className="w-[50px] h-[50px] xs:w-[60px] xs:h-[60px]" />
-            <span className="relative z-10 mt-2 text-sm font-normal text-[#202020] xs:text-[17px] xs:font-medium ">
+            <span className="relative z-10 mt-2 text-sm font-normal text-[#202020] xs:text-[17px] ">
               웰코디
             </span>
           </button>
@@ -56,7 +56,7 @@ export function SecondaryMenu() {
               alt="원클릭"
               className="w-[50px] h-[50px] xs:w-[60px] xs:h-[60px]"
             />
-            <span className="relative z-10 mt-2 text-sm font-normal text-[#202020] xs:text-[17px] xs:font-medium">
+            <span className="relative z-10 mt-2 text-sm font-normal text-[#202020] xs:text-[17px]">
               원클릭보험
             </span>
           </button>
@@ -64,14 +64,14 @@ export function SecondaryMenu() {
       </div>
       {/* 3. 건강검진 */}
 
-      <button className="w-full aspect-square flex flex-col items-center justify-center bg-white rounded-2xl border border-[#d9d9d9] transition-colors">
+      <button className="w-full aspect-square flex flex-col items-center justify-center bg-white rounded-[14px] border border-[#d9d9d9] transition-colors">
         {/* TODO: 이 아이콘을 실제 SVG/이미지로 교체하세요 */}
         <img
           src={CheckupRecords}
           alt="건강검진"
           className="w-[50px] h-[50px] xs:w-[60px] xs:h-[60px]"
         />
-        <span className="mt-2 text-sm font-normal text-[#202020] xs:text-[17px] xs:font-medium">
+        <span className="mt-2 text-sm font-normal text-[#202020] xs:text-[17px]">
           건강검진
         </span>
       </button>

@@ -5,6 +5,7 @@ import { motion, type Variants } from "motion/react";
 import "swiper/css";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import Search from "../assets/images/icon_search_color.svg";
+import { CustomToast } from "./CustomToast";
 
 import { hospitalList } from "./hospitalInfo";
 import type { Hospital } from "./hospitalInfo";
@@ -15,7 +16,7 @@ interface HospitalSearchPageProps {
   favoriteHospitals: Hospital[];
   onToggleFavorite: (hospital: Hospital) => void;
   getHospitalReviewCount?: (hospitalId: number) => number;
-  onPageChange?: (page: string) => void; // 👈 추가
+  onPageChange?: (page: string) => void;
 }
 
 export function HospitalSearchPage({
@@ -24,11 +25,16 @@ export function HospitalSearchPage({
   favoriteHospitals,
   onToggleFavorite,
   getHospitalReviewCount,
-  onPageChange, // 👈 받아오기
+  onPageChange,
 }: HospitalSearchPageProps) {
   const [selectedFilter, setSelectedFilter] = useState("거리순");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  // 토스트 상태
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [showArrow, setShowArrow] = useState(false);
 
   const filters = [
     "거리순",
@@ -55,6 +61,27 @@ export function HospitalSearchPage({
 
     return name.includes(query) || specialty.includes(query);
   });
+
+  const handleToggleFavorite = (hospital: Hospital, wasAdded: boolean) => {
+    // 토스트 메시지 설정
+    if (wasAdded) {
+      setToastMessage("찜 목록에 추가되었습니다");
+      setShowArrow(true);
+    } else {
+      setToastMessage("찜 목록에서 삭제되었습니다");
+      setShowArrow(false);
+    }
+
+    setShowToast(true);
+    onToggleFavorite(hospital);
+  };
+
+  const handleToastClick = () => {
+    if (showArrow && onPageChange) {
+      setShowToast(false);
+      onPageChange("favorite-hospitals");
+    }
+  };
 
   const staggerContainer: Variants = {
     hidden: { opacity: 0 },
@@ -147,18 +174,22 @@ export function HospitalSearchPage({
                 hospital={hospital}
                 onClick={() => onHospitalClick(hospital)}
                 favoriteHospitals={favoriteHospitals}
-                onToggleFavorite={onToggleFavorite}
+                onToggleFavorite={handleToggleFavorite}
                 reviewCount={getHospitalReviewCount?.(hospital.id)}
-                onNavigateToFavorites={
-                  onPageChange
-                    ? () => onPageChange("favorite-hospitals")
-                    : undefined
-                }
               />
             </motion.div>
           ))}
         </div>
       </motion.div>
+
+      {/* 커스텀 토스트 - 페이지 하단 */}
+      <CustomToast
+        show={showToast}
+        message={toastMessage}
+        onClose={() => setShowToast(false)}
+        showArrow={showArrow}
+        onClick={showArrow ? handleToastClick : undefined}
+      />
     </div>
   );
 }

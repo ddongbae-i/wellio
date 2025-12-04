@@ -405,27 +405,24 @@ export function MyReviewsPage({
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] bg-white rounded-2xl shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] z-50 overflow-hidden"
             >
-              <div className="p-6 text-center">
-                <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Trash2 size={28} className="text-red-500" />
-                </div>
-                <h3 className="text-lg mb-2">
+              <div className="px-[32px] pt-[22px] pb-[26px] ">
+                <h3 className="text-[19px] font-semibold mb-1 text-[#202020]">
                   리뷰를 삭제하시겠습니까?
                 </h3>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-[#777777] mb-3 font-normal">
                   삭제한 리뷰는 복구할 수 없습니다.
                 </p>
 
                 <div className="flex gap-3">
                   <button
                     onClick={handleCancelDelete}
-                    className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                    className="flex-1 px-4 py-3 bg-[#e8e8e8] text-[17px] text-[#555] rounded-[12px] transition-colors font-medium"
                   >
                     취소
                   </button>
                   <button
                     onClick={handleConfirmDelete}
-                    className="flex-1 px-4 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors"
+                    className="flex-1 px-4 py-3 bg-[#2ECACA] text-[17px] text-white rounded-[12px] transition-colors font-medium"
                   >
                     삭제
                   </button>
@@ -435,6 +432,6 @@ export function MyReviewsPage({
           </>
         )}
       </AnimatePresence>
-    </div>
+    </div >
   );
 }

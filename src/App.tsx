@@ -756,21 +756,7 @@ export default function App() {
   const bubbles = document.querySelector('#chatbase-message-bubbles') as HTMLElement | null;
 
   const removeChatbaseAll = () => {
-    // 🔥 1) Chatbase 스타일 완전 제거 (패턴 기반)
-    /*     document.querySelectorAll("style").forEach((styleEl) => {
-          const text = styleEl.textContent || "";
-          if (
-            text.includes("chatbase") ||
-            text.includes("#chatbase-") ||
-            text.includes("chatbase-bubble") ||
-            text.includes("chatbase-message") ||
-            text.includes("chatbase-widget")
-          ) {
-            styleEl.remove();
-          }
-        }); */
 
-    // 🔥 2) 요소 제거
     bubble?.remove();
     windowEl?.remove();
     bubbles?.remove();
@@ -788,6 +774,9 @@ export default function App() {
   };
 
   useEffect(() => {
+    // 이미 붙어 있으면 다시 안 붙이기
+    if (document.getElementById("chatbase-widget")) return;
+
     const script = document.createElement("script");
     script.id = "chatbase-widget";
     script.src = "https://www.chatbase.co/embed.min.js";
@@ -795,88 +784,64 @@ export default function App() {
     script.setAttribute("chatbotId", "irCuwpc7c06Qva9cN3Qz6");
     script.setAttribute("domain", "www.chatbase.co");
     document.body.appendChild(script);
-  }, []);
-  useEffect(() => {
-    const showOn = ["home", "hospital"];
-    const shouldShow = showOn.includes(currentPage);
-
-    const bubble = document.querySelector('#chatbase-bubble-button') as HTMLElement | null;
-    const windowEl = document.querySelector('#chatbase-bubble-window') as HTMLElement | null;
-    const bubbles = document.querySelector('#chatbase-message-bubbles') as HTMLElement | null;
-
-    if (shouldShow) {
-      bubble?.style.setProperty("display", "block", "important");
-      windowEl?.style.setProperty("display", "block", "important");
-      bubbles?.style.setProperty("display", "block", "important");
-    } else {
-      bubble?.style.setProperty("display", "none", "important");
-      windowEl?.style.setProperty("display", "none", "important");
-      bubbles?.style.setProperty("display", "none", "important");
-    }
-  }, [currentPage]);
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.id = "chatbase-widget";
-    script.src = "https://www.chatbase.co/embed.min.js";
-    script.defer = true;
-    script.setAttribute("chatbotId", "irCuwpc7c06Qva9cN3Qz6");
-    script.setAttribute("domain", "www.chatbase.co");
-    document.body.appendChild(script);
-
-    // 👇 위치 스타일 추가
-    script.onload = () => {
-      const style = document.createElement("style");
-      style.id = "chatbase-custom-position";
-      style.innerHTML = `
-      /* GNB 높이는 64px (h-16) */
-      #chatbase-bubble-button {
-        bottom: 80px !important;  /* 64px(GNB) + 16px(여백) */
-        right: 20px !important;
-        z-index: 999 !important;
-      }
-
-      #chatbase-bubble-window {
-        bottom: 140px !important; /* 버튼 위에 표시 */
-        right: 20px !important;
-        max-height: calc(100vh - 200px) !important;
-        z-index: 999 !important;
-      }
-
-      #chatbase-message-bubbles {
-        bottom: 80px !important;
-        right: 80px !important; /* 버튼 왼쪽 */
-        z-index: 999 !important;
-      }
-
-      /* 모바일 대응 */
-      @media (max-width: 500px) {
-        #chatbase-bubble-button {
-          bottom: 76px !important;
-          right: 16px !important;
-        }
-        
-        #chatbase-bubble-window {
-          bottom: 136px !important;
-          right: 10px !important;
-          left: 10px !important;
-          max-width: calc(100% - 20px) !important;
-        }
-
-        #chatbase-message-bubbles {
-          bottom: 76px !important;
-          right: 70px !important;
-        }
-      }
-    `;
-      document.head.appendChild(style);
-    };
 
     return () => {
       script.remove();
-      document.getElementById("chatbase-custom-position")?.remove();
+      document
+        .querySelector("#chatbase-bubble-button")
+        ?.remove();
+      document
+        .querySelector("#chatbase-bubble-window")
+        ?.remove();
+      document
+        .querySelector("#chatbase-message-bubbles")
+        ?.remove();
     };
   }, []);
+
+  useEffect(() => {
+    const showOn: Page[] = ["home", "hospital"]; // 챗봇 보이고 싶은 실제 앱 페이지들만
+
+    // 👉 조건: 로그인 완료 + 온보딩 끝 + 지정한 페이지일 때만 노출
+    const shouldShow =
+      isLoggedIn && !showOnboarding && showOn.includes(currentPage);
+
+    const display = shouldShow ? "block" : "none";
+
+    const updateVisibility = () => {
+      const bubble = document.querySelector(
+        "#chatbase-bubble-button",
+      ) as HTMLElement | null;
+      const windowEl = document.querySelector(
+        "#chatbase-bubble-window",
+      ) as HTMLElement | null;
+      const bubbles = document.querySelector(
+        "#chatbase-message-bubbles",
+      ) as HTMLElement | null;
+
+      [bubble, windowEl, bubbles].forEach((el) => {
+        el?.style.setProperty("display", display, "important");
+      });
+    };
+
+    // DOM이 이미 있으면 바로 반영
+    updateVisibility();
+
+    // 로딩이 늦을 수 있어서 잠깐 감시
+    const interval = setInterval(updateVisibility, 500);
+
+    // 5초 후 감시 종료 (필요하면 늘려도 됨)
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [currentPage, isLoggedIn, showOnboarding]);
+
+
   // 알림 상태
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -1025,7 +990,7 @@ export default function App() {
         return prev.filter((h) => h.id !== hospital.id);
       }
 
-      // hospitalMap 에 있는 “정식” 데이터로 추가
+      // hospitalMap 에 있는 "정식" 데이터로 추가
       const fullHospital = hospitalMap[hospital.id];
 
       if (fullHospital) {
@@ -1545,7 +1510,7 @@ export default function App() {
         hospitalName: "매일건강의원",
         rating: 4,
         keywords: ["예약이 쉬워요", "친절해요", "과잉진료가 없어요"],
-        text: "점심시간 30분 안에 진료를 봐야 하는 상황이었는데, 말씀드리니 최대한 빠르게 처리해 주셨어요. 물론 진료 내용은 꼼꼼했습니다. 바쁜 현대인에게 딱 맞는 병원! ",
+        text: "점심시간 30분 안에 진료를 봐야 하는 상황이었는데, 말씀드리니 최대한 빠르게 처리해 주셨어요. 물론 진료 내용은 꼼꼼했습니다. 바쁜 현대인에게 딱 맞는 병원! ",
         visitType: "첫방문" as const,
         likes: 0,
       },
@@ -1826,10 +1791,10 @@ export default function App() {
           <HospitalSearchPage
             onBack={navigateBack}
             onHospitalClick={handleHospitalClick}
-            favoriteHospitals={FavoriteHospitalsPage}
+            favoriteHospitals={favoriteHospitals}
             onToggleFavorite={toggleFavorite}
             getHospitalReviewCount={getHospitalReviewCount}
-            onPageChange={(page) => navigateTo(page as Page)} // 👈 추가
+            onPageChange={(page) => navigateTo(page as Page)}
           />
         )}
 
@@ -1945,7 +1910,6 @@ export default function App() {
             onViewReviews={() => navigateTo("my-reviews")}
             records={medicalRecords}
             onUpdateMemo={handleUpdateMemo}
-            // 👇 추가
             currentPage={currentPage}
             onPageChange={(page) => navigateTo(page as Page)}
           />
