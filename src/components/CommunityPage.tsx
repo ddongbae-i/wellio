@@ -76,7 +76,7 @@ const searchSuggestions = [
   "오운완",
   "오챌완",
   "15만보 걷기",
-  "소래산",
+  "응원",
   "혈당",
   "혈압",
 ];
@@ -380,32 +380,38 @@ export function CommunityPage({
 
     setAddedReactions((prev) => {
       const existingReactions = prev[postId] || [];
-      const existingReactionIndex = existingReactions.findIndex(
-        (r) => r.emoji === emoji,
+
+      // 1) 먼저 이 게시글에서 "나"가 눌렀던 모든 이모지에서 제거
+      const reactionsWithoutMe = existingReactions
+        .map((reaction) => ({
+          ...reaction,
+          users: reaction.users.filter(
+            (u) => u.userName !== currentUser.userName
+          ),
+        }))
+        // 유저가 하나도 안 남은 이모지는 삭제
+        .filter((reaction) => reaction.users.length > 0);
+
+      // 2) 이제 새로 누른 이모지에만 "나" 추가
+      const targetIndex = reactionsWithoutMe.findIndex(
+        (r) => r.emoji === emoji
       );
 
-      if (existingReactionIndex >= 0) {
-        const updatedReactions = [...existingReactions];
-        const userExists = updatedReactions[existingReactionIndex].users.some(
-          (u) => u.userName === currentUser.userName,
-        );
-
-        if (!userExists) {
-          updatedReactions[existingReactionIndex] = {
-            ...updatedReactions[existingReactionIndex],
-            users: [...updatedReactions[existingReactionIndex].users, currentUser],
-          };
-        }
-
+      if (targetIndex >= 0) {
+        const updated = [...reactionsWithoutMe];
+        updated[targetIndex] = {
+          ...updated[targetIndex],
+          users: [...updated[targetIndex].users, currentUser],
+        };
         return {
           ...prev,
-          [postId]: updatedReactions,
+          [postId]: updated,
         };
       } else {
         return {
           ...prev,
           [postId]: [
-            ...existingReactions,
+            ...reactionsWithoutMe,
             {
               emoji,
               users: [currentUser],
@@ -419,6 +425,7 @@ export function CommunityPage({
       setEmojiAnimation(null);
     }, 2000);
   };
+
 
   const getAllComments = (postId: number, originalComments?: Array<any>) => {
     const original = originalComments || [];
@@ -1083,14 +1090,14 @@ export function CommunityPage({
                                 post.id,
                                 post.reactions,
                               ).length > 0 && (
-                                  <div className="absolute top-4 right-4 flex flex-wrap gap-2 justify-end max-w-[60%] z-20">
+                                  <div className="absolute top-4 right-5 flex flex-wrap gap-1 justify-end max-w-[90%] z-20">
                                     {getAllReactions(
                                       post.id,
                                       post.reactions,
                                     ).map((reaction) => (
                                       <div
                                         key={reaction.emoji}
-                                        className="rounded-full pl-2 pr-3 py-1.5 flex items-center gap-2"
+                                        className="rounded-full pl-2 flex items-center gap-1"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           triggerReactionAnimation(
