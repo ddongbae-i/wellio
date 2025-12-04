@@ -1003,13 +1003,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           ) : isDetailEditMode ? (
             <>
               <button
-                onClick={() => {
-                  if (hasDraft) {
-                    setShowLeaveDetailAlert(true);
-                  } else {
-                    handleCloseDetailEdit();
-                  }
-                }}
+                onClick={handleCloseDetailEdit}  // 👈 바로 닫기 (알럿 제거)
                 className="absolute left-5 xs:left-6 sm:left-8"
               >
                 <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
