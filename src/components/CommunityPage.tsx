@@ -3,7 +3,6 @@
 import {
   Heart,
   Plus,
-  Smile,
   Trash2,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -75,9 +74,10 @@ interface SearchSuggestionBarProps {
 const searchSuggestions = [
   "오운완",
   "오챌완",
+  "15만보 걷기",
   "소래산",
-  "9월 누적 15만보 걷기",
   "혈당",
+  "혈압",
 ];
 
 
@@ -106,8 +106,8 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
-      <div className="px-6 pt-5 pb-2">
-        <p className="text-[15px] font-semibold text-[#2b2b2b] mb-2">
+      <div className="pl-5 xs:pl-6 sm:pl-8 pt-5 pb-2">
+        <p className="text-[15px] font-semibold text-[#2b2b2b] mb-2 ml-[6px]">
           추천 검색어
         </p>
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">

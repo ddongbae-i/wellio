@@ -89,7 +89,7 @@ export function PromoBanner() {
             className="min-w-full h-full relative overflow-hidden"
             style={{ backgroundColor: banner.bgColor }}
           >
-            <div className="relative z-10 h-full flex items-center justify-between px-5 xs:px-6 sm:px-8">
+            <div className="relative z-10 h-full flex items-center justify-center pr-3 pl-4 xs:px-6 sm:px-8">
               <div className="flex-1">
                 <h3
                   className="mb-1 text-[17px] font-semibold"
@@ -98,13 +98,13 @@ export function PromoBanner() {
                   {banner.title}
                 </h3>
                 <p
-                  className="text-[13px] font-normal"
+                  className="text-[12px] font-normal"
                   style={{ color: banner.descColor }}
                 >
                   {banner.description}
                 </p>
               </div>
-              <div className="w-[60px] h-[60px] rounded-xl overflow-hidden flex-shrink-0 ml-4">
+              <div className="w-[60px] h-[60px] rounded-xl overflow-hidden flex-shrink-0 ml-2">
                 <ImageWithFallback
                   src={banner.image}
                   alt={banner.title}

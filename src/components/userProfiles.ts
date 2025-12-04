@@ -1,6 +1,6 @@
 // src/components/userProfiles.ts
 
-import Na from "../assets/images/na.png";
+import Na from "../assets/images/my_na.png";
 import Mama from "../assets/images/mama.png";
 import Papa from "../assets/images/papa.png";
 
