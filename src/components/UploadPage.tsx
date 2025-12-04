@@ -1097,13 +1097,19 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
               <div className="w-full h-full z-20">
                 <Swiper
-                  style={{
-                    touchAction: "pan-x",
-                    WebkitUserSelect: "none"
-                  }}
                   spaceBetween={14}
                   slidesPerView="auto"
                   className="w-full h-full"
+
+                  /* ✅ 웹 마우스 드래그 + 모바일 터치 충돌 방지 */
+                  grabCursor={true}
+                  resistanceRatio={0}
+                  touchStartPreventDefault={false}
+                  style={{
+                    touchAction: "pan-x",
+                    WebkitUserSelect: "none",
+                  }}
+
                   loop={true}
                   centeredSlides={true}
                   slideToClickedSlide={true}
