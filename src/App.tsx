@@ -783,7 +783,7 @@ export default function App() {
       ) as HTMLElement | null;
 
       if (windowEl) {
-        windowEl.style.setProperty("display", "none", "important");
+        windowEl.style.display = "none";
         clearInterval(intervalId);
       }
     };
@@ -817,9 +817,9 @@ export default function App() {
 
     const hideAll = () => {
       const { bubble, windowEl, messageBubbles } = getElements();
-      bubble?.style.setProperty("display", "none", "important");
-      windowEl?.style.setProperty("display", "none", "important");
-      messageBubbles?.style.setProperty("display", "none", "important");
+      if (bubble) bubble.style.display = "none";
+      if (windowEl) windowEl.style.display = "none";
+      if (messageBubbles) messageBubbles.style.display = "none";
     };
 
     if (!shouldShow) {
@@ -841,7 +841,7 @@ export default function App() {
       bubble.style.bottom = "100px";
       bubble.style.right = `${baseRight}px`;
       bubble.style.zIndex = "9999";
-      bubble.style.setProperty("display", "block", "important");
+      bubble.style.display = "block";
 
       // 🟣 2) 채팅창 위치 (display 는 여기서 건드리지 않음!)
       if (windowEl) {
@@ -877,7 +877,7 @@ export default function App() {
         messageBubbles.style.maxWidth = "270px";
         messageBubbles.style.maxHeight = "45px";
         messageBubbles.style.zIndex = "9999";
-        messageBubbles.style.setProperty("display", "block", "important");
+        messageBubbles.style.display = "block";
       }
     };
 
@@ -897,8 +897,7 @@ export default function App() {
     };
   }, [currentPage, isLoggedIn, showOnboarding]);
 
-  // 4) 아이콘 클릭할 때만 채팅창 열고 / 닫기
-  // 4) 아이콘 클릭할 때만 채팅창 열고 / 닫기
+
   useEffect(() => {
     if (!isLoggedIn || showOnboarding) return;
 
@@ -924,11 +923,7 @@ export default function App() {
           windowEl.style.display === "none" ||
           window.getComputedStyle(windowEl).display === "none";
 
-        windowEl.style.setProperty(
-          "display",
-          isHidden ? "block" : "none",
-          "important"
-        );
+        windowEl.style.display = isHidden ? "block" : "none";
       };
 
       // 중복 방지용: 이전에 달려 있던 핸들러 제거
