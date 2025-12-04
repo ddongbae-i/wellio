@@ -465,25 +465,52 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   // Canvas 필터 적용
   const applyFilterToImage = (
     imageSrc: string,
-    filterString: string,
+    filterString: string
   ): Promise<string> =>
     new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = "anonymous";
+
+      // ✅ iOS: base64에는 crossOrigin 쓰면 안 됨
+      if (!imageSrc.startsWith("data:")) {
+        img.crossOrigin = "anonymous";
+      }
 
       img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          reject(new Error("Canvas context not available"));
-          return;
-        }
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
 
-        ctx.filter = filterString;
-        ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL("image/jpeg", 0.95));
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Canvas context not available"));
+            return;
+          }
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.filter = filterString || "none";
+          ctx.drawImage(img, 0, 0);
+
+          // ✅ iOS 안정 방식: toBlob → FileReader
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error("Canvas toBlob failed"));
+                return;
+              }
+
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                resolve(reader.result as string);
+              };
+              reader.readAsDataURL(blob);
+            },
+            "image/jpeg",
+            0.95
+          );
+        } catch (e) {
+          reject(e);
+        }
       };
 
       img.onerror = () => reject(new Error("Image load failed"));
@@ -511,6 +538,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           );
         } catch (error) {
           console.error("필터 적용 실패:", error);
+        }
+        if (!finalImage || finalImage.length < 50) {
+          finalImage = selectedImage; // iOS에서 필터 실패 시 원본으로라도 업로드
         }
       }
 
