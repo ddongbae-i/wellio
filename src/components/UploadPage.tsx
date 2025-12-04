@@ -1091,12 +1091,16 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           {isFilterMode ? (
             <div className="w-full h-28 relative flex items-center justify-center">
               {/* 가운데 선택 가이드 */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto">
                 <div className="w-[68px] h-[68px] rounded-full border-[3px] border-[#36D2C5]" />
               </div>
 
               <div className="w-full h-full z-20">
                 <Swiper
+                  style={{
+                    touchAction: "pan-x",
+                    WebkitUserSelect: "none"
+                  }}
                   spaceBetween={14}
                   slidesPerView="auto"
                   className="w-full h-full"
