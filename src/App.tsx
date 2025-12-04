@@ -860,7 +860,7 @@ export default function App() {
         messageBubbles.style.bottom = "100px";
         messageBubbles.style.right = `${baseRight + 60}px`;
         messageBubbles.style.maxWidth = "270px";
-        messageBubbles.style.maxWidth = "55px";
+        messageBubbles.style.maxHeight = "55px";
         messageBubbles.style.zIndex = "9999";
         messageBubbles.style.setProperty("display", "block", "important");
       }
