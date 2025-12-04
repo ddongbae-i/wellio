@@ -658,7 +658,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
-      <div className="px-6 pt-6 pb-2">
+      <div className="pl-5 xs:pl-6 sm:pl-8 pt-6 pb-10">
         <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2">
           AI 추천 캡션
         </p>
@@ -1295,14 +1295,14 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 damping: 30,
                 stiffness: 300,
               }}
-              className="relative w-full max-w-[500px] bg-white rounded-t-[16px] p-6 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+              className="relative w-full max-w-[500px] bg-white rounded-t-[16px] pl-5 xs:pl-6 sm:pl-8 pt-[30px] pb-[40px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
             >
-              <div className="space-y-6">
+              <div className="space-y-6 ">
                 <div className="space-y-3">
-                  <h3 className="text-[17px] font-bold text-[#202020]">
+                  <h3 className="text-[17px] font-semibold text-[#202020]">
                     오늘 운동 기록
                   </h3>
-                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm ">
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm">
                     <button
                       onClick={() =>
                         handleHealthRecordSelect("👟 8,542보")
@@ -1390,17 +1390,20 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 </div>
               </div>
             </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+          </div >
+        )
+        }
+      </AnimatePresence >
 
       {/* AI 추천 캡션 바 */}
       <AnimatePresence>
-        {selectedImage &&
+        {
+          selectedImage &&
           isDetailEditMode &&
           showTextInput &&
-          isTextInputFocused && <AICaptionToolbar />}
-      </AnimatePresence>
+          isTextInputFocused && <AICaptionToolbar />
+        }
+      </AnimatePresence >
     </>
   );
 }
