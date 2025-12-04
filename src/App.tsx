@@ -845,12 +845,27 @@ export default function App() {
 
       // 🟣 2) 채팅창 위치 (display 는 여기서 건드리지 않음!)
       if (windowEl) {
+        const isMobile = window.innerWidth <= 640;
+
         windowEl.style.position = "fixed";
-        windowEl.style.bottom = "170px"; // 아이콘 위
-        windowEl.style.right = `${baseRight}px`;
-        windowEl.style.maxWidth = "300px";
-        windowEl.style.maxHeight = "500px";
-        windowEl.style.width = "360px";
+        windowEl.style.bottom = isMobile ? "90px" : "170px";
+        windowEl.style.top = "auto";          // 🔴 이게 중요: top 0 덮어쓰기
+        windowEl.style.left = "auto";         // 혹시 모를 left: 0도 초기화
+
+        // 가로 사이즈
+        if (isMobile) {
+          windowEl.style.maxWidth = "calc(100% - 32px)";
+          windowEl.style.width = "calc(100% - 32px)";
+        } else {
+          windowEl.style.maxWidth = "360px";
+          windowEl.style.width = "360px";
+        }
+
+        // 세로 사이즈
+        windowEl.style.maxHeight = isMobile ? "70vh" : "500px";
+
+        windowEl.style.borderRadius = "16px";
+        windowEl.style.overflow = "hidden";
         windowEl.style.zIndex = "9999";
       }
 
