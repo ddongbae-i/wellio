@@ -835,6 +835,25 @@ export default function App() {
     };
   }, [isLoggedIn, showOnboarding]);
 
+  useEffect(() => {
+    if (!isLoggedIn || showOnboarding) return;
+
+    const forceCloseAtStart = () => {
+      const windowEl = document.querySelector(
+        "#chatbase-bubble-window"
+      ) as HTMLElement | null;
+
+      if (windowEl) {
+        // ✅ 최초 진입 시 무조건 닫힌 상태
+        windowEl.style.setProperty("display", "none", "important");
+        clearInterval(intervalId);
+      }
+    };
+
+    const intervalId = setInterval(forceCloseAtStart, 200);
+
+    return () => clearInterval(intervalId);
+  }, [isLoggedIn, showOnboarding]);
 
   useEffect(() => {
     // 로그인 안 했거나, 온보딩 중이면 아예 숨김
@@ -889,10 +908,10 @@ export default function App() {
       // 🟣 2) 채팅창
       if (windowEl) {
         windowEl.style.position = "fixed";
-        windowEl.style.bottom = "160px"; // 아이콘 위에
+        windowEl.style.bottom = "170px"; // 아이콘 위에
         windowEl.style.right = `${baseRight}px`;
         windowEl.style.maxWidth = "300px";
-        windowEl.style.maxHeight = "400px";
+        windowEl.style.maxHeight = "500px";
         windowEl.style.width = "360px";
         windowEl.style.zIndex = "9999";
         windowEl.style.removeProperty("display");
