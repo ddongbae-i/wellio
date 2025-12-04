@@ -750,34 +750,11 @@ export default function App() {
   const [selectedPostId, setSelectedPostId] =
     useState<number | null>(null);
 
-
-  const bubble = document.querySelector('#chatbase-bubble-button') as HTMLElement | null;
-  const windowEl = document.querySelector('#chatbase-bubble-window') as HTMLElement | null;
-  const bubbles = document.querySelector('#chatbase-message-bubbles') as HTMLElement | null;
-
-  const removeChatbaseAll = () => {
-
-    bubble?.remove();
-    windowEl?.remove();
-    bubbles?.remove();
-    // document.querySelector('iframe[src*="chatbase"]')?.remove();
-
-    // 🔥 3) 이전 스크립트 제거 (id 패턴 매칭)
-    document.querySelectorAll("script").forEach((script) => {
-      if (
-        script.src.includes("chatbase") ||
-        script.id.startsWith("chatbase-widget")
-      ) {
-        script.remove();
-      }
-    });
-  };
-
+  // 1) Chatbase 스크립트 로드
   useEffect(() => {
-    // 🔒 로그인 전 / 온보딩 중에는 Chatbase 자체를 로드하지 않음
     if (!isLoggedIn || showOnboarding) return;
 
-    // 이미 스크립트가 붙어 있으면 다시 안 붙이기
+    // 이미 스크립트가 있으면 재로딩 X
     if (document.getElementById("chatbase-widget")) return;
 
     const script = document.createElement("script");
@@ -796,45 +773,7 @@ export default function App() {
     };
   }, [isLoggedIn, showOnboarding]);
 
-  useEffect(() => {
-    if (!isLoggedIn || showOnboarding) return;
-
-    const updateBubblePosition = () => {
-      const bubble = document.querySelector(
-        "#chatbase-bubble-button"
-      ) as HTMLElement | null;
-
-      if (!bubble) return;
-
-      const viewportWidth = window.innerWidth;
-      const containerWidth = 500;
-      const sideGap = Math.max((viewportWidth - containerWidth) / 2, 0);
-
-      bubble.style.position = "fixed";
-      bubble.style.bottom = "24px";
-      bubble.style.right = `${sideGap + 16}px`;
-      bubble.style.zIndex = "9999";
-    };
-
-    const intervalId = setInterval(() => {
-      const bubble = document.querySelector(
-        "#chatbase-bubble-button"
-      ) as HTMLElement | null;
-
-      if (bubble) {
-        updateBubblePosition();
-        clearInterval(intervalId);
-      }
-    }, 200);
-
-    window.addEventListener("resize", updateBubblePosition);
-
-    return () => {
-      clearInterval(intervalId);
-      window.removeEventListener("resize", updateBubblePosition);
-    };
-  }, [isLoggedIn, showOnboarding]);
-
+  // 2) 최초 진입 시에는 채팅창(창만) 무조건 닫아두기
   useEffect(() => {
     if (!isLoggedIn || showOnboarding) return;
 
@@ -844,19 +783,18 @@ export default function App() {
       ) as HTMLElement | null;
 
       if (windowEl) {
-        // ✅ 최초 진입 시 무조건 닫힌 상태
         windowEl.style.setProperty("display", "none", "important");
         clearInterval(intervalId);
       }
     };
 
-    const intervalId = setInterval(forceCloseAtStart, 200);
+    const intervalId = window.setInterval(forceCloseAtStart, 200);
 
     return () => clearInterval(intervalId);
   }, [isLoggedIn, showOnboarding]);
 
+  // 3) 홈 / 병원에서만 아이콘 & 말풍선 보여주고, 위치 맞추기
   useEffect(() => {
-    // 로그인 안 했거나, 온보딩 중이면 아예 숨김
     const showOnPages: Page[] = ["home", "hospital"];
     const shouldShow =
       isLoggedIn &&
@@ -894,41 +832,39 @@ export default function App() {
       if (!bubble) return;
 
       const viewportWidth = window.innerWidth;
-      const containerWidth = 500; // 앱 실제 영역
+      const containerWidth = 500; // 실제 앱 너비
       const sideGap = Math.max((viewportWidth - containerWidth) / 2, 0);
-      const baseRight = sideGap + 16; // 앱 오른쪽 안쪽 여백
+      const baseRight = sideGap + 16; // 앱 오른쪽 내부 여백
 
-      // 🔵 1) 챗봇 아이콘 (버튼)
+      // 🔵 1) 아이콘 위치
       bubble.style.position = "fixed";
       bubble.style.bottom = "100px";
       bubble.style.right = `${baseRight}px`;
       bubble.style.zIndex = "9999";
-      bubble.style.removeProperty("display");
+      bubble.style.setProperty("display", "block", "important");
 
-      // 🟣 2) 채팅창
+      // 🟣 2) 채팅창 위치 (display 는 여기서 건드리지 않음!)
       if (windowEl) {
         windowEl.style.position = "fixed";
-        windowEl.style.bottom = "170px"; // 아이콘 위에
+        windowEl.style.bottom = "170px"; // 아이콘 위
         windowEl.style.right = `${baseRight}px`;
         windowEl.style.maxWidth = "300px";
         windowEl.style.maxHeight = "500px";
         windowEl.style.width = "360px";
         windowEl.style.zIndex = "9999";
-        windowEl.style.removeProperty("display");
       }
 
-      // 🟡 3) “안녕하세요 챗봇입니다” 말풍선
+      // 🟡 3) “안녕하세요 챗봇입니다” 말풍선 위치
       if (messageBubbles) {
         messageBubbles.style.position = "fixed";
-        messageBubbles.style.bottom = "112px"; // 아이콘 바로 위
-        messageBubbles.style.right = `${baseRight + 60}px`; // 아이콘 왼쪽으로 약간
+        messageBubbles.style.bottom = "112px";
+        messageBubbles.style.right = `${baseRight + 60}px`;
         messageBubbles.style.maxWidth = "260px";
         messageBubbles.style.zIndex = "9999";
-        messageBubbles.style.removeProperty("display");
+        messageBubbles.style.setProperty("display", "block", "important");
       }
     };
 
-    // Chatbase DOM이 늦게 생기니까 조금 기다렸다가 정렬
     const intervalId = window.setInterval(() => {
       const { bubble } = getElements();
       if (bubble) {
@@ -944,6 +880,56 @@ export default function App() {
       window.removeEventListener("resize", updatePosition);
     };
   }, [currentPage, isLoggedIn, showOnboarding]);
+
+  // 4) 아이콘 클릭할 때만 채팅창 열고 / 닫기
+  useEffect(() => {
+    if (!isLoggedIn || showOnboarding) return;
+
+    let clickHandler: ((e: MouseEvent) => void) | null = null;
+
+    const tryAttach = () => {
+      const bubble = document.querySelector(
+        "#chatbase-bubble-button"
+      ) as HTMLElement | null;
+      const windowEl = document.querySelector(
+        "#chatbase-bubble-window"
+      ) as HTMLElement | null;
+
+      if (!bubble || !windowEl) return false;
+
+      clickHandler = (e: MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isOpen = windowEl.style.display !== "none";
+        windowEl.style.setProperty(
+          "display",
+          isOpen ? "none" : "block",
+          "important"
+        );
+      };
+
+      bubble.addEventListener("click", clickHandler);
+      return true;
+    };
+
+    const intervalId = window.setInterval(() => {
+      if (tryAttach()) {
+        window.clearInterval(intervalId);
+      }
+    }, 200);
+
+    return () => {
+      window.clearInterval(intervalId);
+      const bubble = document.querySelector(
+        "#chatbase-bubble-button"
+      ) as HTMLElement | null;
+      if (bubble && clickHandler) {
+        bubble.removeEventListener("click", clickHandler);
+      }
+    };
+  }, [isLoggedIn, showOnboarding]);
+
 
 
 
