@@ -47,11 +47,13 @@ export function HospitalCard({
   const [toastMessage, setToastMessage] = useState("");
   const [showArrow, setShowArrow] = useState(false);
 
-  // ✅ 수정: optional chaining과 nullish coalescing 제대로 처리
+  // ✅ 더 안전한 처리: 배열이 아니면 빈 배열로 변환
   const isHospitalFavorite =
     isFavorite !== undefined
       ? isFavorite
-      : (favoriteHospitals ?? []).some((h) => h.id === hospital.id);
+      : Array.isArray(favoriteHospitals)
+        ? favoriteHospitals.some((h) => h.id === hospital.id)
+        : false;
 
   const displayReviewCount =
     reviewCount !== undefined ? reviewCount : hospital.reviews;
@@ -137,8 +139,8 @@ export function HospitalCard({
               {/* 찜하기 버튼 */}
               <button
                 className={`${hospitalCardClasses.favoriteButtonBase} ${isHospitalFavorite
-                  ? "text-[#FF0000]"
-                  : "text-[#AEAEAE] hover:text-[#FF6666]"
+                    ? "text-[#FF0000]"
+                    : "text-[#AEAEAE] hover:text-[#FF6666]"
                   }`}
                 onClick={handleFavoriteClick}
               >

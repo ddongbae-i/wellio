@@ -87,6 +87,7 @@ export function FavoriteHospitalsPage({
                 <HospitalCard
                   hospital={hospital}
                   isFavorite={true}
+                  favoriteHospitals={favoriteHospitals} // 👈 추가!
                   onToggleFavorite={handleToggleFavorite}
                   isInFavoritePage={true}
                   onClick={() => {
