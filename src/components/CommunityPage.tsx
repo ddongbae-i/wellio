@@ -245,6 +245,7 @@ export function CommunityPage({
   // 키보드 & 뷰포트 높이
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [screenHeight, setScreenHeight] = useState<number | null>(null);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
 
   // === 유저 프로필 (없으면 김웰리로 기본값) ===
   const currentUserProfile =
@@ -575,17 +576,26 @@ export function CommunityPage({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const initial = window.innerHeight;   // 앱 처음 켰을 때 높이
+    const initial = window.innerHeight; // 앱 처음 켰을 때 전체 높이
     setScreenHeight(initial);
 
     const viewport = window.visualViewport;
 
     const handleResize = () => {
       if (!viewport) return;
-      // viewport 높이가 처음 높이의 75%보다 작아지면 키보드가 떴다고 판단
+
       const isKeyboard = viewport.height < initial * 0.75;
       setIsKeyboardVisible(isKeyboard);
+
+      // ✅ 키보드 높이 = 처음 높이 - 현재 viewport 높이
+      const offset = isKeyboard ? initial - viewport.height : 0;
+
+      // 너무 큰 값 방지용으로 살짝 제한해도 됨
+      setKeyboardOffset(Math.max(0, Math.min(offset, 260)));
     };
+
+    // 처음 한 번 호출해서 초기 상태 맞추기
+    handleResize();
 
     if (viewport) {
       viewport.addEventListener("resize", handleResize);
@@ -598,7 +608,6 @@ export function CommunityPage({
       viewport.removeEventListener("scroll", handleResize);
     };
   }, []);
-
   // 처음 화면 높이 (없으면 800 fallback)
   const baseHeight = screenHeight ?? 800;
 
@@ -1575,6 +1584,7 @@ export function CommunityPage({
       {isSearchActive && (
         <SearchSuggestionBar
           isKeyboardVisible={isKeyboardVisible}
+          keyboardOffset={keyboardOffset} // ✅ 추가
           onSelect={(keyword) => setSearchQuery(keyword)}
         />
       )}
