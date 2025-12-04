@@ -740,8 +740,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         }}
         title="작성을 취소할까요?"
         description="지금까지 작성한 내용이 모두 사라집니다."
-        cancelText="계속 작성"
-        confirmText="취소"
+        cancelText="아니오"
+        confirmText="예"
       />
 
       {/* 메인 래퍼 */}
