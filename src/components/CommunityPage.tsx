@@ -103,14 +103,14 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: "100%", opacity: 0 }}
         transition={{ type: "spring", damping: 24, stiffness: 260 }}
-        className="fixed left-1/2 -translate-x-1/2 z-[60] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
+        className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
         style={{
           bottom: `${keyboardOffset}px`,
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
-        <div className="pl-5 xs:pl-6 sm:pl-8 pt-5 pb-10">
-          <p className="text-[15px] font-semibold text-[#2b2b2b] mb-2 ml-[6px]">
+        <div className="px-5 pt-5 pb-6">
+          <p className="text-[15px] font-semibold text-[#2b2b2b] mb-3">
             추천 검색어
           </p>
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
@@ -121,7 +121,11 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
                   e.preventDefault();
                   onSelect(keyword);
                 }}
-                className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  onSelect(keyword);
+                }}
+                className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] active:bg-gray-100 transition-colors"
               >
                 {keyword}
               </button>

@@ -324,7 +324,7 @@ const createInitialPosts = (): Post[] => {
       id: 4,
       image: COMMUNITY_IMAGES.IMG4,
       userAvatar: USERS.dongseok.avatar,
-      caption: "오운완",
+      caption: "오늘도 친구놈 버리고 오운완!",
       userName: USERS.dongseok.name,
       textOverlay: "오늘도 친구놈 버리고 오운완!",
       createdAt: getDateNDaysAgo(5),
@@ -449,7 +449,7 @@ const createInitialPosts = (): Post[] => {
         icon: MapPin
       },
       userAvatar: USERS.wellie.avatar,
-      caption: "자전거",
+      caption: "대만에서도 관리중",
       userName: USERS.wellie.name,
       textOverlay: "대만에서도 관리중",
       createdAt: getDateNDaysAgo(20),
@@ -580,7 +580,7 @@ const createInitialPosts = (): Post[] => {
         icon: WalkIcon
       },
       userAvatar: USERS.wellie.avatar,
-      caption: "오챌완",
+      caption: "오챌완💪",
       userName: USERS.wellie.name,
       textOverlay: "오챌완💪",
       createdAt: getDateNDaysAgo(31),
@@ -670,7 +670,7 @@ const createInitialPosts = (): Post[] => {
         icon: WalkIcon
       },
       userAvatar: USERS.wellie.avatar,
-      caption: "오챌완",
+      caption: "오챌완💪",
       userName: USERS.wellie.name,
       textOverlay: "오챌완💪",
       createdAt: getDateNDaysAgo(34),
@@ -685,7 +685,7 @@ const createInitialPosts = (): Post[] => {
         icon: WalkIcon
       },
       userAvatar: USERS.seunghee.avatar,
-      caption: "오챌완",
+      caption: "오챌완💪 이렇게 하면 되나",
       userName: USERS.seunghee.name,
       textOverlay: "오챌완💪 이렇게 하면 되나",
       createdAt: getDateNDaysAgo(34),
@@ -882,7 +882,7 @@ export default function App() {
 
 
   // 🔹 처음에 기본으로 찜해 둘 병원 ID
-  const INITIAL_FAVORITE_HOSPITAL_IDS = [1, 2, 3];
+  const INITIAL_FAVORITE_HOSPITAL_IDS = [1, 3, 8, 10];
 
   const [favoriteHospitals, setFavoriteHospitals] = useState<Hospital[]>(() => {
     // hospitalMap 에서 ID 기준으로 병원 정보를 가져와서 초기값으로 세팅
