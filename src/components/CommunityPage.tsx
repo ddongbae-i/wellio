@@ -584,17 +584,31 @@ export function CommunityPage({
     const handleResize = () => {
       if (!viewport) return;
 
-      const isKeyboard = viewport.height < initial * 0.75;
+      const inner = window.innerHeight;
+      const vpHeight = viewport.height;
+
+      const isKeyboard = vpHeight < initial * 0.9; // 어느 정도 줄어들면 키보드라고 판단
       setIsKeyboardVisible(isKeyboard);
 
-      // ✅ 키보드 높이 = 처음 높이 - 현재 viewport 높이
-      const offset = isKeyboard ? initial - viewport.height : 0;
+      if (!isKeyboard) {
+        setKeyboardOffset(0);
+        return;
+      }
 
-      // 너무 큰 값 방지용으로 살짝 제한해도 됨
-      setKeyboardOffset(Math.max(0, Math.min(offset, 260)));
+      // innerHeight와 visualViewport.height 차이
+      const diff = inner - vpHeight;
+
+      if (Math.abs(diff) < 40) {
+        // 거의 차이가 없으면: 화면 자체가 줄어든 타입 (안드로이드 WebView 등)
+        // -> 이미 레이아웃이 키보드 위까지만 보이므로 따로 올릴 필요 없음
+        setKeyboardOffset(0);
+      } else {
+        // 차이가 크면: 키보드가 화면을 덮는 타입 (iOS 등)
+        const offset = initial - vpHeight;
+        setKeyboardOffset(Math.max(0, Math.min(offset, 260)));
+      }
     };
 
-    // 처음 한 번 호출해서 초기 상태 맞추기
     handleResize();
 
     if (viewport) {
@@ -608,6 +622,7 @@ export function CommunityPage({
       viewport.removeEventListener("scroll", handleResize);
     };
   }, []);
+
   // 처음 화면 높이 (없으면 800 fallback)
   const baseHeight = screenHeight ?? 800;
 
