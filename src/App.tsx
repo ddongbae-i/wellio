@@ -848,7 +848,7 @@ export default function App() {
         const isMobile = window.innerWidth <= 640;
 
         windowEl.style.position = "fixed";
-        windowEl.style.bottom = isMobile ? "90px" : "170px";
+        windowEl.style.bottom = isMobile ? "170px" : "170px";
         windowEl.style.top = "auto";          // 🔴 이게 중요: top 0 덮어쓰기
         windowEl.style.left = "auto";         // 혹시 모를 left: 0도 초기화
 
@@ -872,10 +872,10 @@ export default function App() {
       // 🟡 3) “안녕하세요 챗봇입니다” 말풍선 위치
       if (messageBubbles) {
         messageBubbles.style.position = "fixed";
-        messageBubbles.style.bottom = "110px";
+        messageBubbles.style.bottom = "120px";
         messageBubbles.style.right = `${baseRight + 60}px`;
         messageBubbles.style.maxWidth = "270px";
-        messageBubbles.style.maxHeight = "45px";
+        messageBubbles.style.height = "45px";
         messageBubbles.style.zIndex = "9999";
         messageBubbles.style.display = "block";
       }
