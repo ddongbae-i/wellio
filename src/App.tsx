@@ -850,7 +850,7 @@ export default function App() {
         windowEl.style.position = "fixed";
         windowEl.style.bottom = isMobile ? "170px" : "170px";
         windowEl.style.top = "auto";          // 🔴 이게 중요: top 0 덮어쓰기
-        windowEl.style.left = "auto";         // 혹시 모를 left: 0도 초기화
+        windowEl.style.right = "20px";         // 혹시 모를 left: 0도 초기화
 
         // 가로 사이즈
         if (isMobile) {
