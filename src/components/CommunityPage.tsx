@@ -666,7 +666,11 @@ export function CommunityPage({
         {/* 헤더 */}
         <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 flex flex-col justify-center w-full max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
           {isSearchActive ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3"
+              onClick={(e) => {
+                // 상위 div의 onClick으로 검색이 꺼지지 않게 막기
+                e.stopPropagation();
+              }}>
               <button
                 onClick={onBack}
                 className="w-6 h-6 flex items-center justify-center flex-shrink-0"
