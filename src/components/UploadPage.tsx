@@ -1012,7 +1012,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 }}
                 className="absolute left-5 xs:left-6 sm:left-8"
               >
-                <img src={X} alt="닫기" className="w-6 h-6" />
+                <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
               </button>
               <button
                 onClick={() => {

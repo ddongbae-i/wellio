@@ -16,6 +16,8 @@ import { patientMap } from "./userProfiles";
 import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import Edit from "../assets/images/icon_list_memo.svg";
+import { BottomNav } from "./BottomNav";
+import type { Page } from "../types/page";
 
 interface MedicalHistoryPageProps {
   onBack: () => void;
@@ -24,6 +26,20 @@ interface MedicalHistoryPageProps {
   onViewReviews?: () => void;
   records?: MedicalRecord[];
   onUpdateMemo?: (recordId: number, newMemo: string) => void;
+
+}
+
+interface MedicalHistoryPageProps {
+  onBack: () => void;
+  onWriteReview?: (record: MedicalRecord) => void;
+  reviewedHospitals?: number[];
+  onViewReviews?: () => void;
+  records?: MedicalRecord[];
+  onUpdateMemo?: (recordId: number, newMemo: string) => void;
+
+  // 👇 추가
+  currentPage?: Page;
+  onPageChange?: (page: Page) => void;
 }
 
 // 예전/새 구조 둘 다 받을 수 있게 옵션 필드로
@@ -178,6 +194,8 @@ export function MedicalHistoryPage({
   onViewReviews,
   records,
   onUpdateMemo,
+  currentPage,        // 👈 추가
+  onPageChange,       // 👈 추가
 }: MedicalHistoryPageProps) {
   const [activeTab, setActiveTab] =
     useState<"treatment" | "medical">("treatment");
@@ -244,8 +262,8 @@ export function MedicalHistoryPage({
     <div className="relative bg-[#f7f7f7] flex flex-col max-w-[500px] mx-auto min-h-screen">
       {/* Sticky Header + Tabs + Filters */}
       <motion.div
-        // 🔹 전체 헤더 영역에만 글래스 + 살짝 투명 배경
         className="sticky top-0 z-30 backdrop-blur-md bg-[#f7f7f7]/70"
+
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -501,6 +519,15 @@ export function MedicalHistoryPage({
           </div>
         )}
       </div>
+      {currentPage && onPageChange && (
+        <BottomNav
+          currentPage={currentPage}
+          onPageChange={onPageChange}
+        />
+      )}
+
     </div>
+
   );
+
 }

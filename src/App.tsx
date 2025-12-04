@@ -1817,6 +1817,9 @@ export default function App() {
             onViewReviews={() => navigateTo("my-reviews")}
             records={medicalRecords}
             onUpdateMemo={handleUpdateMemo}
+            // 👇 추가
+            currentPage={currentPage}
+            onPageChange={(page) => navigateTo(page as Page)}
           />
         )}
 
