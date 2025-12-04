@@ -883,39 +883,54 @@ export default function App() {
   }, [currentPage, isLoggedIn, showOnboarding]);
 
   // 4) 아이콘 클릭할 때만 채팅창 열고 / 닫기
+  // 4) 아이콘 클릭할 때만 채팅창 열고 / 닫기
   useEffect(() => {
     if (!isLoggedIn || showOnboarding) return;
 
-    let clickHandler: ((e: MouseEvent) => void) | null = null;
-
-    const tryAttach = () => {
+    const attachClickHandler = () => {
       const bubble = document.querySelector(
         "#chatbase-bubble-button"
       ) as HTMLElement | null;
-      const windowEl = document.querySelector(
-        "#chatbase-bubble-window"
-      ) as HTMLElement | null;
 
-      if (!bubble || !windowEl) return false;
+      if (!bubble) return false;
 
-      clickHandler = (e: MouseEvent) => {
+      const handleClick = (e: MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
-        const isOpen = windowEl.style.display !== "none";
+        const windowEl = document.querySelector(
+          "#chatbase-bubble-window"
+        ) as HTMLElement | null;
+
+        // 아직 창 DOM이 안 만들어졌으면 그냥 chatbase 기본 동작에 맡김
+        if (!windowEl) return;
+
+        const isHidden =
+          windowEl.style.display === "none" ||
+          window.getComputedStyle(windowEl).display === "none";
+
         windowEl.style.setProperty(
           "display",
-          isOpen ? "none" : "block",
+          isHidden ? "block" : "none",
           "important"
         );
       };
 
-      bubble.addEventListener("click", clickHandler);
+      // 중복 방지용: 이전에 달려 있던 핸들러 제거
+      (bubble as any)._wellioChatHandler &&
+        bubble.removeEventListener(
+          "click",
+          (bubble as any)._wellioChatHandler
+        );
+
+      bubble.addEventListener("click", handleClick);
+      (bubble as any)._wellioChatHandler = handleClick;
+
       return true;
     };
 
     const intervalId = window.setInterval(() => {
-      if (tryAttach()) {
+      if (attachClickHandler()) {
         window.clearInterval(intervalId);
       }
     }, 200);
@@ -925,17 +940,15 @@ export default function App() {
       const bubble = document.querySelector(
         "#chatbase-bubble-button"
       ) as HTMLElement | null;
-      if (bubble && clickHandler) {
-        bubble.removeEventListener("click", clickHandler);
+      if (bubble && (bubble as any)._wellioChatHandler) {
+        bubble.removeEventListener(
+          "click",
+          (bubble as any)._wellioChatHandler
+        );
+        delete (bubble as any)._wellioChatHandler;
       }
     };
   }, [isLoggedIn, showOnboarding]);
-
-
-
-
-
-
 
   // 알림 상태
   const [notifications, setNotifications] = useState<Notification[]>([
