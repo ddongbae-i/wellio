@@ -29,7 +29,7 @@ interface HospitalCardProps {
   onToggleFavorite?: (hospital: Hospital) => void;
   isInFavoritePage?: boolean;
   reviewCount?: number;
-  onNavigateToFavorites?: () => void; // 👈 추가
+  onNavigateToFavorites?: () => void;
 }
 
 /** 병원 카드 UI 컴포넌트 */
@@ -41,16 +41,17 @@ export function HospitalCard({
   onToggleFavorite,
   isInFavoritePage,
   reviewCount,
-  onNavigateToFavorites, // 👈 추가
+  onNavigateToFavorites,
 }: HospitalCardProps) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showArrow, setShowArrow] = useState(false);
 
+  // ✅ 수정: optional chaining과 nullish coalescing 제대로 처리
   const isHospitalFavorite =
     isFavorite !== undefined
       ? isFavorite
-      : favoriteHospitals?.some((h) => h.id === hospital.id) || false;
+      : (favoriteHospitals ?? []).some((h) => h.id === hospital.id);
 
   const displayReviewCount =
     reviewCount !== undefined ? reviewCount : hospital.reviews;
@@ -136,8 +137,8 @@ export function HospitalCard({
               {/* 찜하기 버튼 */}
               <button
                 className={`${hospitalCardClasses.favoriteButtonBase} ${isHospitalFavorite
-                    ? "text-[#FF0000]"
-                    : "text-[#AEAEAE] hover:text-[#FF6666]"
+                  ? "text-[#FF0000]"
+                  : "text-[#AEAEAE] hover:text-[#FF6666]"
                   }`}
                 onClick={handleFavoriteClick}
               >

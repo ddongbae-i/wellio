@@ -81,8 +81,6 @@ const searchSuggestions = [
   "혈압",
 ];
 
-const [localPosts, setLocalPosts] = useState(posts);
-
 
 // === 드롭다운 메뉴용 가족 구성원 ===
 const familyMembers = [
@@ -213,6 +211,11 @@ export function CommunityPage({
   currentPage,
   onPageChange,
 }: CommunityPageProps) {
+  const [localPosts, setLocalPosts] = useState(() => posts);
+
+  useEffect(() => {
+    setLocalPosts(posts);
+  }, [posts]);
   const [selectedFamilyMember, setSelectedFamilyMember] =
     useState<string | null>(null);
   const [showFamilyDropdown, setShowFamilyDropdown] = useState(false);
