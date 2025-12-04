@@ -63,7 +63,7 @@ interface Post {
   image: string;
   badge?: {
     text: string;
-    icon: string;
+    icon?: string;
   };
   userAvatar: string;
   caption: string;
@@ -374,7 +374,6 @@ const createInitialPosts = (): Post[] => {
       image: COMMUNITY_IMAGES.IMG6,
       badge: {
         text: "🏃 오운완",
-        icon: ""
       },
       userAvatar: USERS.wellie.avatar,
       caption: "딸은 출석 완료입니다",

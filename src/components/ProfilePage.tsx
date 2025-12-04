@@ -126,7 +126,7 @@ export function ProfilePage({
         </motion.div>
 
         {/* Point Section */}
-        <motion.div className="custom-margin bg-white px-5 py-[22px] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] flex items-center justify-between" variants={itemVariants}>
+        <motion.div className="custom-margin bg-white px-5 xs:px-6 sm:px-8 py-[22px] rounded-[12px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] flex items-center justify-between" variants={itemVariants}>
           <span className="text-[#555555] font-medium text-[17px]">
             보유포인트
           </span>

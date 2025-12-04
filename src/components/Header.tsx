@@ -44,7 +44,7 @@ export function Header({
             <img
               src={ChevronLeft}
               alt="뒤로가기"
-              className="w-6 h-6 min-w-6 min-h-6 max-w-6 max-h-6 flex-shrink-0"
+              className="w-6 h-6 flex-shrink-0"
             />
           </button>
         )}
@@ -72,7 +72,7 @@ export function Header({
 
   // --- 'title' prop이 없으면 '홈페이지 헤더' ---
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 px-5 py-4 flex items-center justify-between gap-4 mx-auto h-16 max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs">
+    <header className="fixed top-0 left-0 right-0 z-40 px-5 xs:px-5 sm:px-8 py-4 flex items-center justify-between gap-4 mx-auto h-16 max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs">
       {/* --- 왼쪽: 로고 --- */}
       <div className="flex items-center flex-1 min-w-0">
         {/* 로고 (SVG) */}
