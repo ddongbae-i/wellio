@@ -575,29 +575,25 @@ export function CommunityPage({
     scrollToPost(initialPostId);
   }, [initialPostId, isGridView, isReactionView]);
 
-  // 모바일 키보드 감지 (레이아웃 높이는 처음 값 기준으로 고정)
+  // 모바일 키보드 감지 (레이아웃 높이는 처음 값 기준으로만 사용)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const initial = window.innerHeight; // 앱 처음 켰을 때 전체 높이
-    setScreenHeight(initial);
+    const initialHeight = window.innerHeight; // 앱 처음 켰을 때 높이
+    setScreenHeight(initialHeight);
 
     const viewport = window.visualViewport;
 
     const handleResize = () => {
       if (!viewport) return;
 
-      // 화면에서 실제로 가려진 영역(대부분 키보드 높이)
-      const occluded =
-        window.innerHeight - (viewport.height + viewport.offsetTop);
-
-      const occludedHeight = Math.max(0, occluded);
-
-      // 어느 정도 이상 가려지면 키보드가 올라온 걸로 본다
-      const keyboardShown = occludedHeight > 40;
-
+      // 키보드가 올라오면 visualViewport 높이가 줄어듦
+      const keyboardShown = viewport.height < initialHeight - 80; // 80px 정도 여유
       setIsKeyboardVisible(keyboardShown);
-      setKeyboardOffset(occludedHeight);
+
+      // 추천 검색어 바는 안드로이드에선 viewport 자체가 줄어들어서
+      // 굳이 따로 올릴 필요 없음 → 항상 0으로
+      setKeyboardOffset(0);
     };
 
     handleResize();
@@ -658,6 +654,13 @@ export function CommunityPage({
           setTimeout(() => {
             blurByClickRef.current = false;
           }, 0);
+        }}
+        onClick={() => {
+          if (isSearchActive) {
+            setIsSearchActive(false);
+            setSearchQuery("");
+            setIsSearchFocused(false);
+          }
         }}
       >
         {/* 헤더 */}
