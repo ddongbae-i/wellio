@@ -671,7 +671,7 @@ export function CommunityPage({
         {/* 헤더 */}
         <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 flex flex-col justify-center w-full max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
           {isSearchActive ? (
-            <div className="flex items-center gap-3 w-full"
+            <div className="flex items-center gap-3"
               onClick={(e) => {
                 e.stopPropagation();
               }}>
@@ -682,14 +682,14 @@ export function CommunityPage({
                 <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
               </button>
               <div
-                className={`bg-white rounded-[12px] px-5 xs:px-6 py-2 h-10 flex items-center gap-2 transition-all border-[1.6px] flex-1 ${isSearchFocused ? "border-[#2ECACA]" : "border-[#2ECACA]"
+                className={`bg-white rounded-[12px] px-4 py-2 h-10 flex items-center gap-2 transition-all border-[1.6px] flex-1 min-w-0 ${isSearchFocused ? "border-[#2ECACA]" : "border-[#2ECACA]"
                   }`}
               >
                 <img src={SearchColor} alt="검색" className="w-6 h-6 flex-shrink-0" />
                 <input
                   type="text"
                   placeholder="어떤 사진을 찾으시나요?"
-                  className="flex-1 bg-transparent outline-none text-[#202020] placeholder:text-[#aeaeae] placeholder:font-normal min-w-0"
+                  className="flex-1 bg-transparent outline-none text-[#202020] placeholder:text-[#aeaeae] placeholder:font-normal min-w-0 text-[15px]"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
@@ -698,7 +698,7 @@ export function CommunityPage({
                 />
               </div>
               <button
-                className="text-[#777777] text-[17px] font-normal flex-shrink-0 whitespace-nowrap"
+                className="text-[#777777] text-[15px] font-normal flex-shrink-0 whitespace-nowrap px-1"
                 onClick={() => {
                   setIsSearchActive(false);
                   setSearchQuery("");
