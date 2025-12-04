@@ -29,6 +29,8 @@ import WalkIcon from "../assets/images/WalkIcon.svg"
 import TogetherIcon from "../assets/images/TogetherIcon.svg"
 import HabitIcon from "../assets/images/HabitIcon.svg"
 import TrophyIcon from "../assets/images/TrophyIcon.svg"
+import { FreeMode, Mousewheel } from "swiper/modules";
+import "swiper/css/free-mode";
 
 
 // 커스텀 알럿 컴포넌트
@@ -775,7 +777,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       />
 
       {/* 메인 래퍼 */}
-      <div className="relative w-full min-h-screen bg-[#f7f7f7] overflow-hidden">
+      <div className="relative w-full min-h-screen bg-[#f7f7f7] overflow-x-hidden">
         <div className="absolute inset-0 flex justify-center overflow-visible">
           <div className="relative w-full max-w-[500px] h-full">
             {/* 이미지 카드 컨테이너 */}
@@ -1100,16 +1102,15 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   spaceBetween={14}
                   slidesPerView="auto"
                   className="w-full h-full"
-
-                  /* ✅ 웹 마우스 드래그 + 모바일 터치 충돌 방지 */
                   grabCursor={true}
                   resistanceRatio={0}
                   touchStartPreventDefault={false}
+                  touchMoveStopPropagation={false}
                   style={{
-                    touchAction: "pan-x",
+                    touchAction: "manipulation",   // ← pan-x 말고 이 정도가 안전
                     WebkitUserSelect: "none",
+                    cursor: "grab",
                   }}
-
                   loop={true}
                   centeredSlides={true}
                   slideToClickedSlide={true}
@@ -1140,13 +1141,16 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                         >
                           <div
                             className={`
-                    relative
-                    w-16 h-16 rounded-full overflow-hidden
-                    flex items-center justify-center
-                    shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]
-                    transition-all duration-200
-                    ${isActive ? "bg-white border-[4px] border-[#2ECACA]" : "bg-[#EEEEEE]"}
-                  `}
+              relative
+              w-16 h-16 rounded-full overflow-hidden
+              flex items-center justify-center
+              shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]
+              transition-all duration-200
+              ${isActive
+                                ? "bg-white border-[4px] border-[#2ECACA]"
+                                : "bg-[#EEEEEE]"
+                              }
+            `}
                           >
                             {!isActive && selectedImage && (
                               <ImageWithFallback
@@ -1160,10 +1164,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                               />
                             )}
 
-                            <span
-                              className={`relative z-10 text-[10px] font-medium tracking-wide ${isActive ? "text-[#555555]" : "text-[#555555]"
-                                }`}
-                            >
+                            <span className="relative z-10 text-[10px] font-medium tracking-wide text-[#555555]">
                               {filter.name.toUpperCase()}
                             </span>
                           </div>
@@ -1172,6 +1173,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     </SwiperSlide>
                   ))}
                 </Swiper>
+
               </div>
             </div>
           ) : isDetailEditMode ? (
@@ -1336,38 +1338,33 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   <h3 className="text-[17px] font-semibold text-[#202020]">
                     오늘 운동 기록
                   </h3>
-                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm">
-                    <button
-                      onClick={() =>
-                        handleHealthRecordSelect("👟 8,542보")
-                      }
-                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
-                    >
-                      <span className="text-[15px] font-medium">
-                        👟 걸음수
-                      </span>
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleHealthRecordSelect("🔥 450kcal")
-                      }
-                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
-                    >
-                      <span className="text-[15px] font-medium">
-                        🔥 소모칼로리
-                      </span>
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleHealthRecordSelect("🪜 12층")
-                      }
-                      className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
-                    >
-                      <span className="text-[15px] font-medium">
-                        🪜 오른층수
-                      </span>
-                    </button>
-                  </div>
+                  <Swiper
+                    modules={[FreeMode, Mousewheel]}
+                    slidesPerView="auto"
+                    spaceBetween={12}
+                    freeMode
+                    grabCursor
+                    mousewheel
+                    className="w-full"
+                  >
+                    {[
+                      { label: "👟 걸음수", value: "👟 8,542보" },
+                      { label: "🔥 소모칼로리", value: "🔥 450kcal" },
+                      { label: "🪜 오른층수", value: "🪜 12층" },
+                    ].map((item, idx) => (
+                      <SwiperSlide key={idx} style={{ width: "auto" }}>
+                        <button
+                          onClick={() => handleHealthRecordSelect(item.value)}
+                          className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
+                        >
+                          <span className="text-[15px] font-medium">
+                            {item.label}
+                          </span>
+                        </button>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+
                 </div>
                 <div className="space-y-3">
                   <h3 className="text-[17px] font-bold text-[#202020]">
