@@ -81,6 +81,8 @@ const searchSuggestions = [
   "혈압",
 ];
 
+const [localPosts, setLocalPosts] = useState(posts);
+
 
 // === 드롭다운 메뉴용 가족 구성원 ===
 const familyMembers = [
@@ -508,9 +510,15 @@ export function CommunityPage({
   };
 
   const handleConfirmDelete = () => {
-    if (postToDelete && onDeletePost) {
-      onDeletePost(postToDelete);
-    }
+    if (!postToDelete) return;
+
+    // ✅ 1) 화면에서 즉시 제거
+    setLocalPosts((prev) => prev.filter((post) => post.id !== postToDelete));
+
+    // ✅ 2) 부모에도 삭제 알림 (있을 경우)
+    onDeletePost?.(postToDelete);
+
+    // ✅ 3) 상태 정리
     setShowDeleteModal(false);
     setPostToDelete(null);
   };
@@ -525,7 +533,7 @@ export function CommunityPage({
     setExpandedPostId(null);
   };
 
-  const filteredPosts = posts.filter((post) => {
+  const filteredPosts = localPosts.filter((post) => {
     if (selectedFamilyMember) {
       const isMe = selectedFamilyMember === currentUserName;
       if (isMe) {
@@ -561,7 +569,7 @@ export function CommunityPage({
     );
   });
 
-  const expandedPost = posts.find((p) => p.id === expandedPostId);
+  const expandedPost = localPosts.find((p) => p.id === expandedPostId);
 
   // 초기 currentPostId
   useEffect(() => {
@@ -1022,12 +1030,7 @@ export function CommunityPage({
                           )}
                         <motion.div
                           className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] touch-none"
-                          drag={
-                            !isScrolling &&
-                              post.userName === currentUser.userName
-                              ? "x"
-                              : false
-                          }
+                          drag={!isScrolling ? "x" : false}
                           dragConstraints={{
                             left: -120,
                             right: 0,
