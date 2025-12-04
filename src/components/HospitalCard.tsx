@@ -1,4 +1,3 @@
-// src/components/HospitalCard.tsx
 import React, { useState } from "react";
 import { Heart, Star } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
@@ -30,6 +29,7 @@ interface HospitalCardProps {
   onToggleFavorite?: (hospital: Hospital) => void;
   isInFavoritePage?: boolean;
   reviewCount?: number;
+  onNavigateToFavorites?: () => void; // 👈 추가
 }
 
 /** 병원 카드 UI 컴포넌트 */
@@ -41,9 +41,11 @@ export function HospitalCard({
   onToggleFavorite,
   isInFavoritePage,
   reviewCount,
+  onNavigateToFavorites, // 👈 추가
 }: HospitalCardProps) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [showArrow, setShowArrow] = useState(false);
 
   const isHospitalFavorite =
     isFavorite !== undefined
@@ -79,12 +81,21 @@ export function HospitalCard({
     // 커스텀 토스트 메시지 설정
     if (isHospitalFavorite) {
       setToastMessage("찜 목록에서 삭제되었습니다");
+      setShowArrow(false);
     } else {
       setToastMessage("찜 목록에 추가되었습니다");
+      setShowArrow(true);
     }
 
     setShowToast(true);
     onToggleFavorite?.(hospital);
+  };
+
+  const handleToastClick = () => {
+    if (showArrow && onNavigateToFavorites) {
+      setShowToast(false);
+      onNavigateToFavorites();
+    }
   };
 
   return (
@@ -198,6 +209,8 @@ export function HospitalCard({
         show={showToast}
         message={toastMessage}
         onClose={() => setShowToast(false)}
+        showArrow={showArrow}
+        onClick={showArrow ? handleToastClick : undefined}
       />
     </>
   );

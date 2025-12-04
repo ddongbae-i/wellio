@@ -51,10 +51,10 @@ export function FavoriteHospitalsPage({
   return (
     <div className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-30 px-4 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 w-full bg-[#f7f7f7] relative">
+      <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 w-full bg-[#f7f7f7] relative">
         <button
           onClick={onBack}
-          className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
+          className="absolute left-5 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
         >
           <ChevronLeft size={24} className="text-[#1A1A1A]" />
         </button>
@@ -65,7 +65,7 @@ export function FavoriteHospitalsPage({
 
       {/* Content */}
       <motion.div
-        className="px-4 xs:px-6 sm:px-8 pt-5 pb-20 space-y-3"
+        className="px-5 xs:px-6 sm:px-8 pt-5 pb-20 space-y-3"
         initial="hidden"
         animate="visible"
         variants={staggerContainer}

@@ -15,6 +15,7 @@ interface HospitalSearchPageProps {
   favoriteHospitals: Hospital[];
   onToggleFavorite: (hospital: Hospital) => void;
   getHospitalReviewCount?: (hospitalId: number) => number;
+  onPageChange?: (page: string) => void; // 👈 추가
 }
 
 export function HospitalSearchPage({
@@ -23,6 +24,7 @@ export function HospitalSearchPage({
   favoriteHospitals,
   onToggleFavorite,
   getHospitalReviewCount,
+  onPageChange, // 👈 받아오기
 }: HospitalSearchPageProps) {
   const [selectedFilter, setSelectedFilter] = useState("거리순");
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,15 +40,12 @@ export function HospitalSearchPage({
     "당일 검사",
   ];
 
-  // ✅ 이 페이지에서 보여줄 카드 id 순서
   const cardIds = [1, 2, 3, 4, 5, 6, 7];
 
-  // id 배열 기준으로 hospitalInfo에서 데이터 가져오기
   const hospitalsToShow: Hospital[] = cardIds
     .map((id) => hospitalList.find((h) => h.id === id))
     .filter((h): h is Hospital => Boolean(h));
 
-  // 🔍 검색어 적용 (이름 + 전문 텍스트)
   const filteredHospitals = hospitalsToShow.filter((hospital) => {
     if (!searchQuery.trim()) return true;
 
@@ -78,6 +77,7 @@ export function HospitalSearchPage({
       },
     },
   };
+
   return (
     <div className="bg-[#f7f7f7] flex flex-col min-h-screen">
       {/* Header */}
@@ -113,23 +113,16 @@ export function HospitalSearchPage({
           </div>
         </motion.header>
 
-        {/* Filter Tags - 헤더 밖, 하지만 sticky 영역 안 */}
+        {/* Filter Tags */}
         <div className="filter-swiper-wrapper pb-3 mt-4">
-          <Swiper
-            slidesPerView="auto"
-            spaceBetween={8}
-            className="w-full"
-          >
+          <Swiper slidesPerView="auto" spaceBetween={8} className="w-full">
             {filters.map((filter) => (
-              <SwiperSlide
-                key={filter}
-                className="!w-auto filter-swiper-slide"  // ✅ 별도 클래스만
-              >
+              <SwiperSlide key={filter} className="!w-auto filter-swiper-slide">
                 <button
                   onClick={() => setSelectedFilter(filter)}
                   className={`px-3 py-2 rounded-full whitespace-nowrap transition-colors text-sm ${selectedFilter === filter
-                    ? "bg-[#BCEEEE] border border-[#BCEEEE] text-[#2b2b2b] font-medium"
-                    : "border border-[#aeaeae] text-[#777] font-normal"
+                      ? "bg-[#BCEEEE] border border-[#BCEEEE] text-[#2b2b2b] font-medium"
+                      : "border border-[#aeaeae] text-[#777] font-normal"
                     }`}
                 >
                   {filter}
@@ -138,8 +131,8 @@ export function HospitalSearchPage({
             ))}
           </Swiper>
         </div>
-
       </div>
+
       {/* Hospital List */}
       <motion.div
         className="overflow-y-hidden pt-2 pb-10 space-y-3 px-5 xs:px-6 sm:px-8"
@@ -149,16 +142,18 @@ export function HospitalSearchPage({
       >
         <div className="grid grid-cols-1">
           {filteredHospitals.map((hospital) => (
-            <motion.div
-              key={hospital.id}
-              variants={itemVariants}
-            >
+            <motion.div key={hospital.id} variants={itemVariants}>
               <HospitalCard
                 hospital={hospital}
                 onClick={() => onHospitalClick(hospital)}
                 favoriteHospitals={favoriteHospitals}
                 onToggleFavorite={onToggleFavorite}
                 reviewCount={getHospitalReviewCount?.(hospital.id)}
+                onNavigateToFavorites={
+                  onPageChange
+                    ? () => onPageChange("favorite-hospitals")
+                    : undefined
+                }
               />
             </motion.div>
           ))}

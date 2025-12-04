@@ -1699,9 +1699,10 @@ export default function App() {
           <HospitalSearchPage
             onBack={navigateBack}
             onHospitalClick={handleHospitalClick}
-            favoriteHospitals={favoriteHospitals}
+            favoriteHospitals={FavoriteHospitalsPage}
             onToggleFavorite={toggleFavorite}
             getHospitalReviewCount={getHospitalReviewCount}
+            onPageChange={(page) => navigateTo(page as Page)} // 👈 추가
           />
         )}
 
