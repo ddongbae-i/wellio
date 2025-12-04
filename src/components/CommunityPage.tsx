@@ -69,6 +69,7 @@ interface CommunityPageProps {
 interface SearchSuggestionBarProps {
   isKeyboardVisible: boolean;
   onSelect: (keyword: string) => void;
+  keyboardOffset: number;
 }
 
 const searchSuggestions = [
@@ -92,6 +93,7 @@ const familyMembers = [
 const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
   isKeyboardVisible,
   onSelect,
+  keyboardOffset,
 }) => (
   <AnimatePresence>
     <motion.div
@@ -102,11 +104,11 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
       transition={{ type: "spring", damping: 24, stiffness: 260 }}
       className="fixed left-1/2 -translate-x-1/2 z-[60] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        bottom: isKeyboardVisible ? 60 : 0, // 키보드 올라오면 살짝 위로
+        bottom: isKeyboardVisible ? keyboardOffset : 0, // 키보드 올라오면 살짝 위로
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
-      <div className="pl-5 xs:pl-6 sm:pl-8 pt-5 pb-2">
+      <div className="pl-5 xs:pl-6 sm:pl-8 pt-5 pb-10">
         <p className="text-[15px] font-semibold text-[#2b2b2b] mb-2 ml-[6px]">
           추천 검색어
         </p>
