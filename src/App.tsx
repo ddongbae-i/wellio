@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { WelcomePage } from "./components/WelcomePage";
 import { SocialLoginPage } from "./components/SocialLoginPage";
 import { LoginPage } from "./components/LoginPage";
@@ -749,6 +749,77 @@ export default function App() {
     useState<Hospital | null>(null);
   const [selectedPostId, setSelectedPostId] =
     useState<number | null>(null);
+
+
+  const bubble = document.querySelector('#chatbase-bubble-button') as HTMLElement | null;
+  const windowEl = document.querySelector('#chatbase-bubble-window') as HTMLElement | null;
+  const bubbles = document.querySelector('#chatbase-message-bubbles') as HTMLElement | null;
+
+  const removeChatbaseAll = () => {
+    // 🔥 1) Chatbase 스타일 완전 제거 (패턴 기반)
+    /*     document.querySelectorAll("style").forEach((styleEl) => {
+          const text = styleEl.textContent || "";
+          if (
+            text.includes("chatbase") ||
+            text.includes("#chatbase-") ||
+            text.includes("chatbase-bubble") ||
+            text.includes("chatbase-message") ||
+            text.includes("chatbase-widget")
+          ) {
+            styleEl.remove();
+          }
+        }); */
+
+    // 🔥 2) 요소 제거
+    bubble?.remove();
+    windowEl?.remove();
+    bubbles?.remove();
+    // document.querySelector('iframe[src*="chatbase"]')?.remove();
+
+    // 🔥 3) 이전 스크립트 제거 (id 패턴 매칭)
+    document.querySelectorAll("script").forEach((script) => {
+      if (
+        script.src.includes("chatbase") ||
+        script.id.startsWith("chatbase-widget")
+      ) {
+        script.remove();
+      }
+    });
+  };
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.id = "chatbase-widget";
+    script.src = "https://www.chatbase.co/embed.min.js";
+    script.defer = true;
+    script.setAttribute("chatbotId", "irCuwpc7c06Qva9cN3Qz6");
+    script.setAttribute("domain", "www.chatbase.co");
+    document.body.appendChild(script);
+  }, []);
+  useEffect(() => {
+    const showOn = ["home", "hospital"];
+    const shouldShow = showOn.includes(currentPage);
+
+    const bubble = document.querySelector('#chatbase-bubble-button') as HTMLElement | null;
+    const windowEl = document.querySelector('#chatbase-bubble-window') as HTMLElement | null;
+    const bubbles = document.querySelector('#chatbase-message-bubbles') as HTMLElement | null;
+
+    if (shouldShow) {
+      bubble?.style.setProperty("display", "block", "important");
+      windowEl?.style.setProperty("display", "block", "important");
+      bubbles?.style.setProperty("display", "block", "important");
+    } else {
+      bubble?.style.setProperty("display", "none", "important");
+      windowEl?.style.setProperty("display", "none", "important");
+      bubbles?.style.setProperty("display", "none", "important");
+    }
+  }, [currentPage]);
+
+
+
+
+
+
 
   // 알림 상태
   const [notifications, setNotifications] = useState<Notification[]>([

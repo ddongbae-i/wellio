@@ -8,6 +8,7 @@ import { SecondaryMenu } from "./SecondaryMenu";
 import { HealthKnowledge } from "./HealthKnowledge";
 import { motion, type Variants } from "framer-motion";
 import type { Page } from "../types/page";
+import { useEffect } from "react";
 
 interface HomePageProps {
   userName: string;
@@ -43,6 +44,8 @@ export function HomePage({
   hasUnreadNotification,
   onNotificationClick,
 }: HomePageProps) {
+
+
   return (
     <>
       {/* 🔔 상단 헤더 */}

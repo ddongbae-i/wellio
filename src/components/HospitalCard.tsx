@@ -139,8 +139,8 @@ export function HospitalCard({
               {/* 찜하기 버튼 */}
               <button
                 className={`${hospitalCardClasses.favoriteButtonBase} ${isHospitalFavorite
-                    ? "text-[#FF0000]"
-                    : "text-[#AEAEAE] hover:text-[#FF6666]"
+                  ? "text-[#FF0000]"
+                  : "text-[#AEAEAE] hover:text-[#FF6666]"
                   }`}
                 onClick={handleFavoriteClick}
               >
@@ -205,16 +205,17 @@ export function HospitalCard({
             </div>
           </div>
         </div>
+        {/* 커스텀 토스트 */}
+        <CustomToast
+          show={showToast}
+          message={toastMessage}
+          onClose={() => setShowToast(false)}
+          showArrow={showArrow}
+          onClick={showArrow ? handleToastClick : undefined}
+        />
       </div>
 
-      {/* 커스텀 토스트 */}
-      <CustomToast
-        show={showToast}
-        message={toastMessage}
-        onClose={() => setShowToast(false)}
-        showArrow={showArrow}
-        onClick={showArrow ? handleToastClick : undefined}
-      />
+
     </>
   );
 }

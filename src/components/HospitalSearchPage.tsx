@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HospitalCard } from "./HospitalCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, type Variants } from "motion/react";
@@ -121,8 +121,8 @@ export function HospitalSearchPage({
                 <button
                   onClick={() => setSelectedFilter(filter)}
                   className={`px-3 py-2 rounded-full whitespace-nowrap transition-colors text-sm ${selectedFilter === filter
-                      ? "bg-[#BCEEEE] border border-[#BCEEEE] text-[#2b2b2b] font-medium"
-                      : "border border-[#aeaeae] text-[#777] font-normal"
+                    ? "bg-[#BCEEEE] border border-[#BCEEEE] text-[#2b2b2b] font-medium"
+                    : "border border-[#aeaeae] text-[#777] font-normal"
                     }`}
                 >
                   {filter}
