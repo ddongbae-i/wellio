@@ -857,9 +857,10 @@ export default function App() {
       // 🟡 3) “안녕하세요 챗봇입니다” 말풍선 위치
       if (messageBubbles) {
         messageBubbles.style.position = "fixed";
-        messageBubbles.style.bottom = "112px";
+        messageBubbles.style.bottom = "100px";
         messageBubbles.style.right = `${baseRight + 60}px`;
         messageBubbles.style.maxWidth = "270px";
+        messageBubbles.style.maxWidth = "55px";
         messageBubbles.style.zIndex = "9999";
         messageBubbles.style.setProperty("display", "block", "important");
       }
