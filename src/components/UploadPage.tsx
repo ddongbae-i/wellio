@@ -1095,7 +1095,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 <div className="w-[68px] h-[68px] rounded-full border-[3px] border-[#36D2C5]" />
               </div>
 
-              <div className="w-full h-full z-20">
+              <div className="w-full h-full z-20 pointer-events-auto">
                 <Swiper
                   spaceBetween={14}
                   slidesPerView="auto"
