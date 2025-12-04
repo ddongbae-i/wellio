@@ -664,7 +664,7 @@ export function CommunityPage({
                 <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
               </button>
               <div
-                className={`bg-white rounded-[12px] px-5 xs:px-6 spy-2 h-10 flex items-center gap-2 transition-all border-[1.6px] flex-1 ${isSearchFocused ? "border-[#2ECACA]" : "border-[#2ECACA]"
+                className={`bg-white rounded-[12px] px-5 xs:px-6 py-2 h-10 flex items-center gap-2 transition-all border-[1.6px] flex-1 ${isSearchFocused ? "border-[#2ECACA]" : "border-[#2ECACA]"
                   }`}
               >
                 <img src={SearchColor} alt="검색" className="w-6 h-6" />
