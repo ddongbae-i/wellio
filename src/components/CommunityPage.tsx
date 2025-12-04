@@ -96,41 +96,40 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
   keyboardOffset,
 }) => (
   <AnimatePresence>
-    <motion.div
-      key="search-suggestion-bar"
-      initial={{ y: "100%", opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: "100%", opacity: 0 }}
-      transition={{ type: "spring", damping: 24, stiffness: 260 }}
-      className="fixed left-1/2 -translate-x-1/2 z-[60] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
-      style={{
-        bottom: 0,
-        transform: isKeyboardVisible
-          ? `translateY(-${keyboardOffset}px)`
-          : "translateY(0)",
-        paddingBottom: "env(safe-area-inset-bottom)",
-      }}
-    >
-      <div className="pl-5 xs:pl-6 sm:pl-8 pt-5 pb-10">
-        <p className="text-[15px] font-semibold text-[#2b2b2b] mb-2 ml-[6px]">
-          추천 검색어
-        </p>
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {searchSuggestions.map((keyword, index) => (
-            <button
-              key={index}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                onSelect(keyword);
-              }}
-              className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
-            >
-              {keyword}
-            </button>
-          ))}
+    {isKeyboardVisible && (
+      <motion.div
+        key="search-suggestion-bar"
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0 }}
+        transition={{ type: "spring", damping: 24, stiffness: 260 }}
+        className="fixed left-1/2 -translate-x-1/2 z-[60] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
+        style={{
+          bottom: `${keyboardOffset}px`,
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
+      >
+        <div className="pl-5 xs:pl-6 sm:pl-8 pt-5 pb-10">
+          <p className="text-[15px] font-semibold text-[#2b2b2b] mb-2 ml-[6px]">
+            추천 검색어
+          </p>
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+            {searchSuggestions.map((keyword, index) => (
+              <button
+                key={index}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onSelect(keyword);
+                }}
+                className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
+              >
+                {keyword}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    )}
   </AnimatePresence>
 );
 
@@ -575,11 +574,11 @@ export function CommunityPage({
     scrollToPost(initialPostId);
   }, [initialPostId, isGridView, isReactionView]);
 
-  // 모바일 키보드 감지 (레이아웃 높이는 처음 값 기준으로만 사용)
+  // 모바일 키보드 감지 - 수정된 부분
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const initialHeight = window.innerHeight; // 앱 처음 켰을 때 높이
+    const initialHeight = window.innerHeight;
     setScreenHeight(initialHeight);
 
     const viewport = window.visualViewport;
@@ -587,13 +586,19 @@ export function CommunityPage({
     const handleResize = () => {
       if (!viewport) return;
 
-      // 키보드가 올라오면 visualViewport 높이가 줄어듦
-      const keyboardShown = viewport.height < initialHeight - 80; // 80px 정도 여유
+      const currentHeight = viewport.height;
+      const heightDiff = initialHeight - currentHeight;
+
+      // 키보드가 올라왔는지 판단 (80px 이상 줄어들면 키보드로 간주)
+      const keyboardShown = heightDiff > 80;
       setIsKeyboardVisible(keyboardShown);
 
-      // 추천 검색어 바는 안드로이드에선 viewport 자체가 줄어들어서
-      // 굳이 따로 올릴 필요 없음 → 항상 0으로
-      setKeyboardOffset(0);
+      // 키보드 높이 계산
+      if (keyboardShown) {
+        setKeyboardOffset(heightDiff);
+      } else {
+        setKeyboardOffset(0);
+      }
     };
 
     handleResize();
@@ -666,9 +671,8 @@ export function CommunityPage({
         {/* 헤더 */}
         <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 flex flex-col justify-center w-full max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
           {isSearchActive ? (
-            <div className="flex items-center gap-3"
+            <div className="flex items-center gap-3 w-full"
               onClick={(e) => {
-                // 상위 div의 onClick으로 검색이 꺼지지 않게 막기
                 e.stopPropagation();
               }}>
               <button
@@ -681,11 +685,11 @@ export function CommunityPage({
                 className={`bg-white rounded-[12px] px-5 xs:px-6 py-2 h-10 flex items-center gap-2 transition-all border-[1.6px] flex-1 ${isSearchFocused ? "border-[#2ECACA]" : "border-[#2ECACA]"
                   }`}
               >
-                <img src={SearchColor} alt="검색" className="w-6 h-6" />
+                <img src={SearchColor} alt="검색" className="w-6 h-6 flex-shrink-0" />
                 <input
                   type="text"
                   placeholder="어떤 사진을 찾으시나요?"
-                  className="flex-1 bg-transparent outline-none text-[#202020] placeholder:text-[#aeaeae] placeholder:font-normal"
+                  className="flex-1 bg-transparent outline-none text-[#202020] placeholder:text-[#aeaeae] placeholder:font-normal min-w-0"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
@@ -694,7 +698,7 @@ export function CommunityPage({
                 />
               </div>
               <button
-                className="text-[#777777] text-[17px] font-normal flex-shrink-0"
+                className="text-[#777777] text-[17px] font-normal flex-shrink-0 whitespace-nowrap"
                 onClick={() => {
                   setIsSearchActive(false);
                   setSearchQuery("");
@@ -1598,7 +1602,7 @@ export function CommunityPage({
       {isSearchActive && (
         <SearchSuggestionBar
           isKeyboardVisible={isKeyboardVisible}
-          keyboardOffset={keyboardOffset} // ✅ 추가
+          keyboardOffset={keyboardOffset}
           onSelect={(keyword) => setSearchQuery(keyword)}
         />
       )}

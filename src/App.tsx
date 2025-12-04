@@ -879,67 +879,32 @@ export default function App() {
   };
 
   // 찜한 병원 목록
-  const [favoriteHospitals, setFavoriteHospitals] = useState<Hospital[]>(
-    [
-      {
-        id: 1,
-        name: "매일건강의원",
-        department: "가정의학과",
-        specialtyText: "가정의학과와 전문의 2명",
-        address: "서울 서초구 서초대로 59번길 19, 201호",
-        phone: "02-1234-5678",
-        hours: "10:00-20:00",
-        distance: "37m",
-        description:
-          "환자 중심의 진료를 제공하는 가정의학과 전문 병원입니다. 만성질환 관리부터 건강검진까지 종합적인 의료 서비스를 제공합니다.",
-        imageUrl:
-          "https://images.unsplash.com/photo-1580281658136-17c835359e86?w=100&h=100&fit=crop",
-        latitude: 37.4949,
-        longitude: 127.0283,
-        isAvailableNow: true,
-        rating: 4.8,
-        reviews: 223,
-      },
-      {
-        id: 2,
-        name: "365클리닉 강남본점",
-        department: "피부과",
-        specialtyText: "피부과와 전문의 3명",
-        address: "서울 서초구 서초대로 16가길, 3층",
-        phone: "02-2345-6789",
-        hours: "09:30-20:30",
-        distance: "58m",
-        description:
-          "최신 피부과 시술 장비를 갖춘 전문 클리닉입니다. 여드름, 미백, 안티에이징 등 다양한 피부 치료를 제공합니다.",
-        imageUrl:
-          "https://via.placeholder.com/100x100/E7F3FF/2F80ED?text=Logo",
-        latitude: 37.495,
-        longitude: 127.0285,
-        isAvailableNow: true,
-        rating: 4.6,
-        reviews: 12,
-      },
-      {
-        id: 3,
-        name: "사랑니쏙쏙 강남본점",
-        department: "치과",
-        specialtyText: "치과",
-        address: "서울 서초구 강남대로 102",
-        phone: "02-3456-7890",
-        hours: "10:00-18:00",
-        distance: "167m",
-        description:
-          "사랑니 발치 전문 치과입니다. 통증 최소화와 빠른 회복을 위한 최신 시술 방법을 사용합니다.",
-        imageUrl:
-          "https://via.placeholder.com/100x100/E8F8F7/00C2B3?text=Logo",
-        latitude: 37.4955,
-        longitude: 127.029,
-        isAvailableNow: true,
-        rating: 4.7,
-        reviews: 41,
-      },
-    ],
-  );
+
+
+  const INITIAL_FAVORITE_HOSPITAL_IDS = [1, 2, 3];
+
+  const [favoriteHospitals, setFavoriteHospitals] = useState<Hospital[]>(() => {
+    // hospitalMap 에서 ID 기준으로 병원 정보를 가져와서 초기값으로 세팅
+    return INITIAL_FAVORITE_HOSPITAL_IDS
+      .map((id) => hospitalMap[id])
+      .filter((hospital): hospital is Hospital => !!hospital);
+  });
+
+  // 찜 토글
+  const toggleFavorite = (hospital: Hospital) => {
+    setFavoriteHospitals((prev) => {
+      const isFavorite = prev.some((h) => h.id === hospital.id);
+
+      if (isFavorite) {
+        // 이미 찜 -> 해제
+        return prev.filter((h) => h.id !== hospital.id);
+      }
+
+      // 찜 추가할 때도 hospitalMap 기준으로 풀 데이터 사용
+      const fullHospital = hospitalMap[hospital.id] ?? hospital;
+      return [...prev, fullHospital];
+    });
+  };
 
   const parseKRDateString = (dateStr: string): Date => {
     // 괄호 뒤 요일은 버리고 "2025.08.08"만 사용
