@@ -815,12 +815,68 @@ export default function App() {
     }
   }, [currentPage]);
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.id = "chatbase-widget";
+    script.src = "https://www.chatbase.co/embed.min.js";
+    script.defer = true;
+    script.setAttribute("chatbotId", "irCuwpc7c06Qva9cN3Qz6");
+    script.setAttribute("domain", "www.chatbase.co");
+    document.body.appendChild(script);
 
+    // 👇 위치 스타일 추가
+    script.onload = () => {
+      const style = document.createElement("style");
+      style.id = "chatbase-custom-position";
+      style.innerHTML = `
+      /* GNB 높이는 64px (h-16) */
+      #chatbase-bubble-button {
+        bottom: 80px !important;  /* 64px(GNB) + 16px(여백) */
+        right: 20px !important;
+        z-index: 999 !important;
+      }
 
+      #chatbase-bubble-window {
+        bottom: 140px !important; /* 버튼 위에 표시 */
+        right: 20px !important;
+        max-height: calc(100vh - 200px) !important;
+        z-index: 999 !important;
+      }
 
+      #chatbase-message-bubbles {
+        bottom: 80px !important;
+        right: 80px !important; /* 버튼 왼쪽 */
+        z-index: 999 !important;
+      }
 
+      /* 모바일 대응 */
+      @media (max-width: 500px) {
+        #chatbase-bubble-button {
+          bottom: 76px !important;
+          right: 16px !important;
+        }
+        
+        #chatbase-bubble-window {
+          bottom: 136px !important;
+          right: 10px !important;
+          left: 10px !important;
+          max-width: calc(100% - 20px) !important;
+        }
 
+        #chatbase-message-bubbles {
+          bottom: 76px !important;
+          right: 70px !important;
+        }
+      }
+    `;
+      document.head.appendChild(style);
+    };
 
+    return () => {
+      script.remove();
+      document.getElementById("chatbase-custom-position")?.remove();
+    };
+  }, []);
   // 알림 상태
   const [notifications, setNotifications] = useState<Notification[]>([
     {
