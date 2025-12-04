@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { HospitalCard } from "./HospitalCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, type Variants } from "motion/react";
@@ -182,7 +182,7 @@ export function HospitalSearchPage({
         </div>
       </motion.div>
 
-      {/* 커스텀 토스트 - 페이지 하단 */}
+      {/* 커스텀 토스트 */}
       <CustomToast
         show={showToast}
         message={toastMessage}

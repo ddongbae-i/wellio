@@ -50,9 +50,9 @@ export function FavoriteHospitalsPage({
   };
 
   return (
-    <div className="relative bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto min-h-screen">
+    <div className="bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-30 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center border-b border-gray-100 w-full bg-[#f7f7f7] relative">
+      <header className="sticky top-0 z-30 py-4 flex items-center justify-center w-full bg-[#f7f7f7]/80 backdrop-blur-xs mx-auto min-h-[80px] relative">
         <button
           onClick={onBack}
           className="absolute left-5 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
@@ -106,7 +106,7 @@ export function FavoriteHospitalsPage({
         )}
       </motion.div>
 
-      {/* 커스텀 토스트 - 페이지 하단 */}
+      {/* 커스텀 토스트 */}
       <CustomToast
         show={showToast}
         message="찜 목록에서 삭제되었습니다"

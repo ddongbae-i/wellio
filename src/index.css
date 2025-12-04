@@ -4661,32 +4661,4 @@ html {
   }
 }
 
-/* ✅ 1. 챗봇 버튼 (500px 프레임 기준 고정) */
-#chatbase-bubble-button {
-  position: fixed !important;
-  bottom: 88px !important;
-
-  /* ✅ 500px 프레임 안쪽 오른쪽 16px */
-  right: calc(50% - 250px + 16px) !important;
-
-  z-index: 9999 !important;
-}
-
-/* ✅ 2. 챗봇 윈도우 → "버튼 기준"으로 바로 위에 뜨게 */
-#chatbase-bubble-window {
-  position: fixed !important;
-
-  /* ✅ 버튼과 같은 X좌표 */
-  right: calc(50% - 250px + 16px) !important;
-
-  /* ✅ 버튼보다 위로 정확히 이동 */
-  bottom: calc(88px + 64px + 12px) !important;
-  /* 88px = 버튼 bottom
-     64px = 버튼 높이
-     12px = 버튼-창 간격 */
-
-  width: 380px !important;
-  max-width: 90vw !important;
-
-  z-index: 9998 !important;
-}
+/* Wellio 앱 width랑 동일하게 맞춰주기 */

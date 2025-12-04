@@ -269,7 +269,7 @@ export function MedicalHistoryPage({
         transition={{ duration: 0.3 }}
       >
         {/* Header */}
-        <header className="px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full relative bg-transparent">
+        <header className="px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center w-full relative bg-transparent min-h-[80px]">
           <button
             onClick={onBack}
             className="absolute left-5 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
