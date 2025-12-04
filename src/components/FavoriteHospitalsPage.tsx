@@ -6,7 +6,6 @@ import { motion } from "motion/react";
 import { CustomToast } from "./CustomToast";
 import { useState } from "react";
 
-
 interface FavoriteHospitalsPageProps {
   onBack: () => void;
   favoriteHospitals: any[];
@@ -27,6 +26,16 @@ export function FavoriteHospitalsPage({
     onToggleFavorite(hospital);
   };
 
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+      },
+    },
+  };
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -34,9 +43,9 @@ export function FavoriteHospitalsPage({
       y: 0,
       transition: {
         duration: 0.4,
-        ease: "easeOut"
-      }
-    }
+        ease: "easeOut",
+      },
+    },
   };
 
   return (
@@ -66,22 +75,20 @@ export function FavoriteHospitalsPage({
             className="flex flex-col items-center justify-center py-20 text-center"
             variants={itemVariants}
           >
-            <p className="text-gray-500">
-              찜한 병원이 없습니다
-            </p>
+            <p className="text-gray-500">찜한 병원이 없습니다</p>
             <p className="text-sm text-gray-400 mt-2">
               병원 검색에서 하트를 눌러 저장해보세요
             </p>
           </motion.div>
         ) : (
           <div className="space-y-3">
-            {favoriteHospitals.map((hospital, index) => (
+            {favoriteHospitals.map((hospital) => (
               <motion.div key={hospital.id} variants={itemVariants}>
                 <HospitalCard
                   hospital={hospital}
                   isFavorite={true}
-                  onToggleFavorite={onToggleFavorite}
-                  isInFavoritePage={true} // 찜한 병원 페이지임을 표시
+                  onToggleFavorite={handleToggleFavorite}
+                  isInFavoritePage={true}
                   onClick={() => {
                     // 병원 상세 페이지로 이동하는 로직 추가 가능
                   }}
@@ -96,6 +103,13 @@ export function FavoriteHospitalsPage({
           </div>
         )}
       </motion.div>
+
+      {/* 커스텀 토스트 */}
+      <CustomToast
+        show={showToast}
+        message="찜 목록에서 삭제되었습니다"
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }
