@@ -4547,7 +4547,7 @@ html {
 }
 
 @theme inline {
-  --breakpoint-xs: 400px;
+  --breakpoint-xs: 440px;
 }
 
 /* 컨테이너는 패딩 0 */
