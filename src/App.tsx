@@ -881,6 +881,7 @@ export default function App() {
   // 찜한 병원 목록
 
 
+  // 🔹 처음에 기본으로 찜해 둘 병원 ID
   const INITIAL_FAVORITE_HOSPITAL_IDS = [1, 2, 3];
 
   const [favoriteHospitals, setFavoriteHospitals] = useState<Hospital[]>(() => {
@@ -890,21 +891,29 @@ export default function App() {
       .filter((hospital): hospital is Hospital => !!hospital);
   });
 
-  // 찜 토글
+
+  // 🔹 찜 토글 함수
   const toggleFavorite = (hospital: Hospital) => {
     setFavoriteHospitals((prev) => {
       const isFavorite = prev.some((h) => h.id === hospital.id);
 
+      // 이미 찜 되어 있으면 제거
       if (isFavorite) {
-        // 이미 찜 -> 해제
         return prev.filter((h) => h.id !== hospital.id);
       }
 
-      // 찜 추가할 때도 hospitalMap 기준으로 풀 데이터 사용
-      const fullHospital = hospitalMap[hospital.id] ?? hospital;
-      return [...prev, fullHospital];
+      // hospitalMap 에 있는 “정식” 데이터로 추가
+      const fullHospital = hospitalMap[hospital.id];
+
+      if (fullHospital) {
+        return [...prev, fullHospital];
+      }
+
+      // 혹시 map에 없으면 넘어온 hospital 그대로 추가
+      return [...prev, hospital];
     });
   };
+
 
   const parseKRDateString = (dateStr: string): Date => {
     // 괄호 뒤 요일은 버리고 "2025.08.08"만 사용
@@ -1601,18 +1610,6 @@ export default function App() {
     navigateTo("community");
   };
 
-  const toggleFavorite = (hospital: Hospital) => {
-    const isFavorite = favoriteHospitals.some(
-      (h) => h.id === hospital.id,
-    );
-    if (isFavorite) {
-      setFavoriteHospitals(
-        favoriteHospitals.filter((h) => h.id !== hospital.id),
-      );
-    } else {
-      setFavoriteHospitals([...favoriteHospitals, hospital]);
-    }
-  };
 
   const handleDeletePost = (postId: number) => {
     setPosts(posts.filter((post) => post.id !== postId));

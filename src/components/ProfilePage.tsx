@@ -62,7 +62,7 @@ export function ProfilePage({
   myReviewsCount = 0,
 }: ProfilePageProps) {
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f7f7] px-5 xs:px-6 sm:px-8">
+    <div className="flex flex-col min-h-screen bg-[#f7f7f7]">
       {/* Profile Header */}
       <Header
         title="내 정보"
