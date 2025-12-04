@@ -849,20 +849,20 @@ export default function App() {
 
         windowEl.style.position = "fixed";
         windowEl.style.bottom = isMobile ? "170px" : "170px";
-        windowEl.style.top = "auto";          // 🔴 이게 중요: top 0 덮어쓰기
-        windowEl.style.right = "20px";         // 혹시 모를 left: 0도 초기화
+        windowEl.style.top = isMobile ? '0' : "auto";          // 🔴 이게 중요: top 0 덮어쓰기
+        windowEl.style.right = isMobile ? `0` : `${baseRight}px`;       // 혹시 모를 left: 0도 초기화
 
         // 가로 사이즈
         if (isMobile) {
-          windowEl.style.maxWidth = "calc(100% - 32px)";
-          windowEl.style.width = "calc(100% - 32px)";
+          windowEl.style.maxWidth = "100%";
+          windowEl.style.width = "100%";
         } else {
           windowEl.style.maxWidth = "360px";
           windowEl.style.width = "360px";
         }
 
         // 세로 사이즈
-        windowEl.style.maxHeight = isMobile ? "70vh" : "500px";
+        windowEl.style.maxHeight = isMobile ? "100vh" : "500px";
 
         windowEl.style.borderRadius = "16px";
         windowEl.style.overflow = "hidden";
