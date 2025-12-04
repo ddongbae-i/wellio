@@ -372,9 +372,6 @@ const createInitialPosts = (): Post[] => {
     {
       id: 6,
       image: COMMUNITY_IMAGES.IMG6,
-      badge: {
-        text: "🏃 오운완",
-      },
       userAvatar: USERS.wellie.avatar,
       caption: "딸은 출석 완료입니다",
       userName: USERS.wellie.name,
