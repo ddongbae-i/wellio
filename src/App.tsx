@@ -898,67 +898,67 @@ export default function App() {
   }, [currentPage, isLoggedIn, showOnboarding]);
 
 
-  useEffect(() => {
-    if (!isLoggedIn || showOnboarding) return;
+  // useEffect(() => {
+  //   if (!isLoggedIn || showOnboarding) return;
 
-    const attachClickHandler = () => {
-      const bubble = document.querySelector(
-        "#chatbase-bubble-button"
-      ) as HTMLElement | null;
+  //   const attachClickHandler = () => {
+  //     const bubble = document.querySelector(
+  //       "#chatbase-bubble-button"
+  //     ) as HTMLElement | null;
 
-      if (!bubble) return false;
+  //     if (!bubble) return false;
 
-      const handleClick = (e: MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+  //     const handleClick = (e: MouseEvent) => {
+  //       e.preventDefault();
+  //       e.stopPropagation();
 
-        const windowEl = document.querySelector(
-          "#chatbase-bubble-window"
-        ) as HTMLElement | null;
+  //       const windowEl = document.querySelector(
+  //         "#chatbase-bubble-window"
+  //       ) as HTMLElement | null;
 
-        // 아직 창 DOM이 안 만들어졌으면 그냥 chatbase 기본 동작에 맡김
-        if (!windowEl) return;
+  //       // 아직 창 DOM이 안 만들어졌으면 그냥 chatbase 기본 동작에 맡김
+  //       if (!windowEl) return;
 
-        const isHidden =
-          windowEl.style.display === "none" ||
-          window.getComputedStyle(windowEl).display === "none";
+  //       const isHidden =
+  //         windowEl.style.display === "none" ||
+  //         window.getComputedStyle(windowEl).display === "none";
 
-        windowEl.style.display = isHidden ? "block" : "none";
-      };
+  //       windowEl.style.display = isHidden ? "block" : "none";
+  //     };
 
-      // 중복 방지용: 이전에 달려 있던 핸들러 제거
-      (bubble as any)._wellioChatHandler &&
-        bubble.removeEventListener(
-          "click",
-          (bubble as any)._wellioChatHandler
-        );
+  //     // 중복 방지용: 이전에 달려 있던 핸들러 제거
+  //     (bubble as any)._wellioChatHandler &&
+  //       bubble.removeEventListener(
+  //         "click",
+  //         (bubble as any)._wellioChatHandler
+  //       );
 
-      bubble.addEventListener("click", handleClick);
-      (bubble as any)._wellioChatHandler = handleClick;
+  //     bubble.addEventListener("click", handleClick);
+  //     (bubble as any)._wellioChatHandler = handleClick;
 
-      return true;
-    };
+  //     return true;
+  //   };
 
-    const intervalId = window.setInterval(() => {
-      if (attachClickHandler()) {
-        window.clearInterval(intervalId);
-      }
-    }, 200);
+  //   const intervalId = window.setInterval(() => {
+  //     if (attachClickHandler()) {
+  //       window.clearInterval(intervalId);
+  //     }
+  //   }, 200);
 
-    return () => {
-      window.clearInterval(intervalId);
-      const bubble = document.querySelector(
-        "#chatbase-bubble-button"
-      ) as HTMLElement | null;
-      if (bubble && (bubble as any)._wellioChatHandler) {
-        bubble.removeEventListener(
-          "click",
-          (bubble as any)._wellioChatHandler
-        );
-        delete (bubble as any)._wellioChatHandler;
-      }
-    };
-  }, [isLoggedIn, showOnboarding]);
+  //   return () => {
+  //     window.clearInterval(intervalId);
+  //     const bubble = document.querySelector(
+  //       "#chatbase-bubble-button"
+  //     ) as HTMLElement | null;
+  //     if (bubble && (bubble as any)._wellioChatHandler) {
+  //       bubble.removeEventListener(
+  //         "click",
+  //         (bubble as any)._wellioChatHandler
+  //       );
+  //       delete (bubble as any)._wellioChatHandler;
+  //     }
+  //   };
+  // }, [isLoggedIn, showOnboarding]);
 
   // 알림 상태
   const [notifications, setNotifications] = useState<Notification[]>([
