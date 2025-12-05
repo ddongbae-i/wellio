@@ -119,12 +119,12 @@ export function Header({
       {/* --- 오른쪽: 알림 아이콘 --- */}
       <button
         onClick={onNotificationClick}
-        className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors flex-shrink-0"
+        className="relative w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors flex-shrink-0"
       >
         <img src={Bell} alt="알림" className="w-6 h-6" />
 
         {hasUnreadNotification && (
-          <span className="absolute top-[10px] right-[10px] w-[7px] h-[7px] rounded-full bg-[#FF0000]" />
+          <span className="absolute top-[2px] right-[2px] w-[7px] h-[7px] rounded-full bg-[#FF0000]" />
         )}
       </button>
     </header>
