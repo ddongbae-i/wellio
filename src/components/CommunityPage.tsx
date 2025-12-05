@@ -1129,7 +1129,7 @@ export function CommunityPage({
                       postRefs.current[post.id] = el;
                     }}
                     className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 snap-start snap-always ${isKeyboardVisible
-                      ? "justify-start pt-[120px]"
+                      ? "justify-start pt-[110px]"
                       : "justify-center "
                       }`}
                     key={post.id}
