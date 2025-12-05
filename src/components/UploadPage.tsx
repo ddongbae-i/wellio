@@ -387,8 +387,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       setShowTextInput(false);
       setSelectedFilter("Normal");
     };
-  }, [stream]);
-
+  }, []);
+  // 카메라 스트림 시작
   // 카메라 스트림 시작
   useEffect(() => {
     if (!permissionsGranted || isUploadMode) return;
@@ -399,8 +399,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           stream.getTracks().forEach((track) => track.stop());
         }
 
-        const devices =
-          await navigator.mediaDevices.enumerateDevices();
+        const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(
           (device) => device.kind === "videoinput",
         );
@@ -438,12 +437,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           audio: false,
         };
 
-        const newStream =
-          await navigator.mediaDevices.getUserMedia(
-            constraints,
-          );
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+
         setStream(newStream);
         setCameraError(null);
+
         if (videoRef.current) {
           videoRef.current.srcObject = newStream;
         }
@@ -454,16 +452,17 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     };
 
     startCamera();
+
     return () => {
       // ✅ 카메라 정리
       if (stream) {
         stream.getTracks().forEach((track) => {
           track.stop();
-          console.log("카메라 트랙 정지:", track.label);
+          console.log("🛑 카메라 트랙 정지:", track.label);
         });
       }
     };
-  }, [permissionsGranted, isFrontCamera, isUploadMode, isIOS]);
+  }, [permissionsGranted, isFrontCamera, isUploadMode]); // ✅ isIOS 제거!
 
   const handleCameraPermissionAllow = () => {
     setShowCameraPermission(false);
