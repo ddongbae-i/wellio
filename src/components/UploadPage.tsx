@@ -537,11 +537,17 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   // applyFilterToImage 함수를 완전히 새로 작성
   // 기존 applyFilterToImage 함수를 지우고 아래 코드로 대체하세요.
 
-  const applyFilterToImage = async (
+  const applyFilterToImage = (
     imageSrc: string,
     filterString: string
   ): Promise<string> => {
     return new Promise((resolve) => {
+      // 1. 필터가 없으면 바로 원본 반환
+      if (!filterString || filterString === "none") {
+        resolve(imageSrc);
+        return;
+      }
+
       const img = new Image();
       // CORS 문제 방지
       if (!imageSrc.startsWith("data:")) {
@@ -551,14 +557,18 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       img.onload = () => {
         try {
           const canvas = document.createElement("canvas");
-          // 원본 해상도 유지 또는 필요 시 리사이징 크기 지정
-          // 여기서는 원본 비율 유지를 위해 이미지 크기 그대로 사용하거나
-          // 코드의 다른 로직처럼 335x400으로 강제할 수도 있습니다.
-          // 일반적인 필터 적용을 위해 이미지 크기를 따릅니다.
-          canvas.width = img.width;
-          canvas.height = img.height;
 
-          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          // 2. 캔버스 크기를 이미지 원본 크기에 맞춤 (정수형 변환)
+          const width = Math.floor(img.width);
+          const height = Math.floor(img.height);
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d", {
+            willReadFrequently: true,
+            alpha: false // 투명도 없음 (JPEG 최적화)
+          });
 
           if (!ctx) {
             console.error("Canvas context failed");
@@ -566,32 +576,33 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             return;
           }
 
-          // 핵심: 컨텍스트 자체에 필터를 설정한 뒤 이미지를 그립니다.
-          // iOS Safari, Chrome 등 최신 브라우저 모두 지원
-          ctx.filter = filterString || "none";
+          // 3. 필터 적용 (중요: iOS 호환성을 위해 drawImage 전에 선언)
+          ctx.filter = filterString;
 
-          // 이미지를 그립니다 (필터가 적용된 상태로 그려짐)
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          // 4. 이미지 그리기
+          ctx.drawImage(img, 0, 0, width, height);
 
-          // 필터 초기화
+          // 5. 필터 초기화 (안전장치)
           ctx.filter = "none";
 
-          const result = canvas.toDataURL("image/jpeg", 0.95);
+          // 6. 결과물 추출 (JPEG 품질 0.9)
+          const result = canvas.toDataURL("image/jpeg", 0.90);
 
-          if (result && result.length > 100) {
-            // console.log("✅ 필터 적용 성공");
-            resolve(result);
-          } else {
+          // 결과물이 너무 짧으면(오류) 원본 반환
+          if (result.length < 100) {
+            console.warn("필터 적용 실패: 결과물이 비정상입니다.");
             resolve(imageSrc);
+          } else {
+            resolve(result);
           }
         } catch (error) {
-          console.error("필터 적용 에러:", error);
+          console.error("필터 적용 중 에러 발생:", error);
           resolve(imageSrc);
         }
       };
 
-      img.onerror = (error) => {
-        console.error("이미지 로드 실패:", error);
+      img.onerror = (err) => {
+        console.error("이미지 로드 실패:", err);
         resolve(imageSrc);
       };
 
@@ -600,37 +611,46 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   };
 
   const handleCapture = async () => {
-    // 1. 업로드 모드일 때: 최종 업로드 (이 부분은 기존과 동일)
+    // [CASE 1] 업로드 모드일 때: 최종 업로드 처리
     if (isUploadMode) {
       if (!selectedImage) {
         setShowNoImageAlert(true);
         return;
       }
 
+      // 1. 기본적으로 선택된 이미지를 사용
       let finalImage = selectedImage;
+
+      // 2. 선택된 필터 정보 가져오기
       const currentFilter = ORIGINAL_FILTERS.find(
         (f) => f.name === selectedFilter,
       );
 
+      // 3. 필터가 'Normal'이 아니라면 필터 적용 함수 실행
       if (currentFilter && currentFilter.filter !== "none") {
         try {
+          // ✅ 여기서 필터가 적용된 새 이미지 문자열(Base64)을 받아옵니다.
           const filteredImage = await applyFilterToImage(
             selectedImage,
             currentFilter.filter,
           );
-          if (filteredImage && filteredImage !== selectedImage) {
+
+          // 변환된 이미지가 유효하면 교체
+          if (filteredImage && filteredImage.length > 100) {
             finalImage = filteredImage;
+            console.log("✨ 필터 적용 완료:", currentFilter.name);
           }
         } catch (error) {
-          console.error("필터 적용 에러:", error);
+          console.error("필터 적용 에러, 원본으로 업로드합니다:", error);
         }
       }
 
       const today = new Date();
       const createdAt = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
 
+      // 4. 최종 이미지(finalImage)를 업로드
       onUpload({
-        image: finalImage,
+        image: finalImage, // 👈 여기가 필터 먹인 이미지여야 함
         caption: textInput,
         textOverlay: textInput,
         location: locationInput,
@@ -640,6 +660,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         createdAt,
       });
 
+      // 초기화 로직
       setSelectedImage(null);
       setTextInput("");
       setLocationInput("");
@@ -657,9 +678,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       return;
     }
 
-    // 2. 📸 카메라 캡처 부분 (여기가 수정됨!)
-    // 수정 전: if (hasCameraDevice && videoRef.current && stream)
-    // 수정 후: hasCameraDevice 조건을 제거함 (아이폰 버그 회피)
+    // [CASE 2] 카메라 촬영 모드 (이전 답변의 수정된 코드 유지)
     if (videoRef.current && stream) {
       const canvas = document.createElement("canvas");
       canvas.width = videoRef.current.videoWidth;
@@ -668,20 +687,18 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
       if (!ctx) return;
 
+      // 좌우 반전 처리 (셀카 모드일 때 거울모드처럼 보이게 하려면 필요)
+      // ctx.scale(isFrontCamera ? -1 : 1, 1);
+
       ctx.drawImage(videoRef.current, 0, 0);
       canvas.toBlob(async (blob) => {
         if (!blob) return;
         const reader = new FileReader();
         reader.onloadend = async () => {
           const capturedImage = reader.result as string;
-          try {
-            setSelectedImage(capturedImage);
-          } catch (error) {
-            console.error("이미지 처리 실패:", error);
-            setSelectedImage(capturedImage);
-          }
+          setSelectedImage(capturedImage);
           setIsUploadMode(true);
-          // 캡처 후 스트림 정지
+
           if (stream) {
             stream.getTracks().forEach((track) => track.stop());
             setStream(null);
@@ -690,8 +707,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         reader.readAsDataURL(blob);
       }, "image/jpeg");
     } else {
-      // 실제 비디오 객체가 없거나 스트림이 끊긴 경우에만 에러 표시
-      console.error("캡처 실패: 비디오나 스트림이 없습니다.");
       toast.error("카메라를 사용할 수 없습니다.");
     }
   };
