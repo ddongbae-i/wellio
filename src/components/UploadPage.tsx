@@ -758,16 +758,27 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2 pl-5 xs:pl-6 sm:pl-8">
           AI 추천 캡션
         </p>
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 ml-5 xs:pl-6 sm:pl-8">
-          {aiCaptions.map((caption, index) => (
-            <button
-              key={index}
-              onMouseDown={handleCaptionClick(caption.text)}
-              className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
-            >
-              {caption.text}
-            </button>
-          ))}
+        <div className="pl-5 xs:pl-6 sm:pl-8">
+          <Swiper
+            modules={[FreeMode, Mousewheel]}
+            slidesPerView="auto"
+            spaceBetween={8}
+            freeMode={true}
+            grabCursor={true}
+            mousewheel={true}
+            className="w-full !overflow-visible"
+          >
+            {aiCaptions.map((caption, index) => (
+              <SwiperSlide key={index} style={{ width: "auto" }}>
+                <button
+                  onMouseDown={handleCaptionClick(caption.text)}
+                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
+                >
+                  {caption.text}
+                </button>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
       </div>
     </motion.div>
@@ -1156,7 +1167,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           />
 
           {isFilterMode ? (
-            <div className="w-full h-28 relative flex items-center justify-center">
+            <div className="w-full relative flex items-center justify-center mt-3">
               {/* 가운데 선택 가이드 */}
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto">
                 <div className="w-[68px] h-[68px] rounded-full border-[3px] border-[#36D2C5]" />
@@ -1166,7 +1177,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 <Swiper
                   spaceBetween={14}
                   slidesPerView="auto"
-                  className="w-full h-full"
+                  className="w-full h-28"
                   grabCursor={true}
                   resistanceRatio={0}
                   touchStartPreventDefault={false}
@@ -1337,16 +1348,15 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
               <button
                 onClick={handleCapture}
-                className="w-[70px] h-[70px] rounded-full border-[3px] border-[#2ECACA] bg-white hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                className={`w-[70px] h-[70px] rounded-full transition-colors flex items-center justify-center ${isUploadMode
+                  ? "bg-[#2ECACA] hover:bg-[#00C2B3]"
+                  : "border-[3px] border-white bg-white"
+                  }`}
               >
                 {isUploadMode ? (
-                  <img
-                    src={Upload}
-                    alt="업로드"
-                    className="w-[35px] h-[35px]"
-                  />
+                  <img src={Upload} alt="업로드" className="w-[35px] h-[35px]" />
                 ) : (
-                  <div className="w-[70px] h-[70px] rounded-full" />
+                  <div className="w-[60px] h-[60px] rounded-full bg-[#2ECACA]" />
                 )}
               </button>
 
@@ -1398,113 +1408,120 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
               }}
               className="relative w-full max-w-[500px] bg-white rounded-t-[16px] pt-[30px] pb-[40px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
             >
+
               <div className="space-y-6">
                 {/* 오늘 운동 기록 - 스와이퍼 */}
-                <div className="space-y-3 data-swiper">
-                  <h3 className="text-[17px] font-medium text-[#202020]">
+                <div className="space-y-3">
+                  <h3 className="text-[17px] font-medium text-[#202020] px-5 xs:px-6 sm:px-8">
                     오늘 운동 기록
                   </h3>
-                  <Swiper
-                    modules={[FreeMode, Mousewheel]}
-                    slidesPerView="auto"
-                    spaceBetween={12}
-                    freeMode={true}
-                    grabCursor={true}
-                    mousewheel={true}
-                    className="w-full"
-                  >
-                    {[
-                      { label: "👟 걸음수", value: "👟 8,542보" },
-                      { label: "🔥 소모칼로리", value: "🔥 450kcal" },
-                      { label: "🪜 오른층수", value: "🪜 12층" },
-                    ].map((item, idx) => (
-                      <SwiperSlide key={idx} style={{ width: "auto" }}>
-                        <button
-                          onClick={() => handleHealthRecordSelect(item.value)}
-                          className="flex items-center gap-2 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
-                        >
-                          <span className="text-[15px] font-medium">
-                            {item.label}
-                          </span>
-                        </button>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                </div>
+                  <div className="pl-5 xs:pl-6 sm:pl-8">
+                    <Swiper
+                      modules={[FreeMode, Mousewheel]}
+                      slidesPerView="auto"
+                      spaceBetween={12}
+                      freeMode={true}
+                      grabCursor={true}
+                      mousewheel={true}
+                      className="w-full !overflow-visible"
+                    >
+                      {[
+                        { label: "👟 걸음수", value: "👟 8,542보" },
+                        { label: "🔥 소모칼로리", value: "🔥 450kcal" },
+                        { label: "🪜 오른층수", value: "🪜 12층" },
+                      ].map((item, idx) => (
+                        <SwiperSlide key={idx} style={{ width: "auto" }}>
+                          <button
+                            onClick={() => handleHealthRecordSelect(item.value)}
+                            className="flex items-center gap-2 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
+                          >
+                            <span className="text-[15px] font-medium">
+                              {item.label}
+                            </span>
+                          </button>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </div>
 
-                {/* 오늘 감정 기록 - 스와이퍼 */}
-                <div className="space-y-3 data-swiper">
-                  <h3 className="text-[17px] font-semibold text-[#202020]">
-                    오늘 감정 기록
-                  </h3>
-                  <Swiper
-                    modules={[FreeMode, Mousewheel]}
-                    slidesPerView="auto"
-                    spaceBetween={12}
-                    freeMode={true}
-                    grabCursor={true}
-                    mousewheel={true}
-                    className="w-full"
-                  >
-                    {[
-                      "😄",
-                      "😊",
-                      "🙂",
-                      "😐",
-                      "🙁",
-                      "🥲",
-                      "😭",
-                      "😤",
-                    ].map((emoji, idx) => (
-                      <SwiperSlide key={idx} style={{ width: "auto" }}>
-                        <button
-                          onClick={() =>
-                            handleHealthRecordSelect(`${emoji}`)
-                          }
-                          className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors "
-                        >
-                          {emoji}
-                        </button>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                </div>
+                  {/* 오늘 감정 기록 - 스와이퍼 */}
+                  <div className="space-y-3">
+                    <h3 className="text-[17px] font-medium text-[#202020] px-5 xs:px-6 sm:px-8">
+                      오늘 감정 기록
+                    </h3>
+                    <div className="pl-5 xs:pl-6 sm:pl-8">
+                      <Swiper
+                        modules={[FreeMode, Mousewheel]}
+                        slidesPerView="auto"
+                        spaceBetween={12}
+                        freeMode={true}
+                        grabCursor={true}
+                        mousewheel={true}
+                        className="w-full !overflow-visible"
+                      >
+                        {[
+                          "😄",
+                          "😊",
+                          "🙂",
+                          "😐",
+                          "🙁",
+                          "🥲",
+                          "😭",
+                          "😤",
+                        ].map((emoji, idx) => (
+                          <SwiperSlide key={idx} style={{ width: "auto" }}>
+                            <button
+                              onClick={() =>
+                                handleHealthRecordSelect(`${emoji}`)
+                              }
+                              className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors "
+                            >
+                              {emoji}
+                            </button>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </div>
+                  </div>
 
-                {/* 진행중인 챌린지 - 스와이퍼 */}
-                <div className="space-y-3 data-swiper">
-                  <h3 className="text-[17px] font-medium text-[#202020]">
-                    진행중인 챌린지
-                  </h3>
-                  <Swiper
-                    modules={[FreeMode, Mousewheel]}
-                    slidesPerView="auto"
-                    spaceBetween={12}
-                    freeMode={true}
-                    grabCursor={true}
-                    mousewheel={true}
-                    className="w-full"
-                  >
-                    {[
-                      { text: "월 15만보 걷기", icon: WalkIcon },
-                      { text: "주 1회 함께 걷기", icon: TogetherIcon },
-                      { text: "건강한 습관 만들기", icon: HabitIcon },
-                      { text: "가족 건강 상위 10%", icon: TrophyIcon },
-                    ].map((item, idx) => (
-                      <SwiperSlide key={idx} style={{ width: "auto" }}>
-                        <button
-                          onClick={() => handleHealthRecordSelect(item.text, item.icon)}
-                          className="px-4 py-2 flex items-center gap-2 bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors text-white"
-                        >
-                          <img
-                            src={item.icon}
-                            alt=""
-                            className="w-4 h-4 object-contain"
-                          />
-                          <span>{item.text}</span>
-                        </button>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
+                  {/* 진행중인 챌린지 - 스와이퍼 */}
+                  <div className="space-y-3">
+                    <h3 className="text-[17px] font-medium text-[#202020] px-5 xs:px-6 sm:px-8">
+                      진행중인 챌린지
+                    </h3>
+                    <div className="pl-5 xs:pl-6 sm:pl-8">
+                      <Swiper
+                        modules={[FreeMode, Mousewheel]}
+                        slidesPerView="auto"
+                        spaceBetween={12}
+                        freeMode={true}
+                        grabCursor={true}
+                        mousewheel={true}
+                        className="w-full !overflow-visible"
+                      >
+                        {[
+                          { text: "월 15만보 걷기", icon: WalkIcon },
+                          { text: "주 1회 함께 걷기", icon: TogetherIcon },
+                          { text: "건강한 습관 만들기", icon: HabitIcon },
+                          { text: "가족 건강 상위 10%", icon: TrophyIcon },
+                        ].map((item, idx) => (
+                          <SwiperSlide key={idx} style={{ width: "auto" }}>
+                            <button
+                              onClick={() => handleHealthRecordSelect(item.text, item.icon)}
+                              className="px-4 py-2 flex items-center gap-2 bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors text-white"
+                            >
+                              <img
+                                src={item.icon}
+                                alt=""
+                                className="w-4 h-4 object-contain"
+                              />
+                              <span>{item.text}</span>
+                            </button>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>

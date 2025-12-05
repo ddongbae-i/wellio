@@ -38,13 +38,13 @@ interface ReviewWritePageProps {
 const KEYWORDS = [
   "예약이 쉬워요",
   "주차 편해요",
+  "시설 좋아요",
+  "과잉진료가 없어요",
   "꼼꼼해요",
-  "회복이 빨라요",
   "친절해요",
   "쾌적해요",
   "진료 만족해요",
   "재진료 희망해요",
-  "과잉진료가 없어요",
 ];
 
 export function ReviewWritePage({
