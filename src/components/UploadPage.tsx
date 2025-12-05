@@ -363,7 +363,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const getControlsBottom = () => {
     if (isKeyboardVisible) return 0;
     if (isDetailEditMode) return 50;
-    return 80;
+    return 120;
+  };
+
+  const getFilterBottom = () => {
+    if (isKeyboardVisible) return 0;
+    return 80;  // 👈 필터만 낮춤 (120 → 80)
   };
 
   useEffect(() => {
@@ -1309,7 +1314,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         <div
           className="absolute left-0 right-0 z-10 px-5 xs:px-6 sm:px-8 bg-[#f7f7f7] max-w-[500px] mx-auto"
           style={{
-            bottom: getControlsBottom(),
+            bottom: getFilterBottom(),
           }}
         >
           <input
