@@ -531,71 +531,15 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     });
 
   // applyFilterToImage 함수를 완전히 새로 작성
+  // 기존 applyFilterToImage 함수를 지우고 아래 코드로 대체하세요.
+
   const applyFilterToImage = async (
     imageSrc: string,
     filterString: string
   ): Promise<string> => {
-    // iOS는 DOM 캡처 방식
-    if (isIOS && filterString !== "none") {
-      return new Promise((resolve) => {
-        const tempImg = document.createElement("img");
-        tempImg.crossOrigin = "anonymous";
-        tempImg.src = imageSrc;
-        tempImg.style.position = "fixed";
-        tempImg.style.left = "-9999px";
-        tempImg.style.top = "-9999px";
-        tempImg.style.filter = filterString;
-        tempImg.style.width = "335px";
-        tempImg.style.height = "400px";
-        tempImg.style.objectFit = "cover";
-
-        document.body.appendChild(tempImg);
-
-        tempImg.onload = () => {
-          try {
-            const canvas = document.createElement("canvas");
-            canvas.width = 335;
-            canvas.height = 400;
-            const ctx = canvas.getContext("2d", { willReadFrequently: false });
-
-            if (!ctx) {
-              console.error("Canvas context failed");
-              document.body.removeChild(tempImg);
-              resolve(imageSrc);
-              return;
-            }
-
-            // 필터 적용된 이미지를 캔버스에 그리기
-            ctx.drawImage(tempImg, 0, 0, 335, 400);
-
-            const result = canvas.toDataURL("image/jpeg", 0.95);
-            document.body.removeChild(tempImg);
-
-            if (result && result.length > 100) {
-              console.log("✅ iOS 필터 적용 성공");
-              resolve(result);
-            } else {
-              console.warn("필터 결과 비정상, 원본 사용");
-              resolve(imageSrc);
-            }
-          } catch (error) {
-            console.error("iOS 필터 에러:", error);
-            document.body.removeChild(tempImg);
-            resolve(imageSrc);
-          }
-        };
-
-        tempImg.onerror = (error) => {
-          console.error("이미지 로드 실패:", error);
-          document.body.removeChild(tempImg);
-          resolve(imageSrc);
-        };
-      });
-    }
-
-    // Android는 Canvas filter 방식
     return new Promise((resolve) => {
       const img = new Image();
+      // CORS 문제 방지
       if (!imageSrc.startsWith("data:")) {
         img.crossOrigin = "anonymous";
       }
@@ -603,10 +547,14 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       img.onload = () => {
         try {
           const canvas = document.createElement("canvas");
+          // 원본 해상도 유지 또는 필요 시 리사이징 크기 지정
+          // 여기서는 원본 비율 유지를 위해 이미지 크기 그대로 사용하거나
+          // 코드의 다른 로직처럼 335x400으로 강제할 수도 있습니다.
+          // 일반적인 필터 적용을 위해 이미지 크기를 따릅니다.
           canvas.width = img.width;
           canvas.height = img.height;
 
-          const ctx = canvas.getContext("2d", { willReadFrequently: false });
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
           if (!ctx) {
             console.error("Canvas context failed");
@@ -614,21 +562,26 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             return;
           }
 
+          // 핵심: 컨텍스트 자체에 필터를 설정한 뒤 이미지를 그립니다.
+          // iOS Safari, Chrome 등 최신 브라우저 모두 지원
           ctx.filter = filterString || "none";
-          ctx.drawImage(img, 0, 0);
+
+          // 이미지를 그립니다 (필터가 적용된 상태로 그려짐)
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // 필터 초기화
           ctx.filter = "none";
 
           const result = canvas.toDataURL("image/jpeg", 0.95);
 
           if (result && result.length > 100) {
-            console.log("✅ Android 필터 적용 성공");
+            // console.log("✅ 필터 적용 성공");
             resolve(result);
           } else {
-            console.warn("필터 결과 비정상, 원본 사용");
             resolve(imageSrc);
           }
         } catch (error) {
-          console.error("Android 필터 에러:", error);
+          console.error("필터 적용 에러:", error);
           resolve(imageSrc);
         }
       };
@@ -641,7 +594,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       img.src = imageSrc;
     });
   };
-
 
   const handleCapture = async () => {
     // 업로드 모드일 때: 최종 업로드
