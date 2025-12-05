@@ -414,26 +414,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
         let videoConstraints: MediaTrackConstraints | boolean;
 
-        if (videoDevices.length > 1) {
-          videoConstraints = {
-            facingMode: isFrontCamera ? "user" : "environment"
-          };
-
-          if (isIOS) {
-            videoConstraints = {
-              facingMode: isFrontCamera
-                ? { exact: "user" }
-                : { exact: "environment" }
-            };
-          }
-        } else {
-          videoConstraints = true;
-        }
-
-        const constraints: MediaStreamConstraints = {
-          video: videoConstraints,
-          audio: false,
-        };
 
         const newStream = await navigator.mediaDevices.getUserMedia(constraints);
 
@@ -540,13 +520,14 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     }
 
     // iOS: DOM img 렌더 후 캔버스 캡처
+    // applyFilterToImage (라인 507-585 수정)
     if (isIOS) {
       return new Promise((resolve) => {
         const tempImg = document.createElement("img");
         tempImg.crossOrigin = "anonymous";
-        tempImg.src = imageSrc;
+        tempImg.src = imageSrc;  // ✅ 이미 335x400으로 리사이즈된 이미지
 
-        // 화면 밖에 숨김
+        // ✅ CSS 크기를 실제 이미지 크기와 동일하게
         tempImg.style.position = "fixed";
         tempImg.style.left = "-9999px";
         tempImg.style.top = "-9999px";
@@ -558,13 +539,13 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         document.body.appendChild(tempImg);
 
         tempImg.onload = () => {
-          // ✅ 약간의 지연 후 캡처 (렌더링 완료 대기)
+          // ✅ 지연 시간 늘리기 (작은 이미지지만 안전하게)
           setTimeout(() => {
             try {
               const canvas = document.createElement("canvas");
               canvas.width = 335;
               canvas.height = 400;
-              const ctx = canvas.getContext("2d", { willReadFrequently: false });
+              const ctx = canvas.getContext("2d");
 
               if (!ctx) {
                 console.error("Canvas context 실패");
@@ -573,7 +554,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 return;
               }
 
-              // 필터 적용된 img를 캔버스에 그리기
+              // ✅ 이미지가 이미 335x400이므로 1:1 복사
               ctx.drawImage(tempImg, 0, 0, 335, 400);
 
               const result = canvas.toDataURL("image/jpeg", 0.95);
@@ -591,7 +572,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
               document.body.removeChild(tempImg);
               resolve(imageSrc);
             }
-          }, 100); // ✅ 100ms 지연
+          }, 150);  // ✅ 100ms → 150ms
         };
 
         tempImg.onerror = (error) => {
@@ -601,7 +582,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         };
       });
     }
-
     // Android: Canvas ctx.filter 방식
     return new Promise((resolve) => {
       const img = new Image();
@@ -738,7 +718,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         reader.onloadend = async () => {
           const capturedImage = reader.result as string;
           try {
-            setSelectedImage(capturedImage);
+            // ✅ 촬영 즉시 리사이즈
+            const resizedImage = await resizeAndCropImage(capturedImage);
+            setSelectedImage(resizedImage);
           } catch (error) {
             console.error("이미지 리사이즈 실패:", error);
             setSelectedImage(capturedImage);
@@ -768,7 +750,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     reader.onloadend = async () => {
       const originalImage = reader.result as string;
       try {
-        setSelectedImage(originalImage);
+        // ✅ 갤러리 선택 즉시 리사이즈
+        const resizedImage = await resizeAndCropImage(originalImage);
+        setSelectedImage(resizedImage);
       } catch (error) {
         console.error("이미지 리사이즈 실패:", error);
         setSelectedImage(originalImage);
