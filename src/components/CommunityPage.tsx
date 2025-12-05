@@ -975,7 +975,7 @@ export function CommunityPage({
                 >
                   <img src={Bell} alt="알림" className="w-6 h-6" />
                   {hasUnreadNotification && (
-                    <span className="absolute top-[2px] right-[1px] w-[7px] h-[7px] rounded-full bg-[#FF0000]" />
+                    <span className="absolute top-[2px] right-[2px] w-[7px] h-[7px] rounded-full bg-[#FF0000]" />
                   )}
                 </button>
               </div>
