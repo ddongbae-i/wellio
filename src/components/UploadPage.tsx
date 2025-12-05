@@ -858,18 +858,27 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
               <button
                 key={index}
                 className="ai-caption-button flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] active:bg-gray-100 transition-colors"
+                onMouseDown={() => {
+                  // ✅ 마우스 클릭 시작
+                  aiCaptionClickingRef.current = true;
+                }}
                 onClick={(e) => {
                   if (draggedRef.current) {
                     draggedRef.current = false;
                     e.preventDefault();
+                    aiCaptionClickingRef.current = false;  // ✅ 드래그면 플래그 해제
                     return;
                   }
                   handleCaptionClick(caption.text);
                   requestAnimationFrame(() => {
                     textInputRef.current?.focus();
+                    aiCaptionClickingRef.current = false;  // ✅ 클릭 완료 후 해제
                   });
                 }}
                 onTouchStart={(e) => {
+                  // ✅ 터치 시작
+                  aiCaptionClickingRef.current = true;
+
                   const t = e.touches[0];
                   touchStartRef.current = {
                     x: t.clientX,
@@ -879,7 +888,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 }}
                 onTouchEnd={(e) => {
                   const start = touchStartRef.current;
-                  if (!start) return;
+                  if (!start) {
+                    aiCaptionClickingRef.current = false;  // ✅ 안전 장치
+                    return;
+                  }
 
                   const t = e.changedTouches[0];
                   const dx = Math.abs(t.clientX - start.x);
@@ -897,14 +909,18 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     handleCaptionClick(caption.text);
                     requestAnimationFrame(() => {
                       textInputRef.current?.focus();
+                      aiCaptionClickingRef.current = false;  // ✅ 탭 완료 후 해제
                     });
+                  } else {
+                    // 스와이프면 플래그만 해제
+                    aiCaptionClickingRef.current = false;
                   }
 
                   touchStartRef.current = null;
                 }}
-                onPointerDown={(e) => {
-                  // ✅ 포커스 유지
-                  e.preventDefault();
+                onTouchCancel={() => {
+                  // ✅ 터치 취소 시에도 플래그 해제
+                  aiCaptionClickingRef.current = false;
                 }}
               >
                 {caption.text}
@@ -1164,13 +1180,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                               }
                             }}
                             onFocus={() => setIsTextInputFocused(true)}
-                            onBlur={(e) => {
-                              // ✅ AI 캡션 버튼 클릭인지 확인
-                              const relatedTarget = e.relatedTarget as HTMLElement;
-                              const clickedAICaption = relatedTarget?.closest('.ai-caption-button');
-
-                              if (clickedAICaption) {
-                                // AI 캡션 버튼 클릭 시에는 포커스 유지
+                            onBlur={() => {
+                              // ✅ AI 캡션 버튼 클릭 중이면 무시
+                              if (aiCaptionClickingRef.current) {
+                                aiCaptionClickingRef.current = false;
                                 return;
                               }
 
