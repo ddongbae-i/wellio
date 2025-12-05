@@ -485,12 +485,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       img.src = imageSrc;
     });
 
-  // ✅ Canvas 필터 적용 (iOS 완벽 호환 버전)
+  // ✅ Canvas 필터 적용 (iOS 완벽 호환 버전 - 개선)
   const applyFilterToImage = (
     imageSrc: string,
     filterString: string
   ): Promise<string> =>
-    new Promise((resolve, reject) => {
+    new Promise((resolve) => {
       const img = new Image();
 
       // base64 이미지에는 crossOrigin 설정하지 않음
@@ -510,7 +510,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           });
 
           if (!ctx) {
-            reject(new Error("Canvas context not available"));
+            // Canvas 실패 시 원본 반환
+            console.warn("Canvas context 생성 실패, 원본 사용");
+            resolve(imageSrc);
             return;
           }
 
@@ -518,22 +520,26 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.filter = filterString || "none";
           ctx.drawImage(img, 0, 0);
+          ctx.filter = "none"; // 필터 리셋
 
-          // iOS Safari를 위한 안정적인 방식
+          // ✅ iOS: toDataURL을 먼저 시도 (더 안정적)
+          try {
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+            if (dataUrl && dataUrl.length > 50 && dataUrl.startsWith('data:image')) {
+              resolve(dataUrl);
+              return;
+            }
+          } catch (e) {
+            console.warn("toDataURL 실패, toBlob 시도:", e);
+          }
+
+          // toDataURL 실패 시 toBlob 시도
           canvas.toBlob(
             (blob) => {
               if (!blob) {
-                // toBlob 실패 시 toDataURL 사용
-                try {
-                  const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
-                  if (dataUrl && dataUrl.length > 50 && dataUrl.startsWith('data:image')) {
-                    resolve(dataUrl);
-                  } else {
-                    reject(new Error("Canvas to data URL failed"));
-                  }
-                } catch (e) {
-                  reject(new Error("Canvas to data URL failed"));
-                }
+                // 모두 실패하면 원본 반환
+                console.warn("toBlob 실패, 원본 사용");
+                resolve(imageSrc);
                 return;
               }
 
@@ -543,21 +549,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 if (result && result.length > 50 && result.startsWith('data:image')) {
                   resolve(result);
                 } else {
-                  reject(new Error("Invalid image data"));
+                  resolve(imageSrc);
                 }
               };
               reader.onerror = () => {
-                // FileReader 실패 시 toDataURL 사용
-                try {
-                  const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
-                  if (dataUrl && dataUrl.length > 50 && dataUrl.startsWith('data:image')) {
-                    resolve(dataUrl);
-                  } else {
-                    reject(new Error("FileReader and toDataURL both failed"));
-                  }
-                } catch (e) {
-                  reject(new Error("FileReader failed"));
-                }
+                console.warn("FileReader 실패, 원본 사용");
+                resolve(imageSrc);
               };
               reader.readAsDataURL(blob);
             },
@@ -565,12 +562,17 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             0.95
           );
         } catch (e) {
-          console.error("Filter application error:", e);
-          reject(e);
+          console.error("필터 적용 중 에러:", e);
+          // 에러 시 원본 반환
+          resolve(imageSrc);
         }
       };
 
-      img.onerror = () => reject(new Error("Image load failed"));
+      img.onerror = () => {
+        console.error("이미지 로드 실패, 원본 사용");
+        resolve(imageSrc);
+      };
+
       img.src = imageSrc;
     });
 
@@ -587,23 +589,24 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       const currentFilter = ORIGINAL_FILTERS.find(
         (f) => f.name === selectedFilter,
       );
+
+      // 필터가 Normal이 아닐 때만 적용
       if (currentFilter && currentFilter.filter !== "none") {
         try {
-          finalImage = await applyFilterToImage(
-            finalImage,
+          const filteredImage = await applyFilterToImage(
+            selectedImage,
             currentFilter.filter,
           );
 
           // 필터 적용 결과 검증
-          if (!finalImage || finalImage.length < 50 || !finalImage.startsWith('data:image')) {
+          if (filteredImage && filteredImage !== selectedImage) {
+            finalImage = filteredImage;
+            console.log("필터 적용 성공");
+          } else {
             console.warn("필터 적용 실패, 원본 사용");
-            finalImage = selectedImage;
-            toast.error("필터 적용에 실패했습니다. 원본으로 업로드됩니다.");
           }
         } catch (error) {
-          console.error("필터 적용 실패:", error);
-          finalImage = selectedImage;
-          toast.error("필터 적용에 실패했습니다. 원본으로 업로드됩니다.");
+          console.error("필터 적용 에러:", error);
         }
       }
 
@@ -755,7 +758,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2 pl-5 xs:pl-6 sm:pl-8">
           AI 추천 캡션
         </p>
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 ml-5 xs:ml-6 sm:ml-8">
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 ml-5 xs:pl-6 sm:pl-8">
           {aiCaptions.map((caption, index) => (
             <button
               key={index}
@@ -1296,7 +1299,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
                   <button
                     onClick={handleCapture}
-                    className="w-[70px] h-[70px] rounded-full border-[4px] border-black bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                    className="w-[70px] h-[70px] rounded-full border-[3px] border-white bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
                   >
                     <img
                       src={Upload}
@@ -1334,7 +1337,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
               <button
                 onClick={handleCapture}
-                className="w-[70px] h-[70px] rounded-full border-[4px] border-white bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
               >
                 {isUploadMode ? (
                   <img
@@ -1372,7 +1375,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         </div>
       </div>
 
-      {/* 건강 기록 모달 */}
+      {/* 건강 기록 모달 - ✅ 스와이퍼 추가 */}
       <AnimatePresence>
         {showHealthModal && (
           <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -1393,9 +1396,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 damping: 30,
                 stiffness: 300,
               }}
-              className="relative w-full max-w-[500px] bg-white rounded-t-[16px] pl-5 xs:pl-6 sm:pl-8 pt-[30px] pb-[40px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+              className="relative w-full max-w-[500px] bg-white rounded-t-[16px] px-5 xs:px-6 sm:px-8 pt-[30px] pb-[40px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
             >
-              <div className="space-y-6 ">
+              <div className="space-y-6">
+                {/* 오늘 운동 기록 - 스와이퍼 */}
                 <div className="space-y-3">
                   <h3 className="text-[17px] font-semibold text-[#202020]">
                     오늘 운동 기록
@@ -1404,9 +1408,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     modules={[FreeMode, Mousewheel]}
                     slidesPerView="auto"
                     spaceBetween={12}
-                    freeMode
-                    grabCursor
-                    mousewheel
+                    freeMode={true}
+                    grabCursor={true}
+                    mousewheel={true}
                     className="w-full"
                   >
                     {[
@@ -1426,13 +1430,22 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       </SwiperSlide>
                     ))}
                   </Swiper>
-
                 </div>
+
+                {/* 오늘 감정 기록 - 스와이퍼 */}
                 <div className="space-y-3">
                   <h3 className="text-[17px] font-bold text-[#202020]">
                     오늘 감정 기록
                   </h3>
-                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 pr-5">
+                  <Swiper
+                    modules={[FreeMode, Mousewheel]}
+                    slidesPerView="auto"
+                    spaceBetween={12}
+                    freeMode={true}
+                    grabCursor={true}
+                    mousewheel={true}
+                    className="w-full"
+                  >
                     {[
                       "😄",
                       "😊",
@@ -1443,43 +1456,55 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       "😭",
                       "😤",
                     ].map((emoji, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() =>
-                          handleHealthRecordSelect(`${emoji}`)
-                        }
-                        className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
-                      >
-                        {emoji}
-                      </button>
+                      <SwiperSlide key={idx} style={{ width: "auto" }}>
+                        <button
+                          onClick={() =>
+                            handleHealthRecordSelect(`${emoji}`)
+                          }
+                          className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
+                        >
+                          {emoji}
+                        </button>
+                      </SwiperSlide>
                     ))}
-                  </div>
+                  </Swiper>
                 </div>
+
+                {/* 진행중인 챌린지 - 스와이퍼 */}
                 <div className="space-y-3">
                   <h3 className="text-[17px] font-bold text-[#202020]">
                     진행중인 챌린지
                   </h3>
-                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm pr-5">
+                  <Swiper
+                    modules={[FreeMode, Mousewheel]}
+                    slidesPerView="auto"
+                    spaceBetween={12}
+                    freeMode={true}
+                    grabCursor={true}
+                    mousewheel={true}
+                    className="w-full"
+                  >
                     {[
                       { text: "월 15만보 걷기", icon: WalkIcon },
                       { text: "주 1회 함께 걷기", icon: TogetherIcon },
                       { text: "건강한 습관 만들기", icon: HabitIcon },
                       { text: "가족 건강 상위 10%", icon: TrophyIcon },
                     ].map((item, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleHealthRecordSelect(item.text, item.icon)}
-                        className="px-4 py-2 flex items-center gap-2 bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
-                      >
-                        <img
-                          src={item.icon}
-                          alt=""
-                          className="w-4 h-4 object-contain"
-                        />
-                        <span>{item.text}</span>
-                      </button>
+                      <SwiperSlide key={idx} style={{ width: "auto" }}>
+                        <button
+                          onClick={() => handleHealthRecordSelect(item.text, item.icon)}
+                          className="px-4 py-2 flex items-center gap-2 bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors text-white"
+                        >
+                          <img
+                            src={item.icon}
+                            alt=""
+                            className="w-4 h-4 object-contain"
+                          />
+                          <span>{item.text}</span>
+                        </button>
+                      </SwiperSlide>
                     ))}
-                  </div>
+                  </Swiper>
                 </div>
               </div>
             </motion.div>
