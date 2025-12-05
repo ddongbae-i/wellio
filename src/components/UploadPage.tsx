@@ -362,13 +362,17 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
   const getControlsBottom = () => {
     if (isKeyboardVisible) return 0;
-    if (isDetailEditMode) return 50;
-    return 120;
+    return 120;  // 기본 카메라 모드
+  };
+
+  const getDetailEditBottom = () => {
+    if (isKeyboardVisible) return 0;
+    return 50;  // 꾸미기 버튼들 (텍스트/위치/날씨...)
   };
 
   const getFilterBottom = () => {
     if (isKeyboardVisible) return 0;
-    return 80;  // 👈 필터만 낮춤 (120 → 80)
+    return 80;  // 필터 스와이퍼만 낮춤
   };
 
   useEffect(() => {
@@ -1314,7 +1318,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         <div
           className="absolute left-0 right-0 z-10 px-5 xs:px-6 sm:px-8 bg-[#f7f7f7] max-w-[500px] mx-auto"
           style={{
-            bottom: getFilterBottom(),
+            bottom: isFilterMode
+              ? getFilterBottom()  // 👈 필터 모드일 때만 80px
+              : isDetailEditMode
+                ? getDetailEditBottom()  // 👈 꾸미기 모드일 때 50px
+                : getControlsBottom(),  // 👈 기본 모드 120px
           }}
         >
           <input
