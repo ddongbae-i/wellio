@@ -33,8 +33,6 @@ import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css/free-mode";
 
 
-
-// ... 나머지 state
 // 커스텀 알럿 컴포넌트
 interface CustomAlertProps {
   open: boolean;
@@ -413,16 +411,13 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         const constraints: MediaStreamConstraints = {
           video:
             videoDevices.length > 1
-              ? {
-                facingMode: isFrontCamera ? "user" : "environment",
-                // ✅ iOS에서 후면 카메라 강제
-                ...(isIOS && !isFrontCamera ? {
-                  facingMode: { exact: "environment" }
-                } : {}),
-              }
+              ? isIOS && !isFrontCamera
+                ? { facingMode: { exact: "environment" } }  // ✅ iOS 후면 강제
+                : { facingMode: isFrontCamera ? "user" : "environment" }  // Android/iOS 전면
               : true,
           audio: false,
         };
+
         const newStream =
           await navigator.mediaDevices.getUserMedia(
             constraints,
@@ -518,48 +513,65 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     imageSrc: string,
     filterString: string
   ): Promise<string> => {
-    // ✅ iOS에서는 DOM 요소를 직접 캡처
+    // iOS는 DOM 캡처 방식
     if (isIOS && filterString !== "none") {
       return new Promise((resolve) => {
-        // 임시 이미지 엘리먼트 생성
         const tempImg = document.createElement("img");
+        tempImg.crossOrigin = "anonymous";
         tempImg.src = imageSrc;
         tempImg.style.position = "fixed";
         tempImg.style.left = "-9999px";
+        tempImg.style.top = "-9999px";
         tempImg.style.filter = filterString;
         tempImg.style.width = "335px";
         tempImg.style.height = "400px";
+        tempImg.style.objectFit = "cover";
 
         document.body.appendChild(tempImg);
 
         tempImg.onload = () => {
-          // Canvas로 필터 적용된 이미지 캡처
-          const canvas = document.createElement("canvas");
-          canvas.width = 335;
-          canvas.height = 400;
-          const ctx = canvas.getContext("2d");
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = 335;
+            canvas.height = 400;
+            const ctx = canvas.getContext("2d", { willReadFrequently: false });
 
-          if (!ctx) {
+            if (!ctx) {
+              console.error("Canvas context failed");
+              document.body.removeChild(tempImg);
+              resolve(imageSrc);
+              return;
+            }
+
+            // 필터 적용된 이미지를 캔버스에 그리기
+            ctx.drawImage(tempImg, 0, 0, 335, 400);
+
+            const result = canvas.toDataURL("image/jpeg", 0.95);
+            document.body.removeChild(tempImg);
+
+            if (result && result.length > 100) {
+              console.log("✅ iOS 필터 적용 성공");
+              resolve(result);
+            } else {
+              console.warn("필터 결과 비정상, 원본 사용");
+              resolve(imageSrc);
+            }
+          } catch (error) {
+            console.error("iOS 필터 에러:", error);
             document.body.removeChild(tempImg);
             resolve(imageSrc);
-            return;
           }
-
-          ctx.drawImage(tempImg, 0, 0, 335, 400);
-          document.body.removeChild(tempImg);
-
-          const result = canvas.toDataURL("image/jpeg", 0.95);
-          resolve(result);
         };
 
-        tempImg.onerror = () => {
+        tempImg.onerror = (error) => {
+          console.error("이미지 로드 실패:", error);
           document.body.removeChild(tempImg);
           resolve(imageSrc);
         };
       });
     }
 
-    // Android는 기존 방식 유지
+    // Android는 Canvas filter 방식
     return new Promise((resolve) => {
       const img = new Image();
       if (!imageSrc.startsWith("data:")) {
@@ -567,24 +579,43 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }
 
       img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
 
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
+          const ctx = canvas.getContext("2d", { willReadFrequently: false });
+
+          if (!ctx) {
+            console.error("Canvas context failed");
+            resolve(imageSrc);
+            return;
+          }
+
+          ctx.filter = filterString || "none";
+          ctx.drawImage(img, 0, 0);
+          ctx.filter = "none";
+
+          const result = canvas.toDataURL("image/jpeg", 0.95);
+
+          if (result && result.length > 100) {
+            console.log("✅ Android 필터 적용 성공");
+            resolve(result);
+          } else {
+            console.warn("필터 결과 비정상, 원본 사용");
+            resolve(imageSrc);
+          }
+        } catch (error) {
+          console.error("Android 필터 에러:", error);
           resolve(imageSrc);
-          return;
         }
-
-        ctx.filter = filterString || "none";
-        ctx.drawImage(img, 0, 0);
-        ctx.filter = "none";
-
-        resolve(canvas.toDataURL("image/jpeg", 0.95));
       };
 
-      img.onerror = () => resolve(imageSrc);
+      img.onerror = (error) => {
+        console.error("이미지 로드 실패:", error);
+        resolve(imageSrc);
+      };
+
       img.src = imageSrc;
     });
   };
