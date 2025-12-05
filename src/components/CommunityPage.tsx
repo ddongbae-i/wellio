@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import "swiper/css";
 import Bell from "../assets/images/icon_alarm.svg";
@@ -1028,7 +1028,7 @@ export function CommunityPage({
                     ref={(el) => {
                       postRefs.current[post.id] = el;
                     }}
-                    className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 snap-start snap-always ${isKeyboardVisible ? "justify-start pt-[120px]" : "justify-start pt-[60px]"
+                    className={`flex flex-col items-center w-full gap-4 py-5 xs:py-6 sm:py-8 snap-start snap-always ${isKeyboardVisible ? "justify-start pt-[120px]" : "justify-start pt-[80px]"
                       }`}
                     key={post.id}
                     style={{

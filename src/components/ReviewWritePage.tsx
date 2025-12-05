@@ -1,10 +1,10 @@
 "use client";
 
 import { ChevronLeft, Star } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { toast } from "sonner";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { hospitalMap } from "./hospitalInfo";
 
 interface ReviewWritePageProps {
@@ -87,6 +87,17 @@ export function ReviewWritePage({
   const contentRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // ✅ iPhone 텍스트 입력 시 자동 줌 방지
+  useEffect(() => {
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport) {
+      viewport.setAttribute(
+        'content',
+        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+      );
+    }
+  }, []);
+
   const scrollTextareaIntoView = () => {
     if (!textareaRef.current) return;
 
@@ -138,24 +149,6 @@ export function ReviewWritePage({
   };
 
   const isEditMode = !!editingReview;
-
-  // textarea가 전체 보이도록 스크롤
-  // const scrollTextareaIntoView = () => {
-  //   const container = contentRef.current;
-  //   const textarea = textareaRef.current;
-  //   if (!container || !textarea) return;
-
-  //   const containerRect = container.getBoundingClientRect();
-  //   const textareaRect = textarea.getBoundingClientRect();
-
-  //   const diff = textareaRect.bottom - containerRect.bottom;
-  //   if (diff > 0) {
-  //     container.scrollBy({
-  //       top: diff + 24,
-  //       behavior: "smooth",
-  //     });
-  //   }
-  // };
 
   return (
     <motion.div
@@ -256,7 +249,6 @@ export function ReviewWritePage({
         </div>
 
         {/* 리뷰 텍스트 영역 */}
-        {/* 리뷰 텍스트 영역 */}
         <div className="relative">
           <textarea
             ref={textareaRef}
@@ -275,6 +267,7 @@ export function ReviewWritePage({
             placeholder="선택하신 키워드를 바탕으로 후기를 작성해주세요."
             className="w-full h-[150px] px-5 pt-[22px] pb-[26px] rounded-[16px] resize-none text-sm 
        focus:outline-none focus:border-[#36D2C5] transition-colors bg-white shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+            style={{ fontSize: '16px' }}
           />
 
           {/* 글자수 카운트 */}

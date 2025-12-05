@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { HospitalCard } from "./HospitalCard";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { motion, type Variants } from "motion/react";
+import { motion, type Variants } from "framer-motion";
 import "swiper/css";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import Search from "../assets/images/icon_search_color.svg";
