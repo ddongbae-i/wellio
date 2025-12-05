@@ -389,58 +389,78 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     };
   }, []);
   // 카메라 스트림 시작
-  const streamRef = useRef<MediaStream | null>(null);
-
-  // 카메라 시작
   useEffect(() => {
     if (!permissionsGranted || isUploadMode) return;
 
     const startCamera = async () => {
-      // 기존 스트림 정리
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => {
-          track.stop();
-          console.log("🛑 기존 스트림 정지:", track.label);
-        });
-        streamRef.current = null;
-      }
+      try {
+        // ✅ 기존 스트림 정리
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+        }
 
-      // 새 스트림 시작
-      const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-      streamRef.current = newStream;
-      setStream(newStream);
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(
+          (device) => device.kind === "videoinput",
+        );
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = newStream;
+        if (videoDevices.length === 0) {
+          setCameraError("사용 가능한 카메라가 없습니다.");
+          setHasCameraDevice(false);
+          return;
+        } else {
+          setHasCameraDevice(true);
+        }
+
+        let videoConstraints: MediaTrackConstraints | boolean;
+
+        if (videoDevices.length > 1) {
+          videoConstraints = {
+            facingMode: isFrontCamera ? "user" : "environment"
+          };
+
+          if (isIOS) {
+            videoConstraints = {
+              facingMode: isFrontCamera
+                ? { exact: "user" }
+                : { exact: "environment" }
+            };
+          }
+        } else {
+          videoConstraints = true;
+        }
+
+        const constraints: MediaStreamConstraints = {
+          video: videoConstraints,
+          audio: false,
+        };
+
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        setStream(newStream);
+        setCameraError(null);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = newStream;
+        }
+      } catch (error) {
+        console.error("카메라 접근 실패:", error);
+        setCameraError("카메라를 시작할 수 없습니다.");
       }
     };
 
     startCamera();
 
+    // ✅ cleanup: 컴포넌트 언마운트 시 무조건 카메라 정리
     return () => {
-      // cleanup: 항상 최신 streamRef 참조
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => {
+      if (stream) {
+        stream.getTracks().forEach((track) => {
           track.stop();
-          console.log("🛑 cleanup 스트림 정지:", track.label);
+          console.log("🛑 카메라 트랙 정지:", track.label);
         });
-        streamRef.current = null;
       }
     };
   }, [permissionsGranted, isFrontCamera, isUploadMode]);
-
-  // 컴포넌트 언마운트 시 추가 보험
-  useEffect(() => {
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => {
-          track.stop();
-          console.log("🛑 언마운트 스트림 정지:", track.label);
-        });
-        streamRef.current = null;
-      }
-    };
-  }, []);
 
   const handleCameraPermissionAllow = () => {
     setShowCameraPermission(false);
