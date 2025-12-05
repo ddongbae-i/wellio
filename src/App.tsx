@@ -1990,6 +1990,7 @@ export default function App() {
             onPageChange={(page) => {
               if (page === "calendar") navigateTo("calendar");
             }}
+            onDeletePost={handleDeletePost}  // ✅ 이 한 줄 추가!
           />
         )}
 

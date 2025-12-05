@@ -661,6 +661,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
       // ✅ 페이지 나가기
       onBack();
+
+
       return;
     }
 
