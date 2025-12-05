@@ -63,15 +63,40 @@ export function HospitalSearchPage({
     .map((id) => hospitalList.find((h) => h.id === id))
     .filter((h): h is Hospital => Boolean(h));
 
-  const filteredHospitals = hospitalsToShow.filter((hospital) => {
-    if (!searchQuery.trim()) return true;
+  const getFilteredByFilter = (hospitals: Hospital[]) => {
+    if (selectedFilter === "거리순") return hospitals;
 
-    const query = searchQuery.toLowerCase();
-    const name = hospital.name.toLowerCase();
-    const specialty = hospital.specialtyText.toLowerCase();
+    if (selectedFilter === "진료중") {
+      return hospitals.filter((h) => h.isAvailableNow === true);
+    }
 
-    return name.includes(query) || specialty.includes(query);
-  });
+    if (selectedFilter === "즉시접수가능") {
+      return hospitals.filter((h) => [1, 2, 5].includes(h.id));
+    }
+
+    if (selectedFilter === "약/주사") {
+      return hospitals.filter((h) => h.id !== 3); // 치과 제외
+    }
+
+    if (selectedFilter === "당일 검사") {
+      return hospitals; // 전부
+    }
+
+    return hospitals;
+  };
+
+  // 🔧 필터 + 검색어 둘 다 반영되도록 수정
+  const filteredHospitals = getFilteredByFilter(hospitalsToShow).filter(
+    (hospital) => {
+      if (!searchQuery.trim()) return true;
+
+      const query = searchQuery.toLowerCase();
+      const name = hospital.name.toLowerCase();
+      const specialty = hospital.specialtyText.toLowerCase();
+
+      return name.includes(query) || specialty.includes(query);
+    }
+  );
 
   const handleToggleFavorite = (hospital: Hospital, wasAdded: boolean) => {
     // 토스트 메시지 설정
@@ -116,27 +141,7 @@ export function HospitalSearchPage({
     },
   };
 
-  const getFilteredByFilter = (hospitals: Hospital[]) => {
-    if (selectedFilter === "거리순") return hospitals;
 
-    if (selectedFilter === "진료중") {
-      return hospitals.filter((h) => h.isAvailableNow === true);
-    }
-
-    if (selectedFilter === "즉시접수가능") {
-      return hospitals.filter((h) => [1, 2, 5].includes(h.id));
-    }
-
-    if (selectedFilter === "약/주사") {
-      return hospitals.filter((h) => h.id !== 3); // 치과 제외
-    }
-
-    if (selectedFilter === "당일 검사") {
-      return hospitals; // 전부
-    }
-
-    return hospitals;
-  };
 
   return (
     <div className="bg-[#f7f7f7] flex flex-col min-h-screen">
@@ -156,22 +161,42 @@ export function HospitalSearchPage({
           </div>
 
           {/* Search */}
-          <div className="flex items-center gap-3">
-            <div className={`flex-1 rounded-[12px] px-5 py-2 flex items-center gap-2 transition-all border-[1.6px] h-10 bg-white ${isSearchFocused ? "border-[#2ECACA]" : "border-[#2ECACA]"}`}>
-              <img src={Search} alt="검색" className="w-6 h-6" />
+          <div className="flex items-center gap-2 xs:gap-3 w-full">
+            <div
+              className={`flex-1 min-w-0 rounded-[12px] 
+      h-11 xs:h-11 sm:h-10 
+      px-3 xs:px-4 
+      flex items-center gap-2 
+      bg-white 
+      border-[1.5px] transition-all
+      ${isSearchFocused
+                  ? "border-[#2ECACA]"
+                  : "border-[#E0E0E0]"
+                }`}
+            >
+              <img src={Search} alt="검색" className="w-5 h-5 xs:w-6 xs:h-6 flex-shrink-0" />
               <input
                 type="text"
                 placeholder="진료과, 병원이름을 검색해보세요"
-                className="flex-1 min-w-0 bg-transparent outline-none text-[#1A1A1A] placeholder:text-[#aeaeae] text-sm text-[#777777] font-normal leading-[1.4]"
-                style={{ fontSize: '16px' }}
+                className="flex-1 min-w-0 bg-transparent outline-none 
+                 text-[14px] xs:text-[15px] text-[#1A1A1A] 
+                 placeholder:text-[#aeaeae] leading-[1.4]"
+                style={{ fontSize: "16px" }} // iOS 줌 방지용
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setIsSearchFocused(false)}
               />
             </div>
-            <button className="text-[#777777] text-[17px] font-noraml flex-shrink-0 whitespace-nowrap px-1">취소</button>
+
+            <button
+              className="text-[#777777] text-[14px] xs:text-[15px] sm:text-[17px] 
+               font-normal flex-shrink-0 whitespace-nowrap px-1"
+            >
+              취소
+            </button>
           </div>
+
         </motion.header>
 
         {/* Filter Tags */}
