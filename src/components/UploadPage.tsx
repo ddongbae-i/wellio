@@ -389,7 +389,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     };
   }, []);
   // 카메라 스트림 시작
-  // 카메라 스트림 시작
   useEffect(() => {
     if (!permissionsGranted || isUploadMode) return;
 
