@@ -167,7 +167,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const [isTextInputFocused, setIsTextInputFocused] =
     useState(false);
 
-  const [isFrontCamera, setIsFrontCamera] = useState(true);
+  const [isFrontCamera, setIsFrontCamera] = useState(false); // 후면 카메라가 기본
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(
@@ -272,6 +272,27 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   useEffect(() => {
     setPermissionsGranted(true);
   }, []);
+
+  // ✅ iPhone 텍스트 입력 시 자동 줌 방지
+  useEffect(() => {
+    const viewport = document.querySelector('meta[name="viewport"]');
+    const originalContent = viewport?.getAttribute('content');
+
+    if (viewport && showTextInput && isTextInputFocused) {
+      // 텍스트 입력 중일 때 줌 방지
+      viewport.setAttribute(
+        'content',
+        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+      );
+    }
+
+    return () => {
+      // 원래 설정으로 복구
+      if (viewport && originalContent) {
+        viewport.setAttribute('content', originalContent);
+      }
+    };
+  }, [showTextInput, isTextInputFocused]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -464,7 +485,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       img.src = imageSrc;
     });
 
-  // Canvas 필터 적용
+  // ✅ Canvas 필터 적용 (iOS 완벽 호환 버전)
   const applyFilterToImage = (
     imageSrc: string,
     filterString: string
@@ -472,7 +493,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     new Promise((resolve, reject) => {
       const img = new Image();
 
-      // ✅ iOS: base64에는 crossOrigin 쓰면 안 됨
+      // base64 이미지에는 crossOrigin 설정하지 않음
       if (!imageSrc.startsWith("data:")) {
         img.crossOrigin = "anonymous";
       }
@@ -483,27 +504,60 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           canvas.width = img.width;
           canvas.height = img.height;
 
-          const ctx = canvas.getContext("2d");
+          const ctx = canvas.getContext("2d", {
+            willReadFrequently: false,
+            alpha: true
+          });
+
           if (!ctx) {
             reject(new Error("Canvas context not available"));
             return;
           }
 
+          // 캔버스 초기화 및 필터 적용
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.filter = filterString || "none";
           ctx.drawImage(img, 0, 0);
 
-          // ✅ iOS 안정 방식: toBlob → FileReader
+          // iOS Safari를 위한 안정적인 방식
           canvas.toBlob(
             (blob) => {
               if (!blob) {
-                reject(new Error("Canvas toBlob failed"));
+                // toBlob 실패 시 toDataURL 사용
+                try {
+                  const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+                  if (dataUrl && dataUrl.length > 50 && dataUrl.startsWith('data:image')) {
+                    resolve(dataUrl);
+                  } else {
+                    reject(new Error("Canvas to data URL failed"));
+                  }
+                } catch (e) {
+                  reject(new Error("Canvas to data URL failed"));
+                }
                 return;
               }
 
               const reader = new FileReader();
               reader.onloadend = () => {
-                resolve(reader.result as string);
+                const result = reader.result as string;
+                if (result && result.length > 50 && result.startsWith('data:image')) {
+                  resolve(result);
+                } else {
+                  reject(new Error("Invalid image data"));
+                }
+              };
+              reader.onerror = () => {
+                // FileReader 실패 시 toDataURL 사용
+                try {
+                  const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+                  if (dataUrl && dataUrl.length > 50 && dataUrl.startsWith('data:image')) {
+                    resolve(dataUrl);
+                  } else {
+                    reject(new Error("FileReader and toDataURL both failed"));
+                  }
+                } catch (e) {
+                  reject(new Error("FileReader failed"));
+                }
               };
               reader.readAsDataURL(blob);
             },
@@ -511,6 +565,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             0.95
           );
         } catch (e) {
+          console.error("Filter application error:", e);
           reject(e);
         }
       };
@@ -538,11 +593,17 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             finalImage,
             currentFilter.filter,
           );
+
+          // 필터 적용 결과 검증
+          if (!finalImage || finalImage.length < 50 || !finalImage.startsWith('data:image')) {
+            console.warn("필터 적용 실패, 원본 사용");
+            finalImage = selectedImage;
+            toast.error("필터 적용에 실패했습니다. 원본으로 업로드됩니다.");
+          }
         } catch (error) {
           console.error("필터 적용 실패:", error);
-        }
-        if (!finalImage || finalImage.length < 50) {
-          finalImage = selectedImage; // iOS에서 필터 실패 시 원본으로라도 업로드
+          finalImage = selectedImage;
+          toast.error("필터 적용에 실패했습니다. 원본으로 업로드됩니다.");
         }
       }
 
@@ -963,6 +1024,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             }}
                             placeholder="텍스트를 입력하세요"
                             className="w-full text-[#555555] text-[15px] bg-white/80 backdrop-blur-sm px-5 py-2 rounded-[50px] outline-none placeholder:text-[#aeaeae] border border-[#ffffff]"
+                            style={{ fontSize: '16px' }}
                           />
                         ) : textInput ? (
                           <button
@@ -1035,7 +1097,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           ) : isDetailEditMode ? (
             <>
               <button
-                onClick={handleCloseDetailEdit}  // 👈 바로 닫기 (알럿 제거)
+                onClick={handleCloseDetailEdit}
                 className="absolute left-5 xs:left-6 sm:left-8"
               >
                 <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
@@ -1107,7 +1169,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   touchStartPreventDefault={false}
                   touchMoveStopPropagation={false}
                   style={{
-                    touchAction: "manipulation",   // ← pan-x 말고 이 정도가 안전
+                    touchAction: "manipulation",
                     WebkitUserSelect: "none",
                     cursor: "grab",
                   }}
