@@ -363,7 +363,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const getControlsBottom = () => {
     if (isKeyboardVisible) return 0;
     if (isDetailEditMode) return 50;
-    return 120;
+    return 80;
   };
 
   useEffect(() => {
@@ -834,7 +834,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         }}
         className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
         style={{
-          bottom: isKeyboardVisible ? 40 : 0,
+          bottom: isKeyboardVisible ? 50 : 0,
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
