@@ -359,6 +359,24 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     return 120;
   };
 
+  useEffect(() => {
+    // 페이지가 보일 때마다 모든 state 초기화
+    return () => {
+      // 컴포넌트 언마운트 시에도 정리
+      setSelectedImage(null);
+      setTextInput("");
+      setLocationInput("");
+      setWeatherInput("");
+      setTimeInput("");
+      setHealthInput("");
+      setHealthIcon(null);
+      setIsUploadMode(false);
+      setIsDetailEditMode(false);
+      setShowTextInput(false);
+      setSelectedFilter("Normal");
+    };
+  }, []);
+
   // 카메라 스트림 시작
   useEffect(() => {
     if (!permissionsGranted || isUploadMode) return;
@@ -612,6 +630,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
       const today = new Date();
       const createdAt = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+
+
 
       onUpload({
         image: finalImage,
