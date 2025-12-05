@@ -506,14 +506,20 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     });
 
   // ✅ Canvas 필터 적용 (iOS 완벽 호환 버전 - 개선)
+  // ✅ iOS는 캔버스 필터 자체를 사용하지 않고 원본 그대로 반환
   const applyFilterToImage = (
     imageSrc: string,
     filterString: string
   ): Promise<string> =>
     new Promise((resolve) => {
+      // 👉 아이폰이면 바로 원본 반환 (업로드는 항상 성공하게)
+      if (isIOS) {
+        resolve(imageSrc);
+        return;
+      }
+
       const img = new Image();
 
-      // base64 이미지에는 crossOrigin 설정하지 않음
       if (!imageSrc.startsWith("data:")) {
         img.crossOrigin = "anonymous";
       }
@@ -526,26 +532,27 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
           const ctx = canvas.getContext("2d", {
             willReadFrequently: false,
-            alpha: true
+            alpha: true,
           });
 
           if (!ctx) {
-            // Canvas 실패 시 원본 반환
             console.warn("Canvas context 생성 실패, 원본 사용");
             resolve(imageSrc);
             return;
           }
 
-          // 캔버스 초기화 및 필터 적용
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.filter = filterString || "none";
           ctx.drawImage(img, 0, 0);
-          ctx.filter = "none"; // 필터 리셋
+          ctx.filter = "none";
 
-          // ✅ iOS: toDataURL을 먼저 시도 (더 안정적)
           try {
             const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
-            if (dataUrl && dataUrl.length > 50 && dataUrl.startsWith('data:image')) {
+            if (
+              dataUrl &&
+              dataUrl.length > 50 &&
+              dataUrl.startsWith("data:image")
+            ) {
               resolve(dataUrl);
               return;
             }
@@ -553,11 +560,9 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             console.warn("toDataURL 실패, toBlob 시도:", e);
           }
 
-          // toDataURL 실패 시 toBlob 시도
           canvas.toBlob(
             (blob) => {
               if (!blob) {
-                // 모두 실패하면 원본 반환
                 console.warn("toBlob 실패, 원본 사용");
                 resolve(imageSrc);
                 return;
@@ -566,7 +571,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
               const reader = new FileReader();
               reader.onloadend = () => {
                 const result = reader.result as string;
-                if (result && result.length > 50 && result.startsWith('data:image')) {
+                if (
+                  result &&
+                  result.length > 50 &&
+                  result.startsWith("data:image")
+                ) {
                   resolve(result);
                 } else {
                   resolve(imageSrc);
@@ -583,7 +592,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           );
         } catch (e) {
           console.error("필터 적용 중 에러:", e);
-          // 에러 시 원본 반환
           resolve(imageSrc);
         }
       };
@@ -595,6 +603,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
       img.src = imageSrc;
     });
+
 
   const handleCapture = async () => {
     // 업로드 모드일 때: 최종 업로드
@@ -745,6 +754,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       setTimeout(() => textInputRef.current?.focus(), 80);
     }
   };
+
+  const isIOS =
+    typeof window !== "undefined" &&
+    /iP(hone|od|ad)/.test(window.navigator.userAgent);
 
   const handleLocationInput = () =>
     setLocationInput("소래산");
