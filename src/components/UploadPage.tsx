@@ -1299,7 +1299,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
                   <button
                     onClick={handleCapture}
-                    className="w-[70px] h-[70px] rounded-full border-[3px] border-white bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                    className="w-[70px] h-[70px] rounded-full bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
                   >
                     <img
                       src={Upload}
@@ -1337,7 +1337,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
               <button
                 onClick={handleCapture}
-                className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                className="w-[70px] h-[70px] rounded-full border-[3px] border-[#2ECACA] bg-white hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
               >
                 {isUploadMode ? (
                   <img
@@ -1354,7 +1354,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 onClick={
                   isUploadMode ? handleFilter : handleCameraSwitch
                 }
-                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder- bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
+                className="w-[50px] h-[50px] flex items-center justify-center rounded-full border boder-[#e8e8e8] bg-[#f0f0f0] text-gray-500 transition-colors hover:bg-gray-200"
               >
                 {isUploadMode ? (
                   <img
@@ -1396,12 +1396,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 damping: 30,
                 stiffness: 300,
               }}
-              className="relative w-full max-w-[500px] bg-white rounded-t-[16px] px-5 xs:px-6 sm:px-8 pt-[30px] pb-[40px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
+              className="relative w-full max-w-[500px] bg-white rounded-t-[16px] pt-[30px] pb-[40px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)]"
             >
               <div className="space-y-6">
                 {/* 오늘 운동 기록 - 스와이퍼 */}
-                <div className="space-y-3">
-                  <h3 className="text-[17px] font-semibold text-[#202020]">
+                <div className="space-y-3 data-swiper">
+                  <h3 className="text-[17px] font-medium text-[#202020]">
                     오늘 운동 기록
                   </h3>
                   <Swiper
@@ -1421,7 +1421,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                       <SwiperSlide key={idx} style={{ width: "auto" }}>
                         <button
                           onClick={() => handleHealthRecordSelect(item.value)}
-                          className="flex items-center gap-1.5 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
+                          className="flex items-center gap-2 bg-[#555555] text-white px-4 py-2 rounded-full whitespace-nowrap"
                         >
                           <span className="text-[15px] font-medium">
                             {item.label}
@@ -1433,8 +1433,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 </div>
 
                 {/* 오늘 감정 기록 - 스와이퍼 */}
-                <div className="space-y-3">
-                  <h3 className="text-[17px] font-bold text-[#202020]">
+                <div className="space-y-3 data-swiper">
+                  <h3 className="text-[17px] font-semibold text-[#202020]">
                     오늘 감정 기록
                   </h3>
                   <Swiper
@@ -1461,7 +1461,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                           onClick={() =>
                             handleHealthRecordSelect(`${emoji}`)
                           }
-                          className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors"
+                          className="px-4 py-2 flex items-center justify-center bg-[#555555] rounded-[30px] text-[14px] shrink-0 hover:bg-[#444444] transition-colors "
                         >
                           {emoji}
                         </button>
@@ -1471,8 +1471,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 </div>
 
                 {/* 진행중인 챌린지 - 스와이퍼 */}
-                <div className="space-y-3">
-                  <h3 className="text-[17px] font-bold text-[#202020]">
+                <div className="space-y-3 data-swiper">
+                  <h3 className="text-[17px] font-medium text-[#202020]">
                     진행중인 챌린지
                   </h3>
                   <Swiper
