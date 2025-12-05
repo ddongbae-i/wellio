@@ -1,6 +1,6 @@
 
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
-import Bell from "../assets/images/icon_alarm.svg";
+import Bell from "../assets/images/icon_alarm.png";
 import Settings from "../assets/images/icon_set.svg";
 import Search from "../assets/images/icon_search.svg";
 
