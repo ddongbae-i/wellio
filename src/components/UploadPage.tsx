@@ -1296,7 +1296,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
                   <button
                     onClick={handleCapture}
-                    className="w-[70px] h-[70px] rounded-full border-[3px] border-white bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                    className="w-[70px] h-[70px] rounded-full border-[4px] border-black bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
                   >
                     <img
                       src={Upload}
@@ -1334,7 +1334,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
               <button
                 onClick={handleCapture}
-                className="w-[70px] h-[70px] rounded-full border-4 border-gray-100 bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
+                className="w-[70px] h-[70px] rounded-full border-[4px] border-white bg-[#2ECACA] hover:bg-[#00C2B3] transition-colors flex items-center justify-center"
               >
                 {isUploadMode ? (
                   <img
