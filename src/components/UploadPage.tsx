@@ -766,7 +766,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             freeMode={true}
             grabCursor={true}
             mousewheel={true}
-            className="w-full !overflow-visible"
+            className="w-full"
           >
             {aiCaptions.map((caption, index) => (
               <SwiperSlide key={index} style={{ width: "auto" }}>
@@ -1457,7 +1457,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                         freeMode={true}
                         grabCursor={true}
                         mousewheel={true}
-                        className="w-full !overflow-visible"
+                        className="w-full"
                       >
                         {[
                           "😄",
@@ -1497,7 +1497,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                         freeMode={true}
                         grabCursor={true}
                         mousewheel={true}
-                        className="w-full !overflow-visible"
+                        className="w-full "
                       >
                         {[
                           { text: "월 15만보 걷기", icon: WalkIcon },
