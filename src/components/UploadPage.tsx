@@ -33,6 +33,9 @@ import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css/free-mode";
 
 
+
+const [showCameraPermission, setShowCameraPermission] = useState(false);
+// ... 나머지 state
 // 커스텀 알럿 컴포넌트
 interface CustomAlertProps {
   open: boolean;
@@ -158,6 +161,11 @@ interface UploadPageProps {
 }
 
 export function UploadPage({ onBack, onUpload }: UploadPageProps) {
+
+  const isIOS =
+    typeof window !== "undefined" &&
+    /iP(hone|od|ad)/.test(window.navigator.userAgent);
+
   const [showCameraPermission, setShowCameraPermission] =
     useState(false);
   const [showGalleryPermission, setShowGalleryPermission] =
@@ -407,14 +415,15 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           video:
             videoDevices.length > 1
               ? {
-                facingMode: isFrontCamera
-                  ? "user"
-                  : "environment",
+                facingMode: isFrontCamera ? "user" : "environment",
+                // ✅ iOS에서 후면 카메라 강제
+                ...(isIOS && !isFrontCamera ? {
+                  facingMode: { exact: "environment" }
+                } : {}),
               }
               : true,
           audio: false,
         };
-
         const newStream =
           await navigator.mediaDevices.getUserMedia(
             constraints,
@@ -505,104 +514,81 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       img.src = imageSrc;
     });
 
-  // ✅ Canvas 필터 적용 (iOS 완벽 호환 버전 - 개선)
-  // ✅ iOS는 캔버스 필터 자체를 사용하지 않고 원본 그대로 반환
-  const applyFilterToImage = (
+  // applyFilterToImage 함수를 완전히 새로 작성
+  const applyFilterToImage = async (
     imageSrc: string,
     filterString: string
-  ): Promise<string> =>
-    new Promise((resolve) => {
-      // 👉 아이폰이면 바로 원본 반환 (업로드는 항상 성공하게)
-      if (isIOS) {
-        resolve(imageSrc);
-        return;
-      }
+  ): Promise<string> => {
+    // ✅ iOS에서는 DOM 요소를 직접 캡처
+    if (isIOS && filterString !== "none") {
+      return new Promise((resolve) => {
+        // 임시 이미지 엘리먼트 생성
+        const tempImg = document.createElement("img");
+        tempImg.src = imageSrc;
+        tempImg.style.position = "fixed";
+        tempImg.style.left = "-9999px";
+        tempImg.style.filter = filterString;
+        tempImg.style.width = "335px";
+        tempImg.style.height = "400px";
 
+        document.body.appendChild(tempImg);
+
+        tempImg.onload = () => {
+          // Canvas로 필터 적용된 이미지 캡처
+          const canvas = document.createElement("canvas");
+          canvas.width = 335;
+          canvas.height = 400;
+          const ctx = canvas.getContext("2d");
+
+          if (!ctx) {
+            document.body.removeChild(tempImg);
+            resolve(imageSrc);
+            return;
+          }
+
+          ctx.drawImage(tempImg, 0, 0, 335, 400);
+          document.body.removeChild(tempImg);
+
+          const result = canvas.toDataURL("image/jpeg", 0.95);
+          resolve(result);
+        };
+
+        tempImg.onerror = () => {
+          document.body.removeChild(tempImg);
+          resolve(imageSrc);
+        };
+      });
+    }
+
+    // Android는 기존 방식 유지
+    return new Promise((resolve) => {
       const img = new Image();
-
       if (!imageSrc.startsWith("data:")) {
         img.crossOrigin = "anonymous";
       }
 
       img.onload = () => {
-        try {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
 
-          const ctx = canvas.getContext("2d", {
-            willReadFrequently: false,
-            alpha: true,
-          });
-
-          if (!ctx) {
-            console.warn("Canvas context 생성 실패, 원본 사용");
-            resolve(imageSrc);
-            return;
-          }
-
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.filter = filterString || "none";
-          ctx.drawImage(img, 0, 0);
-          ctx.filter = "none";
-
-          try {
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
-            if (
-              dataUrl &&
-              dataUrl.length > 50 &&
-              dataUrl.startsWith("data:image")
-            ) {
-              resolve(dataUrl);
-              return;
-            }
-          } catch (e) {
-            console.warn("toDataURL 실패, toBlob 시도:", e);
-          }
-
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                console.warn("toBlob 실패, 원본 사용");
-                resolve(imageSrc);
-                return;
-              }
-
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                const result = reader.result as string;
-                if (
-                  result &&
-                  result.length > 50 &&
-                  result.startsWith("data:image")
-                ) {
-                  resolve(result);
-                } else {
-                  resolve(imageSrc);
-                }
-              };
-              reader.onerror = () => {
-                console.warn("FileReader 실패, 원본 사용");
-                resolve(imageSrc);
-              };
-              reader.readAsDataURL(blob);
-            },
-            "image/jpeg",
-            0.95
-          );
-        } catch (e) {
-          console.error("필터 적용 중 에러:", e);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
           resolve(imageSrc);
+          return;
         }
+
+        ctx.filter = filterString || "none";
+        ctx.drawImage(img, 0, 0);
+        ctx.filter = "none";
+
+        resolve(canvas.toDataURL("image/jpeg", 0.95));
       };
 
-      img.onerror = () => {
-        console.error("이미지 로드 실패, 원본 사용");
-        resolve(imageSrc);
-      };
-
+      img.onerror = () => resolve(imageSrc);
       img.src = imageSrc;
     });
+  };
 
 
   const handleCapture = async () => {
@@ -754,10 +740,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       setTimeout(() => textInputRef.current?.focus(), 80);
     }
   };
-
-  const isIOS =
-    typeof window !== "undefined" &&
-    /iP(hone|od|ad)/.test(window.navigator.userAgent);
 
   const handleLocationInput = () =>
     setLocationInput("소래산");
