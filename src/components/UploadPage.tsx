@@ -1432,7 +1432,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   <h3 className="text-[17px] font-bold text-[#202020]">
                     오늘 감정 기록
                   </h3>
-                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1">
+                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 pr-5">
                     {[
                       "😄",
                       "😊",
@@ -1459,7 +1459,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                   <h3 className="text-[17px] font-bold text-[#202020]">
                     진행중인 챌린지
                   </h3>
-                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm">
+                  <div className="flex justify-between gap-2 overflow-x-auto scrollbar-hide pb-1 text-white text-sm pr-5">
                     {[
                       { text: "월 15만보 걷기", icon: WalkIcon },
                       { text: "주 1회 함께 걷기", icon: TogetherIcon },

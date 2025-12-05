@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HospitalCard } from "./HospitalCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, type Variants } from "motion/react";
@@ -35,6 +35,17 @@ export function HospitalSearchPage({
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showArrow, setShowArrow] = useState(false);
+
+  // ✅ iPhone 텍스트 입력 시 자동 줌 방지
+  useEffect(() => {
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport) {
+      viewport.setAttribute(
+        'content',
+        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+      );
+    }
+  }, []);
 
   const filters = [
     "거리순",
@@ -130,6 +141,7 @@ export function HospitalSearchPage({
                 type="text"
                 placeholder="진료과, 병원이름을 검색해보세요"
                 className="flex-1 bg-transparent outline-none text-[#1A1A1A] placeholder:text-[#aeaeae] text-sm text-[#777777] font-normal leading-[1.4]"
+                style={{ fontSize: '16px' }}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}

@@ -315,7 +315,16 @@ export function CommunityPage({
     }>
   >([]);
 
-
+  // ✅ iPhone 텍스트 입력 시 자동 줌 방지
+  useEffect(() => {
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport) {
+      viewport.setAttribute(
+        'content',
+        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+      );
+    }
+  }, []);
 
   function getMaxCommentLength(value: string) {
     const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(value);
@@ -712,6 +721,7 @@ export function CommunityPage({
                   type="text"
                   placeholder="어떤 사진을 찾으시나요?"
                   className="flex-1 bg-transparent outline-none text-[#202020] placeholder:text-[#aeaeae] placeholder:font-normal min-w-0 text-[15px]"
+                  style={{ fontSize: '16px' }}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
@@ -1412,7 +1422,8 @@ export function CommunityPage({
                                         type="text"
                                         placeholder="댓글을 작성해주세요"
                                         className="w-full bg-transparent outline-none text-[#2b2b2b] placeholder:text-[#aeaeae]"
-                                        enterKeyHint="send"   // iOS 키보드에 '전송' 느낌
+                                        style={{ fontSize: '16px' }}
+                                        enterKeyHint="send"
                                         value={currentPostId === post.id ? newComment : ""}
                                         onChange={(e) => {
                                           if (currentPostId !== post.id) return;
