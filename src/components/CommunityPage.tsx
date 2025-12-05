@@ -111,6 +111,9 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
           <p className="text-[15px] font-semibold text-[#2b2b2b] mb-3">
             추천 검색어
           </p>
+          <span className="text-[12px] font-light text-[#777777]">
+            사진에 붙인 태그로만 검색이 가능해요
+          </span>
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
             {searchSuggestions.map((keyword, index) => (
               <button

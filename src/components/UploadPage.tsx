@@ -237,18 +237,19 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   };
 
   const handleCaptionClick = useCallback(
-    (caption: string) =>
-      (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        const combined = textInput.trim()
-          ? `${textInput.trim()} ${caption}`
-          : caption;
-        const newText = applyTextLimit(combined);
-        setTextInput(newText);
-        if (textInputRef.current) {
-          textInputRef.current.focus();
-        }
-      },
+    (caption: string) => {
+      const combined = textInput.trim()
+        ? `${textInput.trim()} ${caption}`
+        : caption;
+
+      const newText = applyTextLimit(combined);
+      setTextInput(newText);
+
+      // 포커스 유지 / 되살리기
+      requestAnimationFrame(() => {
+        textInputRef.current?.focus();
+      });
+    },
     [textInput],
   );
 
@@ -804,11 +805,19 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             grabCursor={true}
             mousewheel={true}
             className="w-full"
+            touchStartPreventDefault={false}
           >
             {aiCaptions.map((caption, index) => (
               <SwiperSlide key={index} style={{ width: "auto" }}>
                 <button
-                  onMouseDown={handleCaptionClick(caption.text)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();      // 마우스 환경에서 포커스 이동 방지
+                    handleCaptionClick(caption.text);
+                  }}
+                  onTouchStart={(e) => {
+                    e.preventDefault();      // 모바일 터치에서도 포커스 이동 방지
+                    handleCaptionClick(caption.text);
+                  }}
                   className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
                 >
                   {caption.text}
@@ -1495,6 +1504,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                         grabCursor={true}
                         mousewheel={true}
                         className="w-full"
+                        touchStartPreventDefault={false}
                       >
                         {[
                           "😄",
@@ -1535,6 +1545,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                         grabCursor={true}
                         mousewheel={true}
                         className="w-full "
+                        touchStartPreventDefault={false}
                       >
                         {[
                           { text: "월 15만보 걷기", icon: WalkIcon },
