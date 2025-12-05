@@ -34,7 +34,6 @@ import "swiper/css/free-mode";
 
 
 
-const [showCameraPermission, setShowCameraPermission] = useState(false);
 // ... 나머지 state
 // 커스텀 알럿 컴포넌트
 interface CustomAlertProps {
