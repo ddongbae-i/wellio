@@ -1151,7 +1151,11 @@ export function CommunityPage({
                           )}
                         <motion.div
                           className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] touch-none"
-                          drag={!isScrolling ? "x" : false}
+                          drag={
+                            !isScrolling && post.userName === currentUser.userName
+                              ? "x"
+                              : false
+                          }
                           dragConstraints={{
                             left: -120,
                             right: 0,
