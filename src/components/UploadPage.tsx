@@ -392,43 +392,39 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   useEffect(() => {
     if (!permissionsGranted || isUploadMode) return;
 
+    // startCamera 내부 수정
+
     const startCamera = async () => {
       try {
         if (stream) {
           stream.getTracks().forEach((track) => track.stop());
         }
 
+        // 1. 장치 리스트를 가져오긴 하지만, 개수 체크(length > 1) 로직은 제거합니다.
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(
-          (device) => device.kind === "videoinput",
-        );
+        const videoDevices = devices.filter((device) => device.kind === "videoinput");
 
-        if (videoDevices.length === 0) {
-          setCameraError("사용 가능한 카메라가 없습니다.");
-          setHasCameraDevice(false);
-          return;
-        } else {
-          setHasCameraDevice(true);
+        // 카메라가 아예 없는 경우에만 에러 처리
+        if (videoDevices.length === 0 && devices.length > 0) {
+          // devices.length > 0 체크는 초기 로딩 시 빈 배열일 수 있어 방어적으로 넣음
+          // 하지만 모바일 환경에서는 보통 무시하고 진행해도 facingMode가 동작합니다.
         }
 
         let videoConstraints: MediaTrackConstraints | boolean;
 
-        if (videoDevices.length > 1) {
-          if (isIOS) {
-            // iOS: exact 사용
-            videoConstraints = {
-              facingMode: isFrontCamera
-                ? { exact: "user" }
-                : { exact: "environment" }
-            };
-          } else {
-            // Android: ideal 사용
-            videoConstraints = {
-              facingMode: isFrontCamera ? "user" : "environment"
-            };
-          }
+        // 2. 조건문 없이 바로 OS별 제약 조건을 설정합니다.
+        if (isIOS) {
+          // iOS: exact를 써야 후면이 확실히 잡힙니다.
+          videoConstraints = {
+            facingMode: isFrontCamera
+              ? { exact: "user" }
+              : { exact: "environment" } // isFrontCamera가 false면 여기(후면) 실행
+          };
         } else {
-          videoConstraints = true;
+          // Android/PC: ideal을 사용 (PC 웹캠 등 고려)
+          videoConstraints = {
+            facingMode: isFrontCamera ? "user" : "environment"
+          };
         }
 
         const constraints: MediaStreamConstraints = {
@@ -446,7 +442,15 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         }
       } catch (error) {
         console.error("카메라 접근 실패:", error);
-        setCameraError("카메라를 시작할 수 없습니다.");
+        // iOS에서 exact: environment 요청 시 후면 카메라를 못 찾으면 OverconstrainedError가 날 수 있음
+        // 이 경우 폴백으로 기본 카메라를 켭니다.
+        try {
+          const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          setStream(fallbackStream);
+          if (videoRef.current) videoRef.current.srcObject = fallbackStream;
+        } catch (fallbackError) {
+          setCameraError("카메라를 시작할 수 없습니다.");
+        }
       }
     };
 
