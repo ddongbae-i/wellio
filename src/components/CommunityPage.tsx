@@ -93,6 +93,7 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
   onSelect,
   keyboardOffset,
 }) => {
+  // 🔹 모바일 탭/스와이프 구분용
   const touchStartRef = useRef<{
     x: number;
     y: number;
@@ -102,84 +103,135 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
   const MOVE_THRESHOLD = 10;   // px
   const TIME_THRESHOLD = 250;  // ms
 
+  // 🔹 데스크탑용 드래그 스크롤
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const startScrollLeftRef = useRef(0);
+  const draggedRef = useRef(false);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // 마우스 좌클릭일 때만 (터치는 기본 스크롤 사용)
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+
+    isDraggingRef.current = true;
+    draggedRef.current = false;
+    dragStartXRef.current = e.clientX;
+    startScrollLeftRef.current = scrollRef.current?.scrollLeft ?? 0;
+
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+    if (!scrollRef.current) return;
+
+    const dx = e.clientX - dragStartXRef.current;
+
+    if (Math.abs(dx) > 3) {
+      draggedRef.current = true;
+    }
+
+    scrollRef.current.scrollLeft = startScrollLeftRef.current - dx;
+    e.preventDefault(); // 텍스트 선택 대신 스크롤
+  };
+
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse") return;
+    isDraggingRef.current = false;
+    (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+    // 클릭 막기 플래그는 onClick에서 한 번 보고 바로 초기화
+  };
+
   return (
     <AnimatePresence>
-      {isKeyboardVisible && (
-        <motion.div
-          key="search-suggestion-bar"
-          initial={{ y: "100%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: "100%", opacity: 0 }}
-          transition={{ type: "spring", damping: 24, stiffness: 260 }}
-          className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
-          style={{
-            bottom: `${keyboardOffset}px`,
-            paddingBottom: "env(safe-area-inset-bottom)",
-          }}
-        >
-          <div className="px-5 pt-5 pb-6">
-            <p className="text-[15px] font-semibold text-[#2b2b2b] mb-3">
+      <motion.div
+        key="search-suggestion-bar"
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0 }}
+        transition={{ type: "spring", damping: 24, stiffness: 260 }}
+        className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
+        style={{
+          bottom: isKeyboardVisible ? `${keyboardOffset}px` : 0,
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
+      >
+        <div className="px-5 pt-5 pb-6">
+          <div className="flex gap-3 items-center mb-3">
+            <p className="text-[15px] font-semibold text-[#2b2b2b] ">
               추천 검색어
             </p>
             <span className="text-[12px] font-light text-[#777777]">
               사진에 붙인 태그로만 검색이 가능해요
-            </span>
+            </span></div>
 
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-              {searchSuggestions.map((keyword, index) => (
-                <button
-                  key={index}
-                  // 🖱 데스크톱 클릭
-                  onClick={(e) => {
+
+          <div
+            ref={scrollRef}
+            className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 cursor-grab active:cursor-grabbing"
+            style={{ WebkitOverflowScrolling: "touch" }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onPointerLeave={endDrag}
+          >
+            {searchSuggestions.map((keyword, index) => (
+              <button
+                key={index}
+                // 🖱 데스크탑 클릭 (드래그 후 클릭은 막기)
+                onClick={(e) => {
+                  if (draggedRef.current) {
+                    // 드래그로 스크롤하다가 손 뗀 경우 → 클릭 무시
+                    draggedRef.current = false;
+                    e.preventDefault();
+                    return;
+                  }
+                  onSelect(keyword);
+                }}
+                // 📱 모바일 터치: 탭만 선택, 스와이프는 스크롤
+                onTouchStart={(e) => {
+                  const t = e.touches[0];
+                  touchStartRef.current = {
+                    x: t.clientX,
+                    y: t.clientY,
+                    time: Date.now(),
+                  };
+                }}
+                onTouchEnd={(e) => {
+                  const start = touchStartRef.current;
+                  if (!start) return;
+
+                  const t = e.changedTouches[0];
+                  const dx = Math.abs(t.clientX - start.x);
+                  const dy = Math.abs(t.clientY - start.y);
+                  const dt = Date.now() - start.time;
+
+                  const isTap =
+                    dx < MOVE_THRESHOLD &&
+                    dy < MOVE_THRESHOLD &&
+                    dt < TIME_THRESHOLD;
+
+                  if (isTap) {
                     e.preventDefault();
                     e.stopPropagation();
                     onSelect(keyword);
-                  }}
-                  // 📱 터치 시작: 좌표/시간만 기록
-                  onTouchStart={(e) => {
-                    const t = e.touches[0];
-                    touchStartRef.current = {
-                      x: t.clientX,
-                      y: t.clientY,
-                      time: Date.now(),
-                    };
-                  }}
-                  // 📱 터치 끝: 탭인지 스와이프인지 판별
-                  onTouchEnd={(e) => {
-                    const start = touchStartRef.current;
-                    if (!start) return;
+                  }
 
-                    const t = e.changedTouches[0];
-                    const dx = Math.abs(t.clientX - start.x);
-                    const dy = Math.abs(t.clientY - start.y);
-                    const dt = Date.now() - start.time;
-
-                    const isTap =
-                      dx < MOVE_THRESHOLD &&
-                      dy < MOVE_THRESHOLD &&
-                      dt < TIME_THRESHOLD;
-
-                    if (isTap) {
-                      // 탭일 때만 선택 + 클릭 중복 방지
-                      e.preventDefault();
-                      e.stopPropagation();
-                      onSelect(keyword);
-                    }
-
-                    touchStartRef.current = null;
-                  }}
-                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] active:bg-gray-100 transition-colors"
-                >
-                  {keyword}
-                </button>
-              ))}
-            </div>
+                  touchStartRef.current = null;
+                }}
+                className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] active:bg-gray-100 transition-colors"
+              >
+                {keyword}
+              </button>
+            ))}
           </div>
-        </motion.div>
-      )}
+        </div>
+      </motion.div>
     </AnimatePresence>
   );
 };
+
 
 
 // === 드롭다운 컴포넌트 ===
@@ -1661,35 +1713,38 @@ export function CommunityPage({
         </AnimatePresence>
 
         {/* 하단 GNB – 키보드 올라올 때는 숨김 */}
-        {!isGridView && !isReactionView && !isKeyboardVisible && (
-          <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[500px] mx-auto bg-white">
-            <div className="relative px-4 pt-2 pb-4 shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] h-[80px]">
-              <div className="flex items-center justify-around">
+        {!isGridView &&
+          !isReactionView &&
+          !isKeyboardVisible &&
+          !isSearchActive && (   // ✅ 검색 중에는 GNB 숨김
+            <div className="fixed bottom-0 left-0 right-0 z-50 max-w-[500px] mx-auto bg-white">
+              <div className="relative px-4 pt-2 pb-4 shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)] rounded-t-[16px] h-[80px]">
+                <div className="flex items-center justify-around">
+                  <button
+                    onClick={() => setIsGridView(true)}
+                    className="flex flex-col items-center gap-1 text-[#aeaeae]"
+                  >
+                    <img src={LayoutGrid} alt="모아보기" className="w-6 h-6" />
+                    <span className="text-[12px] font-normal">모아보기</span>
+                  </button>
+                  <div className="w-16" />
+                  <button
+                    className="flex flex-col items-center gap-1 text-[#aeaeae]"
+                    onClick={() => onPageChange?.("calendar")}
+                  >
+                    <img src={Calendar} alt="캘린더" className="w-6 h-6" />
+                    <span className="text-[12px] font-normal">캘린더</span>
+                  </button>
+                </div>
                 <button
-                  onClick={() => setIsGridView(true)}
-                  className="flex flex-col items-center gap-1 text-[#aeaeae]"
+                  className="absolute left-1/2 -translate-x-1/2 -top-[16px] w-14 h-14 bg-[#36D2C5] rounded-full flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:bg-[#00C2B3] transition-colors"
+                  onClick={onUploadClick}
                 >
-                  <img src={LayoutGrid} alt="모아보기" className="w-6 h-6" />
-                  <span className="text-[12px] font-normal">모아보기</span>
-                </button>
-                <div className="w-16" />
-                <button
-                  className="flex flex-col items-center gap-1 text-[#aeaeae]"
-                  onClick={() => onPageChange?.("calendar")}
-                >
-                  <img src={Calendar} alt="캘린더" className="w-6 h-6" />
-                  <span className="text-[12px] font-normal">캘린더</span>
+                  <Plus size={28} className="text-white" />
                 </button>
               </div>
-              <button
-                className="absolute left-1/2 -translate-x-1/2 -top-[16px] w-14 h-14 bg-[#36D2C5] rounded-full flex items-center justify-center shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] hover:bg-[#00C2B3] transition-colors"
-                onClick={onUploadClick}
-              >
-                <Plus size={28} className="text-white" />
-              </button>
             </div>
-          </div>
-        )}
+          )}
 
         {/* 이모지 떠오르는 애니메이션 */}
         <AnimatePresence>

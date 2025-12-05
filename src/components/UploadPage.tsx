@@ -1396,13 +1396,13 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                 onClick={handleCapture}
                 className={`w-[70px] h-[70px] rounded-full transition-colors flex items-center justify-center ${isUploadMode
                   ? "bg-[#2ECACA] hover:bg-[#00C2B3]"
-                  : "border-[3px] border-white bg-white"
+                  : "border-[3px] border-[#2ECACA] bg-white"
                   }`}
               >
                 {isUploadMode ? (
                   <img src={Upload} alt="업로드" className="w-[35px] h-[35px]" />
                 ) : (
-                  <div className="w-[60px] h-[60px] rounded-full bg-[#2ECACA]" />
+                  <div className="w-[60px] h-[60px] rounded-full bg-white" />
                 )}
               </button>
 
