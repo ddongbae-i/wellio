@@ -844,7 +844,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     // 캡션 클릭 처리 끝
                     aiCaptionTapRef.current = false;
                   }}
-                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
+                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] "
                 >
                   {caption.text}
                 </button>
