@@ -34,7 +34,7 @@ export function Header({
   // --- 'title' prop이 있으면 '서브 페이지 헤더' (내 정보) ---
   if (title) {
     return (
-      <header className="sticky top-0 left-0 right-0 z-40 px-5 xs:px-6 sm:px-8 py-4 flex w-full items-center justify-center mx-auto h-[80px] max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative">
+      <header className="sticky top-0 left-0 right-0 z-40 px-5 xs:px-6 sm:px-8 py-4 flex w-full items-center justify-center mx-auto h-[80px] max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
         {/* 왼쪽: 뒤로가기 */}
         {showBackButton && (
           <button
@@ -72,7 +72,7 @@ export function Header({
 
   // --- 'title' prop이 없으면 '홈페이지 헤더' ---
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 px-5 xs:px-5 sm:px-8 py-4 flex items-center justify-between gap-4 mx-auto h-16 max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs">
+    <header className="fixed top-0 left-0 right-0 z-40 px-5 xs:px-5 sm:px-8 py-4 flex items-center justify-between gap-4 mx-auto h-16 max-w-[500px] bg-[#f7f7f7]/80 backdrop-blur-xs min-h-[80px]">
       {/* --- 왼쪽: 로고 --- */}
       <div className="flex items-center flex-1 min-w-0">
         {/* 로고 (SVG) */}

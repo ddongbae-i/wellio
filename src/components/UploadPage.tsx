@@ -792,7 +792,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }}
     >
       <div className="pt-6 pb-10">
-        <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2 pl-5 xs:pl-6 sm:pl-8">
+        <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2 px-5 xs:px-6 sm:px-8">
           AI 추천 캡션
         </p>
         <div className="pl-5 xs:pl-6 sm:pl-8">
