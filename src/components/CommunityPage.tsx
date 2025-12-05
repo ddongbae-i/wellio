@@ -92,51 +92,95 @@ const SearchSuggestionBar: React.FC<SearchSuggestionBarProps> = ({
   isKeyboardVisible,
   onSelect,
   keyboardOffset,
-}) => (
-  <AnimatePresence>
-    {isKeyboardVisible && (
-      <motion.div
-        key="search-suggestion-bar"
-        initial={{ y: "100%", opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: "100%", opacity: 0 }}
-        transition={{ type: "spring", damping: 24, stiffness: 260 }}
-        className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
-        style={{
-          bottom: `${keyboardOffset}px`,
-          paddingBottom: "env(safe-area-inset-bottom)",
-        }}
-      >
-        <div className="px-5 pt-5 pb-6">
-          <p className="text-[15px] font-semibold text-[#2b2b2b] mb-3">
-            추천 검색어
-          </p>
-          <span className="text-[12px] font-light text-[#777777]">
-            사진에 붙인 태그로만 검색이 가능해요
-          </span>
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-            {searchSuggestions.map((keyword, index) => (
-              <button
-                key={index}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  onSelect(keyword);
-                }}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  onSelect(keyword);
-                }}
-                className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] active:bg-gray-100 transition-colors"
-              >
-                {keyword}
-              </button>
-            ))}
+}) => {
+  const touchStartRef = useRef<{
+    x: number;
+    y: number;
+    time: number;
+  } | null>(null);
+
+  const MOVE_THRESHOLD = 10;   // px
+  const TIME_THRESHOLD = 250;  // ms
+
+  return (
+    <AnimatePresence>
+      {isKeyboardVisible && (
+        <motion.div
+          key="search-suggestion-bar"
+          initial={{ y: "100%", opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: "100%", opacity: 0 }}
+          transition={{ type: "spring", damping: 24, stiffness: 260 }}
+          className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
+          style={{
+            bottom: `${keyboardOffset}px`,
+            paddingBottom: "env(safe-area-inset-bottom)",
+          }}
+        >
+          <div className="px-5 pt-5 pb-6">
+            <p className="text-[15px] font-semibold text-[#2b2b2b] mb-3">
+              추천 검색어
+            </p>
+            <span className="text-[12px] font-light text-[#777777]">
+              사진에 붙인 태그로만 검색이 가능해요
+            </span>
+
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+              {searchSuggestions.map((keyword, index) => (
+                <button
+                  key={index}
+                  // 🖱 데스크톱 클릭
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onSelect(keyword);
+                  }}
+                  // 📱 터치 시작: 좌표/시간만 기록
+                  onTouchStart={(e) => {
+                    const t = e.touches[0];
+                    touchStartRef.current = {
+                      x: t.clientX,
+                      y: t.clientY,
+                      time: Date.now(),
+                    };
+                  }}
+                  // 📱 터치 끝: 탭인지 스와이프인지 판별
+                  onTouchEnd={(e) => {
+                    const start = touchStartRef.current;
+                    if (!start) return;
+
+                    const t = e.changedTouches[0];
+                    const dx = Math.abs(t.clientX - start.x);
+                    const dy = Math.abs(t.clientY - start.y);
+                    const dt = Date.now() - start.time;
+
+                    const isTap =
+                      dx < MOVE_THRESHOLD &&
+                      dy < MOVE_THRESHOLD &&
+                      dt < TIME_THRESHOLD;
+
+                    if (isTap) {
+                      // 탭일 때만 선택 + 클릭 중복 방지
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onSelect(keyword);
+                    }
+
+                    touchStartRef.current = null;
+                  }}
+                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] active:bg-gray-100 transition-colors"
+                >
+                  {keyword}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 
 // === 드롭다운 컴포넌트 ===
 const FamilyDropdown = ({
