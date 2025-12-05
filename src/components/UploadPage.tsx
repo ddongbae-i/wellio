@@ -196,7 +196,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [showNoImageAlert, setShowNoImageAlert] = useState(false);
   const textInputRef = useRef<HTMLInputElement>(null);
-  const aiCaptionTapRef = useRef(false);
+  const aiCaptionClickingRef = useRef(false);
 
   const [showLeaveDetailAlert, setShowLeaveDetailAlert] =
     useState(false);
