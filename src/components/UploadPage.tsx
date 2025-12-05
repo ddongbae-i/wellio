@@ -600,7 +600,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   };
 
   const handleCapture = async () => {
-    // 업로드 모드일 때: 최종 업로드
+    // 1. 업로드 모드일 때: 최종 업로드 (이 부분은 기존과 동일)
     if (isUploadMode) {
       if (!selectedImage) {
         setShowNoImageAlert(true);
@@ -608,25 +608,18 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       }
 
       let finalImage = selectedImage;
-
       const currentFilter = ORIGINAL_FILTERS.find(
         (f) => f.name === selectedFilter,
       );
 
-      // 필터가 Normal이 아닐 때만 적용
       if (currentFilter && currentFilter.filter !== "none") {
         try {
           const filteredImage = await applyFilterToImage(
             selectedImage,
             currentFilter.filter,
           );
-
-          // 필터 적용 결과 검증
           if (filteredImage && filteredImage !== selectedImage) {
             finalImage = filteredImage;
-            console.log("필터 적용 성공");
-          } else {
-            console.warn("필터 적용 실패, 원본 사용");
           }
         } catch (error) {
           console.error("필터 적용 에러:", error);
@@ -635,8 +628,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
       const today = new Date();
       const createdAt = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-
-
 
       onUpload({
         image: finalImage,
@@ -649,7 +640,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         createdAt,
       });
 
-      // ✅ 모든 state 초기화
       setSelectedImage(null);
       setTextInput("");
       setLocationInput("");
@@ -663,20 +653,19 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       setSelectedFilter("Normal");
 
       toast.success("업로드 되었습니다!");
-
-      // ✅ 페이지 나가기
       onBack();
-
-
       return;
     }
 
-    // 카메라 캡처
-    if (hasCameraDevice && videoRef.current && stream) {
+    // 2. 📸 카메라 캡처 부분 (여기가 수정됨!)
+    // 수정 전: if (hasCameraDevice && videoRef.current && stream)
+    // 수정 후: hasCameraDevice 조건을 제거함 (아이폰 버그 회피)
+    if (videoRef.current && stream) {
       const canvas = document.createElement("canvas");
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
       const ctx = canvas.getContext("2d");
+
       if (!ctx) return;
 
       ctx.drawImage(videoRef.current, 0, 0);
@@ -688,10 +677,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           try {
             setSelectedImage(capturedImage);
           } catch (error) {
-            console.error("이미지 리사이즈 실패:", error);
+            console.error("이미지 처리 실패:", error);
             setSelectedImage(capturedImage);
           }
           setIsUploadMode(true);
+          // 캡처 후 스트림 정지
           if (stream) {
             stream.getTracks().forEach((track) => track.stop());
             setStream(null);
@@ -700,6 +690,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         reader.readAsDataURL(blob);
       }, "image/jpeg");
     } else {
+      // 실제 비디오 객체가 없거나 스트림이 끊긴 경우에만 에러 표시
+      console.error("캡처 실패: 비디오나 스트림이 없습니다.");
       toast.error("카메라를 사용할 수 없습니다.");
     }
   };
