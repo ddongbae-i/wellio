@@ -67,15 +67,15 @@ export function HospitalSearchPage({
     if (selectedFilter === "거리순") return hospitals;
 
     if (selectedFilter === "진료중") {
-      return hospitals.filter((h) => h.isAvailableNow === true);
+      return hospitals.filter((h) => h.todayStatus === "open");
     }
 
     if (selectedFilter === "즉시접수가능") {
-      return hospitals.filter((h) => [1, 2, 5].includes(h.id));
+      return hospitals.filter((h) => h.todayStatus === "open");
     }
 
     if (selectedFilter === "약/주사") {
-      return hospitals.filter((h) => h.id !== 3); // 치과 제외
+      return hospitals.filter((h) => ![3, 4].includes(h.id)); // 치과 제외
     }
 
     if (selectedFilter === "당일 검사") {
@@ -171,7 +171,7 @@ export function HospitalSearchPage({
       border-[1.5px] transition-all
       ${isSearchFocused
                   ? "border-[#2ECACA]"
-                  : "border-[#E0E0E0]"
+                  : "border-[#2ECACA]"
                 }`}
             >
               <img src={Search} alt="검색" className="w-5 h-5 xs:w-6 xs:h-6 flex-shrink-0" />
@@ -179,7 +179,7 @@ export function HospitalSearchPage({
                 type="text"
                 placeholder="진료과, 병원이름을 검색해보세요"
                 className="flex-1 min-w-0 bg-transparent outline-none 
-                 text-[14px] xs:text-[15px] text-[#1A1A1A] 
+                 text-[14px] xs:text-[15px] text-[#2b2b2b] 
                  placeholder:text-[#aeaeae] leading-[1.4]"
                 style={{ fontSize: "16px" }} // iOS 줌 방지용
                 value={searchQuery}
