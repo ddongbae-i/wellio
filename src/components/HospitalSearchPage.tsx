@@ -82,7 +82,7 @@ export function HospitalSearchPage({
       return hospitals; // 전부
     }
 
-    return hospitals;
+    return [];
   };
 
   // 🔧 필터 + 검색어 둘 다 반영되도록 수정

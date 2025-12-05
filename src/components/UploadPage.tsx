@@ -191,6 +191,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [showNoImageAlert, setShowNoImageAlert] = useState(false);
   const textInputRef = useRef<HTMLInputElement>(null);
+  const aiCaptionTapRef = useRef(false);
 
   const [showLeaveDetailAlert, setShowLeaveDetailAlert] =
     useState(false);
@@ -810,13 +811,25 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             {aiCaptions.map((caption, index) => (
               <SwiperSlide key={index} style={{ width: "auto" }}>
                 <button
-                  onMouseDown={(e) => {
-                    e.preventDefault();      // 마우스 환경에서 포커스 이동 방지
-                    handleCaptionClick(caption.text);
+                  type="button"
+                  tabIndex={-1}
+                  onMouseDown={() => {
+                    aiCaptionTapRef.current = true;
                   }}
-                  onTouchStart={(e) => {
-                    e.preventDefault();      // 모바일 터치에서도 포커스 이동 방지
+                  onTouchStart={() => {
+                    aiCaptionTapRef.current = true;
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
                     handleCaptionClick(caption.text);
+
+                    // 인풋 포커스 다시 살리기
+                    requestAnimationFrame(() => {
+                      textInputRef.current?.focus();
+                    });
+
+                    // 캡션 클릭 처리 끝
+                    aiCaptionTapRef.current = false;
                   }}
                   className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
                 >
@@ -1079,6 +1092,17 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             }}
                             onFocus={() => setIsTextInputFocused(true)}
                             onBlur={() => {
+                              // 🔹 아래 캡션 버튼 누르면서 생긴 blur면 무시
+                              if (aiCaptionTapRef.current) {
+                                aiCaptionTapRef.current = false;
+                                // 필요하면 다시 포커스 살려주기
+                                requestAnimationFrame(() => {
+                                  textInputRef.current?.focus();
+                                });
+                                return;
+                              }
+
+                              // 🔹 진짜로 포커스를 잃은 경우만 닫기
                               setIsTextInputFocused(false);
                               setShowTextInput(false);
                             }}
