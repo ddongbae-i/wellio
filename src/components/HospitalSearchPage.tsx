@@ -116,6 +116,28 @@ export function HospitalSearchPage({
     },
   };
 
+  const getFilteredByFilter = (hospitals: Hospital[]) => {
+    if (selectedFilter === "거리순") return hospitals;
+
+    if (selectedFilter === "진료중") {
+      return hospitals.filter((h) => h.isAvailableNow === true);
+    }
+
+    if (selectedFilter === "즉시접수가능") {
+      return hospitals.filter((h) => [1, 2, 5].includes(h.id));
+    }
+
+    if (selectedFilter === "약/주사") {
+      return hospitals.filter((h) => h.id !== 3); // 치과 제외
+    }
+
+    if (selectedFilter === "당일 검사") {
+      return hospitals; // 전부
+    }
+
+    return hospitals;
+  };
+
   return (
     <div className="bg-[#f7f7f7] flex flex-col min-h-screen">
       {/* Header */}
@@ -140,7 +162,7 @@ export function HospitalSearchPage({
               <input
                 type="text"
                 placeholder="진료과, 병원이름을 검색해보세요"
-                className="flex-1 bg-transparent outline-none text-[#1A1A1A] placeholder:text-[#aeaeae] text-sm text-[#777777] font-normal leading-[1.4]"
+                className="flex-1 min-w-0 bg-transparent outline-none text-[#1A1A1A] placeholder:text-[#aeaeae] text-sm text-[#777777] font-normal leading-[1.4]"
                 style={{ fontSize: '16px' }}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -148,7 +170,7 @@ export function HospitalSearchPage({
                 onBlur={() => setIsSearchFocused(false)}
               />
             </div>
-            <button className="text-[#777777] text-[17px] font-noraml">취소</button>
+            <button className="text-[#777777] text-[17px] font-noraml flex-shrink-0 whitespace-nowrap px-1">취소</button>
           </div>
         </motion.header>
 
