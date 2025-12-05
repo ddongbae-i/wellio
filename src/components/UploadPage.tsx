@@ -771,67 +771,150 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   // import { FreeMode } from "swiper/modules"; 
 
   // ✅ 캡션 바 컴포넌트 수정
-  const AICaptionToolbar: React.FC = () => (
-    <motion.div
-      key="ai-caption-toolbar"
-      initial={{ y: "100%", opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: "100%", opacity: 0 }}
-      transition={{
-        type: "spring",
-        damping: 24,
-        stiffness: 260,
-      }}
-      className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
-      style={{
-        bottom: isKeyboardVisible ? 40 : 0, // 키보드 위에 위치
-        paddingBottom: "env(safe-area-inset-bottom)",
-      }}
-    >
-      <div className="pt-6 pb-10">
-        <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2 px-5 xs:px-6 sm:px-8">
-          AI 추천 캡션
-        </p>
+  const AICaptionToolbar: React.FC = () => {
+    // 🔹 모바일 탭/스와이프 구분용
+    const touchStartRef = useRef<{
+      x: number;
+      y: number;
+      time: number;
+    } | null>(null);
 
-        {/* Swiper 컨테이너에 overflow-hidden을 줘서 영역을 확실히 잡습니다 */}
-        <div className="pl-5 xs:pl-6 sm:pl-8 w-full overflow-hidden">
-          <Swiper
-            modules={[FreeMode]}
-            slidesPerView="auto"
-            spaceBetween={8}
-            freeMode={true}
-            observer={true}
-            observeParents={true}
-            resizeObserver={true}
-            grabCursor={true}
-            touchStartPreventDefault={false}  // ✅ 추가!
-            className="w-full !overflow-visible"
-            style={{ paddingRight: "20px" }}
+    const MOVE_THRESHOLD = 10;   // px
+    const TIME_THRESHOLD = 250;  // ms
+
+    // 🔹 데스크탑용 드래그 스크롤
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const isDraggingRef = useRef(false);
+    const dragStartXRef = useRef(0);
+    const startScrollLeftRef = useRef(0);
+    const draggedRef = useRef(false);
+
+    const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+      // 마우스 좌클릭일 때만 (터치는 기본 스크롤 사용)
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+
+      isDraggingRef.current = true;
+      draggedRef.current = false;
+      dragStartXRef.current = e.clientX;
+      startScrollLeftRef.current = scrollRef.current?.scrollLeft ?? 0;
+
+      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    };
+
+    const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!isDraggingRef.current) return;
+      if (!scrollRef.current) return;
+
+      const dx = e.clientX - dragStartXRef.current;
+
+      if (Math.abs(dx) > 3) {
+        draggedRef.current = true;
+      }
+
+      scrollRef.current.scrollLeft = startScrollLeftRef.current - dx;
+      e.preventDefault();
+    };
+
+    const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.pointerType !== "mouse") return;
+      isDraggingRef.current = false;
+      (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+    };
+
+    return (
+      <motion.div
+        key="ai-caption-toolbar"
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0 }}
+        transition={{
+          type: "spring",
+          damping: 24,
+          stiffness: 260,
+        }}
+        className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
+        style={{
+          bottom: isKeyboardVisible ? 40 : 0,
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
+      >
+        <div className="px-5 pt-5 pb-6">
+          <p className="text-[15px] font-semibold text-[#2b2b2b] mb-3">
+            AI 추천 캡션
+          </p>
+
+          <div
+            ref={scrollRef}
+            className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 cursor-grab active:cursor-grabbing"
+            style={{ WebkitOverflowScrolling: "touch" }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onPointerLeave={endDrag}
           >
             {aiCaptions.map((caption, index) => (
-              <SwiperSlide key={index} style={{ width: "auto" }}>
-                <button
-                  type="button"
-                  // ❌ onMouseDown, onTouchStart 삭제!
-                  onClick={(e) => {
+              <button
+                key={index}
+                // 🖱 데스크탑 클릭 (드래그 후 클릭은 막기)
+                onClick={(e) => {
+                  if (draggedRef.current) {
+                    draggedRef.current = false;
                     e.preventDefault();
+                    return;
+                  }
+                  handleCaptionClick(caption.text);
+
+                  // 포커스 유지
+                  requestAnimationFrame(() => {
+                    textInputRef.current?.focus();
+                  });
+                }}
+                // 📱 모바일 터치: 탭만 선택, 스와이프는 스크롤
+                onTouchStart={(e) => {
+                  const t = e.touches[0];
+                  touchStartRef.current = {
+                    x: t.clientX,
+                    y: t.clientY,
+                    time: Date.now(),
+                  };
+                }}
+                onTouchEnd={(e) => {
+                  const start = touchStartRef.current;
+                  if (!start) return;
+
+                  const t = e.changedTouches[0];
+                  const dx = Math.abs(t.clientX - start.x);
+                  const dy = Math.abs(t.clientY - start.y);
+                  const dt = Date.now() - start.time;
+
+                  const isTap =
+                    dx < MOVE_THRESHOLD &&
+                    dy < MOVE_THRESHOLD &&
+                    dt < TIME_THRESHOLD;
+
+                  if (isTap) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     handleCaptionClick(caption.text);
 
+                    // 포커스 유지
                     requestAnimationFrame(() => {
                       textInputRef.current?.focus();
                     });
-                  }}
-                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] transition-colors active:bg-gray-100"
-                >
-                  {caption.text}
-                </button>
-              </SwiperSlide>
+                  }
+
+                  touchStartRef.current = null;
+                }}
+                className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] active:bg-gray-100 transition-colors"
+              >
+                {caption.text}
+              </button>
             ))}
-          </Swiper>
+          </div>
         </div>
-      </div>
-    </motion.div>
-  );
+      </motion.div>
+    );
+  };
 
   return (
     <>
