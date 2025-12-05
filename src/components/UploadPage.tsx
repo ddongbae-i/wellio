@@ -767,44 +767,75 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   // ✅ 캡션 바: 항상 "현재 뷰포트"의 바닥 (키보드 위) 에 고정
 
 
+  // ... 상단 import 부분에 FreeMode가 있는지 확인해주세요.
+  // import { FreeMode } from "swiper/modules"; 
+
+  // ✅ 캡션 바 컴포넌트 수정
   const AICaptionToolbar: React.FC = () => (
     <motion.div
-      // ... (기존 animation props 유지)
+      key="ai-caption-toolbar"
+      initial={{ y: "100%", opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: "100%", opacity: 0 }}
+      transition={{
+        type: "spring",
+        damping: 24,
+        stiffness: 260,
+      }}
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
-        bottom: isKeyboardVisible ? 40 : 0,
+        bottom: isKeyboardVisible ? 40 : 0, // 키보드 위에 위치
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
+      // 마우스/터치 이벤트가 씹히지 않도록 이벤트 전파 설정
+      onMouseDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
     >
       <div className="pt-6 pb-10">
         <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2 px-5 xs:px-6 sm:px-8">
           AI 추천 캡션
         </p>
-        <div className="pl-5 xs:pl-6 sm:pl-8">
+
+        {/* Swiper 컨테이너에 overflow-hidden을 줘서 영역을 확실히 잡습니다 */}
+        <div className="pl-5 xs:pl-6 sm:pl-8 w-full overflow-hidden">
           <Swiper
-            modules={[FreeMode, Mousewheel]}
+            modules={[FreeMode]} // Mousewheel 제거 (모바일 터치 충돌 방지)
             slidesPerView="auto"
             spaceBetween={8}
             freeMode={true}
-            grabCursor={true}
-            mousewheel={true}
-            // ✅ [수정된 부분] 아래 2줄 추가: 화면 크기 변화를 감지하여 스와이프 기능 갱신
+            // 👇 [중요] 아래 3가지 옵션이 있어야 키보드가 올라올 때도 스와이프가 고장나지 않습니다.
             observer={true}
             observeParents={true}
-            // ---------------------------------------------------------
-            className="w-full"
-            touchStartPreventDefault={false}
+            resizeObserver={true}
+            // ----------------------------------------------------
+            grabCursor={true}
+            className="w-full !overflow-visible" // !overflow-visible로 잘림 방지
+            style={{ paddingRight: "20px" }} // 오른쪽 끝 여백 확보
           >
             {aiCaptions.map((caption, index) => (
               <SwiperSlide key={index} style={{ width: "auto" }}>
                 <button
-                  // ... (기존 버튼 코드 유지)
+                  type="button"
+                  // 탭인지 스크롤인지 구분하기 위한 로직
+                  onMouseDown={() => {
+                    aiCaptionTapRef.current = true;
+                  }}
+                  onTouchStart={() => {
+                    aiCaptionTapRef.current = true;
+                  }}
                   onClick={(e) => {
                     e.preventDefault();
+                    // 드래그가 아니라 클릭일 때만 실행
                     handleCaptionClick(caption.text);
-                    // ...
+
+                    // 텍스트 인풋 포커스 유지
+                    requestAnimationFrame(() => {
+                      textInputRef.current?.focus();
+                    });
+
+                    aiCaptionTapRef.current = false;
                   }}
-                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
+                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] transition-colors active:bg-gray-100"
                 >
                   {caption.text}
                 </button>
