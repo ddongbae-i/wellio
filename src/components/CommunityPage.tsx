@@ -1282,7 +1282,7 @@ export function CommunityPage({
                                       className="w-10 h-10 rounded-full object-cover border border-[#f0f0f0] -my-4 -ml-2"
                                     />
                                     <p className="text-[15px] text-[#202020] font-medium leading-[1.3] max-w-[85%] truncate flex-shrink">
-                                      {post.textOverlay || post.userName}
+                                      {(post.textOverlay && post.textOverlay.trim()) || post.userName}
                                     </p>
                                   </div>
                                 </div>
