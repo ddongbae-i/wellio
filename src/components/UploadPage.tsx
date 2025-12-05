@@ -779,8 +779,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       time: number;
     } | null>(null);
 
-    const MOVE_THRESHOLD = 10;   // px
-    const TIME_THRESHOLD = 250;  // ms
+    const MOVE_THRESHOLD = 10;
+    const TIME_THRESHOLD = 250;
 
     // 🔹 데스크탑용 드래그 스크롤
     const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -790,7 +790,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     const draggedRef = useRef(false);
 
     const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-      // 마우스 좌클릭일 때만 (터치는 기본 스크롤 사용)
       if (e.pointerType !== "mouse" || e.button !== 0) return;
 
       isDraggingRef.current = true;
@@ -836,6 +835,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         style={{
           bottom: isKeyboardVisible ? 40 : 0,
           paddingBottom: "env(safe-area-inset-bottom)",
+          pointerEvents: "auto",
         }}
       >
         <div className="px-5 pt-5 pb-6">
@@ -846,7 +846,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           <div
             ref={scrollRef}
             className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 cursor-grab active:cursor-grabbing"
-            style={{ WebkitOverflowScrolling: "touch" }}
+            style={{
+              WebkitOverflowScrolling: "touch",
+              touchAction: "pan-x",
+            }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={endDrag}
@@ -855,7 +858,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             {aiCaptions.map((caption, index) => (
               <button
                 key={index}
-                // 🖱 데스크탑 클릭 (드래그 후 클릭은 막기)
                 onClick={(e) => {
                   if (draggedRef.current) {
                     draggedRef.current = false;
@@ -863,13 +865,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     return;
                   }
                   handleCaptionClick(caption.text);
-
-                  // 포커스 유지
                   requestAnimationFrame(() => {
                     textInputRef.current?.focus();
                   });
                 }}
-                // 📱 모바일 터치: 탭만 선택, 스와이프는 스크롤
                 onTouchStart={(e) => {
                   const t = e.touches[0];
                   touchStartRef.current = {
@@ -896,8 +895,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                     e.preventDefault();
                     e.stopPropagation();
                     handleCaptionClick(caption.text);
-
-                    // 포커스 유지
                     requestAnimationFrame(() => {
                       textInputRef.current?.focus();
                     });
