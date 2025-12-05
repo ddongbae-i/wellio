@@ -394,7 +394,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
     const startCamera = async () => {
       try {
-        // ✅ 기존 스트림 정리
         if (stream) {
           stream.getTracks().forEach((track) => track.stop());
         }
@@ -414,6 +413,28 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
         let videoConstraints: MediaTrackConstraints | boolean;
 
+        if (videoDevices.length > 1) {
+          if (isIOS) {
+            // iOS: exact 사용
+            videoConstraints = {
+              facingMode: isFrontCamera
+                ? { exact: "user" }
+                : { exact: "environment" }
+            };
+          } else {
+            // Android: ideal 사용
+            videoConstraints = {
+              facingMode: isFrontCamera ? "user" : "environment"
+            };
+          }
+        } else {
+          videoConstraints = true;
+        }
+
+        const constraints: MediaStreamConstraints = {
+          video: videoConstraints,
+          audio: false,
+        };
 
         const newStream = await navigator.mediaDevices.getUserMedia(constraints);
 
@@ -431,8 +452,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
     startCamera();
 
-    // ✅ cleanup: 컴포넌트 언마운트 시 무조건 카메라 정리
     return () => {
+      // ✅ 카메라 정리
       if (stream) {
         stream.getTracks().forEach((track) => {
           track.stop();
@@ -440,7 +461,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         });
       }
     };
-  }, [permissionsGranted, isFrontCamera, isUploadMode]);
+  }, [permissionsGranted, isFrontCamera, isUploadMode]); // ✅ isIOS 제거!
 
   const handleCameraPermissionAllow = () => {
     setShowCameraPermission(false);
@@ -514,20 +535,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     imageSrc: string,
     filterString: string
   ): Promise<string> => {
-    // Normal 필터면 원본 그대로
-    if (filterString === "none") {
-      return imageSrc;
-    }
-
-    // iOS: DOM img 렌더 후 캔버스 캡처
-    // applyFilterToImage (라인 507-585 수정)
-    if (isIOS) {
+    // iOS는 DOM 캡처 방식
+    if (isIOS && filterString !== "none") {
       return new Promise((resolve) => {
         const tempImg = document.createElement("img");
         tempImg.crossOrigin = "anonymous";
-        tempImg.src = imageSrc;  // ✅ 이미 335x400으로 리사이즈된 이미지
-
-        // ✅ CSS 크기를 실제 이미지 크기와 동일하게
+        tempImg.src = imageSrc;
         tempImg.style.position = "fixed";
         tempImg.style.left = "-9999px";
         tempImg.style.top = "-9999px";
@@ -539,40 +552,37 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         document.body.appendChild(tempImg);
 
         tempImg.onload = () => {
-          // ✅ 지연 시간 늘리기 (작은 이미지지만 안전하게)
-          setTimeout(() => {
-            try {
-              const canvas = document.createElement("canvas");
-              canvas.width = 335;
-              canvas.height = 400;
-              const ctx = canvas.getContext("2d");
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = 335;
+            canvas.height = 400;
+            const ctx = canvas.getContext("2d", { willReadFrequently: false });
 
-              if (!ctx) {
-                console.error("Canvas context 실패");
-                document.body.removeChild(tempImg);
-                resolve(imageSrc);
-                return;
-              }
-
-              // ✅ 이미지가 이미 335x400이므로 1:1 복사
-              ctx.drawImage(tempImg, 0, 0, 335, 400);
-
-              const result = canvas.toDataURL("image/jpeg", 0.95);
-              document.body.removeChild(tempImg);
-
-              if (result && result.length > 100) {
-                console.log("✅ iOS 필터 적용 성공");
-                resolve(result);
-              } else {
-                console.warn("필터 결과 이상, 원본 사용");
-                resolve(imageSrc);
-              }
-            } catch (error) {
-              console.error("iOS 필터 에러:", error);
+            if (!ctx) {
+              console.error("Canvas context failed");
               document.body.removeChild(tempImg);
               resolve(imageSrc);
+              return;
             }
-          }, 150);  // ✅ 100ms → 150ms
+
+            // 필터 적용된 이미지를 캔버스에 그리기
+            ctx.drawImage(tempImg, 0, 0, 335, 400);
+
+            const result = canvas.toDataURL("image/jpeg", 0.95);
+            document.body.removeChild(tempImg);
+
+            if (result && result.length > 100) {
+              console.log("✅ iOS 필터 적용 성공");
+              resolve(result);
+            } else {
+              console.warn("필터 결과 비정상, 원본 사용");
+              resolve(imageSrc);
+            }
+          } catch (error) {
+            console.error("iOS 필터 에러:", error);
+            document.body.removeChild(tempImg);
+            resolve(imageSrc);
+          }
         };
 
         tempImg.onerror = (error) => {
@@ -582,7 +592,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         };
       });
     }
-    // Android: Canvas ctx.filter 방식
+
+    // Android는 Canvas filter 방식
     return new Promise((resolve) => {
       const img = new Image();
       if (!imageSrc.startsWith("data:")) {
@@ -598,12 +609,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           const ctx = canvas.getContext("2d", { willReadFrequently: false });
 
           if (!ctx) {
-            console.error("Canvas context 실패");
+            console.error("Canvas context failed");
             resolve(imageSrc);
             return;
           }
 
-          ctx.filter = filterString;
+          ctx.filter = filterString || "none";
           ctx.drawImage(img, 0, 0);
           ctx.filter = "none";
 
@@ -613,7 +624,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             console.log("✅ Android 필터 적용 성공");
             resolve(result);
           } else {
-            console.warn("필터 결과 이상, 원본 사용");
+            console.warn("필터 결과 비정상, 원본 사용");
             resolve(imageSrc);
           }
         } catch (error) {
@@ -630,6 +641,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       img.src = imageSrc;
     });
   };
+
 
   const handleCapture = async () => {
     // 업로드 모드일 때: 최종 업로드
@@ -718,9 +730,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         reader.onloadend = async () => {
           const capturedImage = reader.result as string;
           try {
-            // ✅ 촬영 즉시 리사이즈
-            const resizedImage = await resizeAndCropImage(capturedImage);
-            setSelectedImage(resizedImage);
+            setSelectedImage(capturedImage);
           } catch (error) {
             console.error("이미지 리사이즈 실패:", error);
             setSelectedImage(capturedImage);
@@ -750,9 +760,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     reader.onloadend = async () => {
       const originalImage = reader.result as string;
       try {
-        // ✅ 갤러리 선택 즉시 리사이즈
-        const resizedImage = await resizeAndCropImage(originalImage);
-        setSelectedImage(resizedImage);
+        setSelectedImage(originalImage);
       } catch (error) {
         console.error("이미지 리사이즈 실패:", error);
         setSelectedImage(originalImage);
