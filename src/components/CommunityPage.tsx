@@ -311,6 +311,10 @@ export function CommunityPage({
   onPageChange,
   hasUnreadNotification: hasUnreadNotificationFromParent,
 }: CommunityPageProps) {
+  const isIOS =
+    typeof window !== "undefined" &&
+    /iP(hone|od|ad)/.test(window.navigator.userAgent);
+
   const [localPosts, setLocalPosts] = useState(() => posts);
 
   useEffect(() => {

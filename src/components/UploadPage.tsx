@@ -369,6 +369,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   useEffect(() => {
     // 페이지가 보일 때마다 모든 state 초기화
     return () => {
+      // ✅ 컴포넌트 언마운트 시 카메라 스트림 정리
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+
       // 컴포넌트 언마운트 시에도 정리
       setSelectedImage(null);
       setTextInput("");
@@ -382,7 +387,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       setShowTextInput(false);
       setSelectedFilter("Normal");
     };
-  }, []);
+  }, [stream]);
 
   // 카메라 스트림 시작
   useEffect(() => {
@@ -435,11 +440,15 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
     startCamera();
     return () => {
+      // ✅ 카메라 정리
       if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((track) => {
+          track.stop();
+          console.log("카메라 트랙 정지:", track.label);
+        });
       }
     };
-  }, [permissionsGranted, isFrontCamera, isUploadMode]);
+  }, [permissionsGranted, isFrontCamera, isUploadMode, isIOS]);
 
   const handleCameraPermissionAllow = () => {
     setShowCameraPermission(false);
