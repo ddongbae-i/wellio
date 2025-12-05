@@ -6,7 +6,7 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import "swiper/css";
-import Bell from "../assets/images/icon_alarm.svg";
+import Bell from "../assets/images/icon_alarm.png";
 import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
 import Search from "../assets/images/icon_search.svg";
