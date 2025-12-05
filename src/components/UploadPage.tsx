@@ -413,13 +413,28 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           setHasCameraDevice(true);
         }
 
+        let videoConstraints: MediaTrackConstraints | boolean;
+
+        if (videoDevices.length > 1) {
+          if (isIOS) {
+            // iOS: exact 사용
+            videoConstraints = {
+              facingMode: isFrontCamera
+                ? { exact: "user" }
+                : { exact: "environment" }
+            };
+          } else {
+            // Android: ideal 사용
+            videoConstraints = {
+              facingMode: isFrontCamera ? "user" : "environment"
+            };
+          }
+        } else {
+          videoConstraints = true;
+        }
+
         const constraints: MediaStreamConstraints = {
-          video:
-            videoDevices.length > 1
-              ? isIOS && !isFrontCamera
-                ? { facingMode: { exact: "environment" } }  // ✅ iOS 후면 강제
-                : { facingMode: isFrontCamera ? "user" : "environment" }  // Android/iOS 전면
-              : true,
+          video: videoConstraints,
           audio: false,
         };
 
