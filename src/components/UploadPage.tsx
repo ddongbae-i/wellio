@@ -631,7 +631,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       onUpload({
         image: finalImage, // 👈 여기가 필터 먹인 이미지여야 함
         caption: textInput,
-        textOverlay: textInput,
+        textOverlay: textInput.trim() || undefined,
         location: locationInput,
         weather: weatherInput,
         time: timeInput,

@@ -1807,6 +1807,7 @@ export default function App() {
 
     const post: Post = {
       ...newPost,
+      textOverlay: newPost.textOverlay?.trim() || undefined,
       id: Math.max(0, ...posts.map((p) => p.id)) + 1,
       userName: userName,
       userAvatar: userAvatar,
