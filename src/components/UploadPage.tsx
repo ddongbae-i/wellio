@@ -790,6 +790,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     const draggedRef = useRef(false);
 
     const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+      // ✅ 버튼 클릭은 제외
+      if ((e.target as HTMLElement).tagName === 'BUTTON') return;
       if (e.pointerType !== "mouse" || e.button !== 0) return;
 
       isDraggingRef.current = true;
@@ -797,12 +799,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       dragStartXRef.current = e.clientX;
       startScrollLeftRef.current = scrollRef.current?.scrollLeft ?? 0;
 
-      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      e.currentTarget.setPointerCapture(e.pointerId);
     };
 
     const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!isDraggingRef.current) return;
-      if (!scrollRef.current) return;
+      if (!isDraggingRef.current || !scrollRef.current) return;
 
       const dx = e.clientX - dragStartXRef.current;
 
@@ -817,7 +818,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
       if (e.pointerType !== "mouse") return;
       isDraggingRef.current = false;
-      (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+      e.currentTarget.releasePointerCapture?.(e.pointerId);
     };
 
     return (
@@ -835,7 +836,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         style={{
           bottom: isKeyboardVisible ? 40 : 0,
           paddingBottom: "env(safe-area-inset-bottom)",
-          pointerEvents: "auto",
         }}
       >
         <div className="px-5 pt-5 pb-6">
@@ -848,7 +848,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 cursor-grab active:cursor-grabbing"
             style={{
               WebkitOverflowScrolling: "touch",
-              touchAction: "pan-x",
             }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -858,6 +857,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             {aiCaptions.map((caption, index) => (
               <button
                 key={index}
+                className="ai-caption-button flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] active:bg-gray-100 transition-colors"
                 onClick={(e) => {
                   if (draggedRef.current) {
                     draggedRef.current = false;
@@ -902,7 +902,10 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
                   touchStartRef.current = null;
                 }}
-                className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] active:bg-gray-100 transition-colors"
+                onPointerDown={(e) => {
+                  // ✅ 포커스 유지
+                  e.preventDefault();
+                }}
               >
                 {caption.text}
               </button>
@@ -1161,7 +1164,16 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                               }
                             }}
                             onFocus={() => setIsTextInputFocused(true)}
-                            onBlur={() => {
+                            onBlur={(e) => {
+                              // ✅ AI 캡션 버튼 클릭인지 확인
+                              const relatedTarget = e.relatedTarget as HTMLElement;
+                              const clickedAICaption = relatedTarget?.closest('.ai-caption-button');
+
+                              if (clickedAICaption) {
+                                // AI 캡션 버튼 클릭 시에는 포커스 유지
+                                return;
+                              }
+
                               setIsTextInputFocused(false);
                               setShowTextInput(false);
                             }}
