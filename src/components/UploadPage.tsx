@@ -787,9 +787,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         bottom: isKeyboardVisible ? 40 : 0, // 키보드 위에 위치
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
-      // 마우스/터치 이벤트가 씹히지 않도록 이벤트 전파 설정
-      onMouseDown={(e) => e.stopPropagation()}
-      onTouchStart={(e) => e.stopPropagation()}
     >
       <div className="pt-6 pb-10">
         <p className="text-[19px] font-semibold text-[#2b2b2b] mb-2 px-5 xs:px-6 sm:px-8">
@@ -799,41 +796,30 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         {/* Swiper 컨테이너에 overflow-hidden을 줘서 영역을 확실히 잡습니다 */}
         <div className="pl-5 xs:pl-6 sm:pl-8 w-full overflow-hidden">
           <Swiper
-            modules={[FreeMode]} // Mousewheel 제거 (모바일 터치 충돌 방지)
+            modules={[FreeMode]}
             slidesPerView="auto"
             spaceBetween={8}
             freeMode={true}
-            // 👇 [중요] 아래 3가지 옵션이 있어야 키보드가 올라올 때도 스와이프가 고장나지 않습니다.
             observer={true}
             observeParents={true}
             resizeObserver={true}
-            // ----------------------------------------------------
             grabCursor={true}
-            className="w-full !overflow-visible" // !overflow-visible로 잘림 방지
-            style={{ paddingRight: "20px" }} // 오른쪽 끝 여백 확보
+            touchStartPreventDefault={false}  // ✅ 추가!
+            className="w-full !overflow-visible"
+            style={{ paddingRight: "20px" }}
           >
             {aiCaptions.map((caption, index) => (
               <SwiperSlide key={index} style={{ width: "auto" }}>
                 <button
                   type="button"
-                  // 탭인지 스크롤인지 구분하기 위한 로직
-                  onMouseDown={() => {
-                    aiCaptionTapRef.current = true;
-                  }}
-                  onTouchStart={() => {
-                    aiCaptionTapRef.current = true;
-                  }}
+                  // ❌ onMouseDown, onTouchStart 삭제!
                   onClick={(e) => {
                     e.preventDefault();
-                    // 드래그가 아니라 클릭일 때만 실행
                     handleCaptionClick(caption.text);
 
-                    // 텍스트 인풋 포커스 유지
                     requestAnimationFrame(() => {
                       textInputRef.current?.focus();
                     });
-
-                    aiCaptionTapRef.current = false;
                   }}
                   className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] transition-colors active:bg-gray-100"
                 >
@@ -1096,17 +1082,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
                             }}
                             onFocus={() => setIsTextInputFocused(true)}
                             onBlur={() => {
-                              // 🔹 아래 캡션 버튼 누르면서 생긴 blur면 무시
-                              if (aiCaptionTapRef.current) {
-                                aiCaptionTapRef.current = false;
-                                // 필요하면 다시 포커스 살려주기
-                                requestAnimationFrame(() => {
-                                  textInputRef.current?.focus();
-                                });
-                                return;
-                              }
-
-                              // 🔹 진짜로 포커스를 잃은 경우만 닫기
                               setIsTextInputFocused(false);
                               setShowTextInput(false);
                             }}
