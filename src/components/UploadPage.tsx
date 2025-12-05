@@ -394,6 +394,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
     const startCamera = async () => {
       try {
+        // ✅ 기존 스트림 정리
         if (stream) {
           stream.getTracks().forEach((track) => track.stop());
         }
@@ -414,17 +415,15 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         let videoConstraints: MediaTrackConstraints | boolean;
 
         if (videoDevices.length > 1) {
+          videoConstraints = {
+            facingMode: isFrontCamera ? "user" : "environment"
+          };
+
           if (isIOS) {
-            // iOS: exact 사용
             videoConstraints = {
               facingMode: isFrontCamera
                 ? { exact: "user" }
                 : { exact: "environment" }
-            };
-          } else {
-            // Android: ideal 사용
-            videoConstraints = {
-              facingMode: isFrontCamera ? "user" : "environment"
             };
           }
         } else {
@@ -452,8 +451,8 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
 
     startCamera();
 
+    // ✅ cleanup: 컴포넌트 언마운트 시 무조건 카메라 정리
     return () => {
-      // ✅ 카메라 정리
       if (stream) {
         stream.getTracks().forEach((track) => {
           track.stop();
@@ -461,7 +460,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         });
       }
     };
-  }, [permissionsGranted, isFrontCamera, isUploadMode]); // ✅ isIOS 제거!
+  }, [permissionsGranted, isFrontCamera, isUploadMode]);
 
   const handleCameraPermissionAllow = () => {
     setShowCameraPermission(false);
@@ -535,12 +534,19 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
     imageSrc: string,
     filterString: string
   ): Promise<string> => {
-    // iOS는 DOM 캡처 방식
-    if (isIOS && filterString !== "none") {
+    // Normal 필터면 원본 그대로
+    if (filterString === "none") {
+      return imageSrc;
+    }
+
+    // iOS: DOM img 렌더 후 캔버스 캡처
+    if (isIOS) {
       return new Promise((resolve) => {
         const tempImg = document.createElement("img");
         tempImg.crossOrigin = "anonymous";
         tempImg.src = imageSrc;
+
+        // 화면 밖에 숨김
         tempImg.style.position = "fixed";
         tempImg.style.left = "-9999px";
         tempImg.style.top = "-9999px";
@@ -552,37 +558,40 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
         document.body.appendChild(tempImg);
 
         tempImg.onload = () => {
-          try {
-            const canvas = document.createElement("canvas");
-            canvas.width = 335;
-            canvas.height = 400;
-            const ctx = canvas.getContext("2d", { willReadFrequently: false });
+          // ✅ 약간의 지연 후 캡처 (렌더링 완료 대기)
+          setTimeout(() => {
+            try {
+              const canvas = document.createElement("canvas");
+              canvas.width = 335;
+              canvas.height = 400;
+              const ctx = canvas.getContext("2d", { willReadFrequently: false });
 
-            if (!ctx) {
-              console.error("Canvas context failed");
+              if (!ctx) {
+                console.error("Canvas context 실패");
+                document.body.removeChild(tempImg);
+                resolve(imageSrc);
+                return;
+              }
+
+              // 필터 적용된 img를 캔버스에 그리기
+              ctx.drawImage(tempImg, 0, 0, 335, 400);
+
+              const result = canvas.toDataURL("image/jpeg", 0.95);
+              document.body.removeChild(tempImg);
+
+              if (result && result.length > 100) {
+                console.log("✅ iOS 필터 적용 성공");
+                resolve(result);
+              } else {
+                console.warn("필터 결과 이상, 원본 사용");
+                resolve(imageSrc);
+              }
+            } catch (error) {
+              console.error("iOS 필터 에러:", error);
               document.body.removeChild(tempImg);
               resolve(imageSrc);
-              return;
             }
-
-            // 필터 적용된 이미지를 캔버스에 그리기
-            ctx.drawImage(tempImg, 0, 0, 335, 400);
-
-            const result = canvas.toDataURL("image/jpeg", 0.95);
-            document.body.removeChild(tempImg);
-
-            if (result && result.length > 100) {
-              console.log("✅ iOS 필터 적용 성공");
-              resolve(result);
-            } else {
-              console.warn("필터 결과 비정상, 원본 사용");
-              resolve(imageSrc);
-            }
-          } catch (error) {
-            console.error("iOS 필터 에러:", error);
-            document.body.removeChild(tempImg);
-            resolve(imageSrc);
-          }
+          }, 100); // ✅ 100ms 지연
         };
 
         tempImg.onerror = (error) => {
@@ -593,7 +602,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       });
     }
 
-    // Android는 Canvas filter 방식
+    // Android: Canvas ctx.filter 방식
     return new Promise((resolve) => {
       const img = new Image();
       if (!imageSrc.startsWith("data:")) {
@@ -609,12 +618,12 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
           const ctx = canvas.getContext("2d", { willReadFrequently: false });
 
           if (!ctx) {
-            console.error("Canvas context failed");
+            console.error("Canvas context 실패");
             resolve(imageSrc);
             return;
           }
 
-          ctx.filter = filterString || "none";
+          ctx.filter = filterString;
           ctx.drawImage(img, 0, 0);
           ctx.filter = "none";
 
@@ -624,7 +633,7 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             console.log("✅ Android 필터 적용 성공");
             resolve(result);
           } else {
-            console.warn("필터 결과 비정상, 원본 사용");
+            console.warn("필터 결과 이상, 원본 사용");
             resolve(imageSrc);
           }
         } catch (error) {
@@ -641,7 +650,6 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       img.src = imageSrc;
     });
   };
-
 
   const handleCapture = async () => {
     // 업로드 모드일 때: 최종 업로드
