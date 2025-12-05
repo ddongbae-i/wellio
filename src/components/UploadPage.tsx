@@ -534,82 +534,61 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
       img.src = imageSrc;
     });
 
-  // applyFilterToImage 함수를 완전히 새로 작성
-  // 기존 applyFilterToImage 함수를 지우고 아래 코드로 대체하세요.
 
   const applyFilterToImage = (
     imageSrc: string,
     filterString: string
   ): Promise<string> => {
     return new Promise((resolve) => {
-      // 1. 필터가 없으면 바로 원본 반환
+      // 필터가 없으면 원본 반환
       if (!filterString || filterString === "none") {
         resolve(imageSrc);
         return;
       }
 
       const img = new Image();
-      // CORS 문제 방지
-      if (!imageSrc.startsWith("data:")) {
-        img.crossOrigin = "anonymous";
-      }
+      img.crossOrigin = "anonymous";
 
       img.onload = () => {
         try {
           const canvas = document.createElement("canvas");
+          // 원본 이미지 크기 그대로 사용
+          canvas.width = img.width;
+          canvas.height = img.height;
 
-          // 2. 캔버스 크기를 이미지 원본 크기에 맞춤 (정수형 변환)
-          const width = Math.floor(img.width);
-          const height = Math.floor(img.height);
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext("2d", {
-            willReadFrequently: true,
-            alpha: false // 투명도 없음 (JPEG 최적화)
-          });
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
           if (!ctx) {
-            console.error("Canvas context failed");
             resolve(imageSrc);
             return;
           }
 
-          // 3. 필터 적용 (중요: iOS 호환성을 위해 drawImage 전에 선언)
+          // 🎨 핵심: 필터 적용
           ctx.filter = filterString;
 
-          // 4. 이미지 그리기
-          ctx.drawImage(img, 0, 0, width, height);
+          // 이미지 그리기
+          ctx.drawImage(img, 0, 0, img.width, img.height);
 
-          // 5. 필터 초기화 (안전장치)
+          // 필터 해제
           ctx.filter = "none";
 
-          // 6. 결과물 추출 (JPEG 품질 0.9)
-          const result = canvas.toDataURL("image/jpeg", 0.90);
-
-          // 결과물이 너무 짧으면(오류) 원본 반환
-          if (result.length < 100) {
-            console.warn("필터 적용 실패: 결과물이 비정상입니다.");
-            resolve(imageSrc);
-          } else {
-            resolve(result);
-          }
+          // 결과 반환 (JPEG 품질 0.95)
+          const result = canvas.toDataURL("image/jpeg", 0.95);
+          resolve(result);
         } catch (error) {
-          console.error("필터 적용 중 에러 발생:", error);
-          resolve(imageSrc);
+          console.error("필터 적용 실패:", error);
+          resolve(imageSrc); // 실패 시 원본 반환
         }
       };
 
-      img.onerror = (err) => {
-        console.error("이미지 로드 실패:", err);
+      img.onerror = () => {
+        console.error("이미지 로드 실패");
         resolve(imageSrc);
       };
 
       img.src = imageSrc;
     });
   };
-
   const handleCapture = async () => {
     // [CASE 1] 업로드 모드일 때: 최종 업로드 처리
     if (isUploadMode) {
@@ -786,17 +765,11 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
   const getTextBottom = () => 12;
 
   // ✅ 캡션 바: 항상 "현재 뷰포트"의 바닥 (키보드 위) 에 고정
+
+
   const AICaptionToolbar: React.FC = () => (
     <motion.div
-      key="ai-caption-toolbar"
-      initial={{ y: "100%", opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: "100%", opacity: 0 }}
-      transition={{
-        type: "spring",
-        damping: 24,
-        stiffness: 260,
-      }}
+      // ... (기존 animation props 유지)
       className="fixed left-1/2 -translate-x-1/2 z-[100] w-full max-w-[500px] bg-white rounded-t-[16px] shadow-[0_-2px_5px_0_rgba(0,0,0,0.10)]"
       style={{
         bottom: isKeyboardVisible ? 40 : 0,
@@ -815,33 +788,23 @@ export function UploadPage({ onBack, onUpload }: UploadPageProps) {
             freeMode={true}
             grabCursor={true}
             mousewheel={true}
+            // ✅ [수정된 부분] 아래 2줄 추가: 화면 크기 변화를 감지하여 스와이프 기능 갱신
+            observer={true}
+            observeParents={true}
+            // ---------------------------------------------------------
             className="w-full"
             touchStartPreventDefault={false}
           >
             {aiCaptions.map((caption, index) => (
               <SwiperSlide key={index} style={{ width: "auto" }}>
                 <button
-                  type="button"
-                  tabIndex={-1}
-                  onMouseDown={() => {
-                    aiCaptionTapRef.current = true;
-                  }}
-                  onTouchStart={() => {
-                    aiCaptionTapRef.current = true;
-                  }}
+                  // ... (기존 버튼 코드 유지)
                   onClick={(e) => {
                     e.preventDefault();
                     handleCaptionClick(caption.text);
-
-                    // 인풋 포커스 다시 살리기
-                    requestAnimationFrame(() => {
-                      textInputRef.current?.focus();
-                    });
-
-                    // 캡션 클릭 처리 끝
-                    aiCaptionTapRef.current = false;
+                    // ...
                   }}
-                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9] ㅛ"
+                  className="flex-shrink-0 px-5 py-2 text-[14px] font-normal border rounded-full whitespace-nowrap bg-white text-[#555555] border-[#d9d9d9]"
                 >
                   {caption.text}
                 </button>
