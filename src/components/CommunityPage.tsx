@@ -1513,10 +1513,10 @@ export function CommunityPage({
               >
                 <div className="px-[32px] pt-[22px] pb-[26px] ">
                   <h3 className="text-[19px] font-semibold mb-1 text-[#202020]">
-                    알림을 삭제하시겠습니까?
+                    게시글을 삭제하시겠습니까?
                   </h3>
                   <p className="text-sm text-[#777777] mb-3 font-normal">
-                    삭제한 알림은 복구할 수 없습니다.
+                    삭제한 게시글은 복구할 수 없습니다.
                   </p>
                   <div className="flex gap-2">
                     <button
