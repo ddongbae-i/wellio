@@ -1292,7 +1292,7 @@ export function CommunityPage({
                                 post.id,
                                 post.comments,
                               ).length > 0 && (
-                                  <div className="absolute bottom-[60px] right-0 flex flex-col gap-5 items-end max-w-[70%] max-h-[50vh] overflow-y-auto z-20 p-4 scrollbar-hide">
+                                  <div className="absolute bottom-[60px] right-0 flex flex-col gap-5 items-end max-w-[80%] max-h-[50vh] overflow-y-auto z-20 p-4 scrollbar-hide">
                                     {getAllComments(
                                       post.id,
                                       post.comments,
@@ -1307,9 +1307,9 @@ export function CommunityPage({
                                             comment.userAvatar,
                                           )}
                                           alt={comment.userName}
-                                          className="w-[35px] h-[35px] border border-[#f0f0f0] rounded-full object-cover -my-4 -mr-5"
+                                          className="w-[35px] h-[35px] border border-[#f0f0f0] rounded-full object-cover -my-4 -mr-5 "
                                         />
-                                        <p className="text-[15px] text-[#202020] font-medium leading-[1.4] max-w-[85%] truncate flex-shrink mr-1">
+                                        <p className="text-[15px] text-[#202020] font-medium leading-[1.4]  truncate flex-shrink mr-2">
                                           {comment.text}
                                         </p>
                                       </div>
