@@ -1292,7 +1292,7 @@ export function CommunityPage({
                                 post.id,
                                 post.comments,
                               ).length > 0 && (
-                                  <div className="absolute bottom-[60px] right-0 flex flex-col gap-5 items-end max-w-[80%] max-h-[50vh] overflow-y-auto z-20 p-4 scrollbar-hide">
+                                  <div className="absolute bottom-[60px] right-0 flex flex-col gap-5 items-end max-w-[90%] max-h-[50vh] overflow-y-auto z-20 p-4 scrollbar-hide">
                                     {getAllComments(
                                       post.id,
                                       post.comments,
