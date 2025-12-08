@@ -9,6 +9,7 @@ import IconHospital from "../assets/images/icon_alarm_hos.svg";
 import IconFamily from "../assets/images/icon_alarm_fam.svg";
 import IconMedicine from "../assets/images/icon_alarm_medecine.svg";
 import IconChallenge from "../assets/images/icon_alarm_chall.svg";
+import IconCom from "../assets/images/icon_alarm_com.svg";
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -32,7 +33,7 @@ const itemVariants: Variants = {
 // --- [타입 정의] ---
 interface Notification {
   id: number;
-  type: "hospital" | "family" | "medicine" | "challenge" /* | "community" */;
+  type: "hospital" | "family" | "medicine" | "challenge" | "community";
   category: string;
   message: string;
   time: string;
@@ -102,8 +103,8 @@ export function NotificationPage({
       case "challenge":
         return { icon: IconChallenge };
 
-      // case "community":
-      //   return { icon: IconCommunity };
+      case "community":
+        return { icon: IconCom };
 
       default:
         return { icon: IconHospital };

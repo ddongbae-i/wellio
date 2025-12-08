@@ -962,6 +962,7 @@ export default function App() {
 
   // 알림 상태
   const [notifications, setNotifications] = useState<Notification[]>([
+
     {
       id: 1,
       type: "hospital",
@@ -973,10 +974,11 @@ export default function App() {
     },
     {
       id: 2,
-      type: "family",
-      category: "가족",
-      message: "**박승희**님이 가족에 추가됐어요.",
-      time: "5분전",
+      type: "community",
+      category: "커뮤니티",
+      message:
+        "**김동석님**이 새로운 글을 올렸어요.",
+      time: "10분전",
       isRead: false,
     },
     {
@@ -984,7 +986,7 @@ export default function App() {
       type: "family",
       category: "가족",
       message: "**김동석**님이 가족에 추가됐어요.",
-      time: "5분전",
+      time: "1일전",
       isRead: false,
     },
     {
@@ -992,7 +994,7 @@ export default function App() {
       type: "medicine",
       category: "복약알림",
       message: "오늘 오후 9시 복용할 약이 있습니다.",
-      time: "3시간전",
+      time: "1일전",
       isRead: true,
     },
     {
@@ -1001,7 +1003,7 @@ export default function App() {
       category: "챌린지",
       message:
         "**김웰리**님 새로운 추천 챌린지가 있어요.\n눌러서 알아보세요.",
-      time: "12시간전",
+      time: "1일전",
       isRead: true,
     },
     {
@@ -1009,7 +1011,7 @@ export default function App() {
       type: "medicine",
       category: "복약알림",
       message:
-        "오늘 오후 6시, **박승희**님의 약 복용 시간입니다.",
+        "오늘 오후 13시, **박승희**님의 약 복용 시간입니다.",
       time: "1일전",
       isRead: true,
     },
