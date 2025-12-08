@@ -1026,15 +1026,16 @@ export default function App() {
   };
 
   const handleNotificationClick = (notification: Notification) => {
-    // 읽음 처리
     handleMarkNotificationAsRead(notification.id);
 
-    // 커뮤니티 알림이면 해당 포스트로 이동
     if (notification.type === "community") {
-      // 알림 ID 2 → 포스트 ID 2로 매핑
-      const postId = 2; // 김동석님 글
+      const postId = 2;
       setSelectedPostId(postId);
-      navigateTo("community");
+
+      // ✅ 상태 업데이트 후 페이지 전환
+      setTimeout(() => {
+        navigateTo("community");
+      }, 0);
     }
   };
 
@@ -1077,6 +1078,7 @@ export default function App() {
   const navigateTo = (page: Page) => {
     if (currentPage === page) return;
 
+    // ✅ 커뮤니티로 갈 때는 selectedPostId 유지
     if (page !== "community") {
       setSelectedPostId(null);
     }
@@ -1084,7 +1086,6 @@ export default function App() {
     setNavigationHistory((prev) => [...prev, page]);
     setCurrentPage(page);
   };
-
   const navigateBack = () => {
     if (navigationHistory.length > 1) {
       const newHistory = [...navigationHistory];
@@ -2002,12 +2003,12 @@ export default function App() {
             onNotificationClick={() => navigateTo("notifications")}
             posts={posts}
             currentUserId={"kim-welly"}
-            initialPostId={selectedPostId}
+            initialPostId={selectedPostId}  // ✅ 이게 제대로 전달되는지
             onPageChange={(page) => {
               if (page === "calendar") navigateTo("calendar");
             }}
             onDeletePost={handleDeletePost}
-            hasUnreadNotification={hasUnreadNotification} // ✅ 이 한 줄 추가!
+            hasUnreadNotification={hasUnreadNotification}
           />
         )}
 
