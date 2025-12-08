@@ -42,9 +42,10 @@ interface Notification {
 
 interface NotificationPageProps {
   onBack: () => void;
-  notifications: Notification[];                 // 🔹 부모에서 내려줌
-  onDeleteNotification: (id: number) => void;    // 🔹 삭제 콜백
-  onMarkAsRead: (id: number) => void;            // 🔹 읽음 처리 콜백
+  notifications: Notification[];
+  onDeleteNotification: (id: number) => void;
+  onMarkAsRead: (id: number) => void;
+  onNotificationClick?: (notification: Notification) => void;  // ✅ 추가!
 }
 
 export function NotificationPage({
@@ -52,6 +53,7 @@ export function NotificationPage({
   notifications,         // ✅ props
   onDeleteNotification,   // ✅ props
   onMarkAsRead,           // ✅ props
+  onNotificationClick,
 }: NotificationPageProps) {
   // 모달 상태만 로컬에서 관리
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -59,10 +61,10 @@ export function NotificationPage({
     useState<number | null>(null);
 
   // --- [이벤트 핸들러] ---
-  const handleNotificationClick = (id: number) => {
-    onMarkAsRead(id);  // ✅ 부모에게 "읽음 처리" 요청
+  const handleNotificationClick = (notification: Notification) => {
+    onMarkAsRead(notification.id);
+    onNotificationClick?.(notification);  // ✅ 부모에게 전달!
   };
-
   const handleDragEnd = (
     event: any,
     info: any,
@@ -177,7 +179,7 @@ export function NotificationPage({
                   onDragEnd={(event, info) =>
                     handleDragEnd(event, info, notification.id)
                   }
-                  onClick={() => handleNotificationClick(notification.id)}
+                  onClick={() => handleNotificationClick(notification)}
                   className={`${notification.isRead ? "bg-white" : "bg-[#E2F7F7]"
                     } relative z-10 rounded-[8px] p-4 shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] flex items-start gap-4 cursor-pointer transition-shadow hover:shadow-[0_4px_6px_0_rgba(201,208,216,0.25)]`}
                 >

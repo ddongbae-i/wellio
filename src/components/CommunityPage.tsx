@@ -715,7 +715,7 @@ export function CommunityPage({
     if (!initialPostId) return;
     if (isGridView || isReactionView) return;
 
-    scrollToPost(initialPostId);
+    scrollToPost(initialPostId, false); // ✅ RAF 사용
   }, [initialPostId, isGridView, isReactionView]);
 
   // 모바일 키보드 감지
@@ -776,21 +776,29 @@ export function CommunityPage({
   // 카드 한 묶음 높이: 항상 일정(키보드 여부 상관 X)
   const cardHeight = baseHeight - 160;
 
-  const scrollToPost = (postId: number) => {
-    // 피드가 렌더된 다음에 스크롤해야 해서 살짝 딜레이
-    setTimeout(() => {
+  const scrollToPost = (postId: number, immediate = false) => {
+    const doScroll = () => {
       const container = scrollContainerRef.current;
       const target = postRefs.current[postId];
 
       if (container && target) {
         container.scrollTo({
           top: target.offsetTop,
-          behavior: "auto", // 바로 점프
+          behavior: "auto",
         });
       }
-    }, 50);
-  };
+    };
 
+    if (immediate) {
+      // ✅ 모아보기/리액션뷰에서 복귀: 충분히 기다림
+      setTimeout(doScroll, 100);
+    } else {
+      // ✅ 알림/캘린더: RAF로 깜빡임 방지
+      requestAnimationFrame(() => {
+        requestAnimationFrame(doScroll);
+      });
+    }
+  };
   return (
     <>
       <div
@@ -1051,13 +1059,9 @@ export function CommunityPage({
                           }
                         }}
                         onClick={() => {
-                          // 리액션 뷰 끄고
                           setIsReactionView(false);
-                          // 그리드 뷰도 강제로 끔 → 바로 피드로
                           setIsGridView(false);
-
-                          // 피드가 뜬 뒤에 해당 포스트로 점프
-                          scrollToPost(post.id);
+                          scrollToPost(post.id, true); // ✅ setTimeout 사용
                         }}
                       >
                         <ImageWithFallback
@@ -1099,11 +1103,8 @@ export function CommunityPage({
                         }
                       }}
                       onClick={() => {
-                        // 모아보기 끄고 피드로
                         setIsGridView(false);
-
-                        // 피드 렌더 후 해당 카드 위치로 점프
-                        scrollToPost(post.id);
+                        scrollToPost(post.id, true); // ✅ setTimeout 사용
                       }}
                     >
                       <ImageWithFallback

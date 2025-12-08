@@ -1025,6 +1025,19 @@ export default function App() {
     );
   };
 
+  const handleNotificationClick = (notification: Notification) => {
+    // 읽음 처리
+    handleMarkNotificationAsRead(notification.id);
+
+    // 커뮤니티 알림이면 해당 포스트로 이동
+    if (notification.type === "community") {
+      // 알림 ID 2 → 포스트 ID 2로 매핑
+      const postId = 2; // 김동석님 글
+      setSelectedPostId(postId);
+      navigateTo("community");
+    }
+  };
+
   const handleDeleteNotification = (id: number) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
@@ -2071,6 +2084,7 @@ export default function App() {
             notifications={notifications}
             onDeleteNotification={handleDeleteNotification}
             onMarkAsRead={handleMarkNotificationAsRead}
+            onNotificationClick={handleNotificationClick}  // ✅ 추가!
           />
         )}
 
