@@ -326,6 +326,8 @@ export function CommunityPage({
   const [showFamilyDropdown, setShowFamilyDropdown] = useState(false);
   const [isGridView, setIsGridView] = useState(false);
   const [isReactionView, setIsReactionView] = useState(false);
+  const gridScrollRef = useRef<HTMLDivElement | null>(null);
+  const gridScrollTopRef = useRef(0);
 
   const [reactionFilter, setReactionFilter] = useState("ALL");
 
@@ -435,6 +437,12 @@ export function CommunityPage({
       );
     }
   }, []);
+
+  useEffect(() => {
+    if (isGridView && gridScrollRef.current) {
+      gridScrollRef.current.scrollTop = gridScrollTopRef.current;
+    }
+  }, [isGridView]);
 
   function getMaxCommentLength(value: string) {
     const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(value);
@@ -1117,7 +1125,13 @@ export function CommunityPage({
               </div>
             </div>
           ) : isGridView ? (
-            <div className="px-5 xs:px-6 sm:px-8 py-4 pb-10 h-full overflow-y-auto">
+            <div
+              className="px-5 xs:px-6 sm:px-8 py-4 pb-10 h-full overflow-y-auto"
+              ref={gridScrollRef}
+              onScroll={(e) => {
+                gridScrollTopRef.current = e.currentTarget.scrollTop;
+              }}
+            >
               <div className="grid grid-cols-3 gap-1">
                 {filteredPosts
                   .filter((post) => post.image)
