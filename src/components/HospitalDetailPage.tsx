@@ -310,10 +310,10 @@ export function HospitalDetailPage({
   return (
     <div className="relative min-h-screen bg-[#F7F7F7] flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-20 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center bg-[#f7f7f7]/80 backdrop-blur-xs relative h-[80px]">
+      <header className="sticky top-0 z-20 px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
         <button
           onClick={onBack}
-          className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
+          className="absolute left-5 xs:left-6 sm:left-8 flex items-center justify-center"
         >
           <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>

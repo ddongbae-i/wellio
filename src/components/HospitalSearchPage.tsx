@@ -149,12 +149,12 @@ export function HospitalSearchPage({
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[#f7f7f7]/80 backdrop-blur-xs">
         <motion.header
-          className="relative px-5 xs:px-6 sm:px-8 pt-4 space-y-4"
+          className="relative px-5 xs:px-6 sm:px-8 space-y-4"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="flex items-center justify-center pb-2 relative">
+          <div className="flex items-center justify-center relative min-h-[80px]">
             <button onClick={onBack} className="absolute left-0 w-10 p-2 -ml-2">
               <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
             </button>

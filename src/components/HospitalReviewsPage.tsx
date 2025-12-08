@@ -112,7 +112,7 @@ export function HospitalReviewsPage({
       <header className="sticky top-0 z-20 bg-white px-5 xs:px-6 sm:px-8 py-4 flex items-center justify-center bg-[#f7f7f7]/80 backdrop-blur-xs relative min-h-[80px]">
         <button
           onClick={onBack}
-          className="absolute left-5 xs:left-6 sm:left-8 w-10 h-10 flex items-center justify-start -ml-2"
+          className="absolute left-5 xs:left-6 sm:left-8 flex items-center justify-start"
         >
           <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>
