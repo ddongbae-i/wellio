@@ -1030,15 +1030,16 @@ export default function App() {
 
     if (notification.type === "community") {
       const postId = 2;
+
+      // ✅ 1단계: postId 설정
       setSelectedPostId(postId);
 
-      // ✅ 상태 업데이트 후 페이지 전환
+      // ✅ 2단계: 페이지 전환 (약간 지연)
       setTimeout(() => {
         navigateTo("community");
-      }, 0);
+      }, 50);  // 50ms만 충분
     }
   };
-
   const handleDeleteNotification = (id: number) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
