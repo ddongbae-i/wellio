@@ -497,10 +497,11 @@ export function CommunityPage({
   const handleEmojiReaction = (emoji: string, postId: number) => {
     setEmojiAnimation({ emoji, active: true });
 
+    // 🔹 1) 기존처럼 addedReactions 업데이트 (그대로 유지)
     setAddedReactions((prev) => {
       const existingReactions = prev[postId] || [];
 
-      // 1) 먼저 이 게시글에서 "나"가 눌렀던 모든 이모지에서 제거
+      // 이 게시글에서 "나"가 눌렀던 이모지 전부 제거
       const reactionsWithoutMe = existingReactions
         .map((reaction) => ({
           ...reaction,
@@ -508,10 +509,9 @@ export function CommunityPage({
             (u) => u.userName !== currentUser.userName,
           ),
         }))
-        // 유저가 하나도 안 남은 이모지는 삭제
         .filter((reaction) => reaction.users.length > 0);
 
-      // 2) 이제 새로 누른 이모지에만 "나" 추가
+      // 새로 누른 이모지에만 나 추가
       const targetIndex = reactionsWithoutMe.findIndex(
         (r) => r.emoji === emoji,
       );
@@ -540,10 +540,53 @@ export function CommunityPage({
       }
     });
 
+    // 🔹 2) 실제 포스트 데이터(localPosts.reactions)도 교체
+    setLocalPosts((prev) =>
+      prev.map((post) => {
+        if (post.id !== postId) return post;
+
+        const original = post.reactions || [];
+
+        // (1) 이 게시글에서 "나"가 들어간 리액션 전부 제거
+        const cleaned = original
+          .map((reaction) => ({
+            ...reaction,
+            users: reaction.users.filter(
+              (u: any) => u.userName !== currentUser.userName,
+            ),
+          }))
+          .filter((reaction) => reaction.users.length > 0);
+
+        // (2) 새 이모지를 해당 배열에 반영
+        const idx = cleaned.findIndex((r) => r.emoji === emoji);
+
+        if (idx >= 0) {
+          const updated = [...cleaned];
+          updated[idx] = {
+            ...updated[idx],
+            users: [...updated[idx].users, currentUser],
+          };
+          return { ...post, reactions: updated };
+        }
+
+        return {
+          ...post,
+          reactions: [
+            ...cleaned,
+            {
+              emoji,
+              users: [currentUser],
+            },
+          ],
+        };
+      }),
+    );
+
     setTimeout(() => {
       setEmojiAnimation(null);
     }, 2000);
   };
+
 
   const getAllComments = (postId: number, originalComments?: Array<any>) => {
     const original = originalComments || [];
@@ -584,23 +627,20 @@ export function CommunityPage({
   const hasUnreadNotification = !!hasUnreadNotificationFromParent;
 
   const getFilteredReactionPosts = () => {
-    const myReactedPosts = posts.filter((post) => {
+    // 🔁 부모 props가 아니라, 수정된 localPosts 기준으로
+    const myReactedPosts = localPosts.filter((post) => {
       if (!post.image) return false;
 
       const hasMyComment = addedComments[post.id]?.some(
         (comment) => comment.userName === currentUser.userName,
       );
 
-      const hasMyAddedReaction = addedReactions[post.id]?.some((reaction) =>
-        reaction.users.some((user) => user.userName === currentUser.userName),
+      const hasMyReaction = post.reactions?.some((reaction: any) =>
+        reaction.users.some(
+          (user: any) => user.userName === currentUser.userName,
+        ),
       );
 
-      const hasMyOriginalReaction = post.reactions?.some((reaction) =>
-        reaction.users.some((user) => user.userName === currentUser.userName),
-      );
-
-      const hasMyReaction =
-        hasMyComment || hasMyAddedReaction || hasMyOriginalReaction;
 
       if (selectedFamilyMember) {
         const isMe = selectedFamilyMember === currentUserName;
@@ -625,19 +665,15 @@ export function CommunityPage({
     }
 
     return myReactedPosts.filter((post) => {
-      const hasAddedReaction = addedReactions[post.id]?.some(
-        (reaction) =>
+      const hasReactionEmoji = post.reactions?.some(
+        (reaction: any) =>
           reaction.emoji === reactionFilter &&
-          reaction.users.some((u) => u.userName === currentUser.userName),
+          reaction.users.some(
+            (u: any) => u.userName === currentUser.userName,
+          ),
       );
 
-      const hasOriginalReaction = post.reactions?.some(
-        (reaction) =>
-          reaction.emoji === reactionFilter &&
-          reaction.users.some((u) => u.userName === currentUser.userName),
-      );
-
-      return hasAddedReaction || hasOriginalReaction;
+      return hasReactionEmoji;
     });
   };
 
