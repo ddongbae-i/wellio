@@ -897,6 +897,16 @@ export default function App() {
     };
   }, [currentPage, isLoggedIn, showOnboarding]);
 
+  useEffect(() => {
+    // 윈도우 스크롤 리셋
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+    // 내부 스크롤 컨테이너들 리셋 (필요한 경우)
+    const containers = document.querySelectorAll<HTMLElement>("[data-page-scroll]");
+    containers.forEach((el) => {
+      el.scrollTop = 0;
+    });
+  }, [currentPage]);
 
   // useEffect(() => {
   //   if (!isLoggedIn || showOnboarding) return;

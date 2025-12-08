@@ -144,7 +144,8 @@ export function HospitalSearchPage({
 
 
   return (
-    <div className="bg-[#f7f7f7] flex flex-col min-h-screen">
+    <div className="bg-[#f7f7f7] flex flex-col min-h-screen overflow-y-auto"
+      data-page-scroll>
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[#f7f7f7]/80 backdrop-blur-xs">
         <motion.header
@@ -221,7 +222,7 @@ export function HospitalSearchPage({
 
       {/* Hospital List */}
       <motion.div
-        className="overflow-y-hidden pt-2 pb-10 space-y-3 px-5 xs:px-6 sm:px-8"
+        className=" pt-2 pb-10 space-y-3 px-5 xs:px-6 sm:px-8"
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
