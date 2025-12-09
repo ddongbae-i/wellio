@@ -146,26 +146,40 @@ export function HospitalDetailPage({
 
   // 1. 카카오맵 스크립트 로드
   useEffect(() => {
-    // window.kakao.maps가 준비될 때까지 대기
-    const checkKakaoMaps = setInterval(() => {
-      if (window.kakao && window.kakao.maps) {
-        console.log('✅ 카카오맵 준비 완료');
+    console.log('🔍 카카오맵 체크 시작');
+
+    if (window.kakao && window.kakao.maps) {
+      console.log('✅ 이미 로드됨');
+      window.kakao.maps.load(() => {
+        console.log('✅ 초기화 완료');
         setIsMapLoaded(true);
-        clearInterval(checkKakaoMaps);
+      });
+      return;
+    }
+
+    // 반복적으로 체크
+    let attempts = 0;
+    const maxAttempts = 50; // 5초
+
+    const checkInterval = setInterval(() => {
+      attempts++;
+      console.log(`🔄 시도 ${attempts}/${maxAttempts}`);
+
+      if (window.kakao && window.kakao.maps) {
+        console.log('✅ 카카오맵 발견!');
+        clearInterval(checkInterval);
+        window.kakao.maps.load(() => {
+          console.log('✅ 초기화 완료');
+          setIsMapLoaded(true);
+        });
+      } else if (attempts >= maxAttempts) {
+        console.error('❌ 타임아웃 - kakao:', !!window.kakao, 'maps:', !!window.kakao?.maps);
+        clearInterval(checkInterval);
       }
     }, 100);
 
-    // 10초 후에도 로드 안 되면 포기
-    setTimeout(() => {
-      clearInterval(checkKakaoMaps);
-      if (!window.kakao?.maps) {
-        console.error('❌ 카카오맵 로드 실패 (타임아웃)');
-      }
-    }, 10000);
-
-    return () => clearInterval(checkKakaoMaps);
+    return () => clearInterval(checkInterval);
   }, []);
-
   // 2. 지도 그리기
   useEffect(() => {
     if (!isMapLoaded || !mapRef.current) return;
