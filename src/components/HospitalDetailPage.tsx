@@ -144,13 +144,13 @@ export function HospitalDetailPage({
         },
       ];
 
-  // 1. 카카오맵 스크립트 로드 (표준 방식)
+  // 1. 카카오맵 스크립트 로드 부분을 완전히 교체
   useEffect(() => {
-    if (
-      window.kakao &&
-      window.kakao.maps &&
-      window.kakao.maps.services
-    ) {
+    console.log('📍 스크립트 로드 시작');
+
+    // 이미 로드되어 있으면 바로 완료
+    if (window.kakao?.maps) {
+      console.log('✅ 카카오맵 이미 로드됨');
       setIsMapLoaded(true);
       return;
     }
@@ -159,29 +159,38 @@ export function HospitalDetailPage({
     const existingScript = document.getElementById(scriptId);
 
     if (existingScript) {
-      if (
-        window.kakao &&
-        window.kakao.maps &&
-        window.kakao.maps.services
-      ) {
-        setIsMapLoaded(true);
-      } else {
-        existingScript.addEventListener("load", () =>
-          setIsMapLoaded(true),
-        );
-      }
+      console.log('📌 기존 스크립트 발견');
+      existingScript.addEventListener("load", () => {
+        console.log('✅ 기존 스크립트 로드 완료');
+        if (window.kakao?.maps) {
+          window.kakao.maps.load(() => {
+            setIsMapLoaded(true);
+          });
+        }
+      });
       return;
     }
 
+    console.log('🔄 새 스크립트 생성');
     const script = document.createElement("script");
     script.id = scriptId;
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&autoload=false&libraries=services`;
-    script.async = true;
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&autoload=false`;
+    script.async = false; // ⚠️ async를 false로 변경!
 
     script.onload = () => {
-      window.kakao.maps.load(() => {
-        setIsMapLoaded(true);
-      });
+      console.log('📦 스크립트 다운로드 완료');
+      if (window.kakao?.maps) {
+        window.kakao.maps.load(() => {
+          console.log('✅ 카카오맵 초기화 완료');
+          setIsMapLoaded(true);
+        });
+      } else {
+        console.error('❌ window.kakao.maps 없음');
+      }
+    };
+
+    script.onerror = () => {
+      console.error('❌ 스크립트 로드 실패');
     };
 
     document.head.appendChild(script);
