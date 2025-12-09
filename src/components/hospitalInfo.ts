@@ -17,6 +17,7 @@ export interface Hospital {
   id: number;
   name: string;
   specialtyText: string;
+  department?: string; 
   hours: string;
   distance: string;
   address: string;
@@ -34,6 +35,7 @@ export const hospitalList: Hospital[] = [
   id: 1,
   name: "매일건강의원",
   specialtyText: "가정의학과 전문의 2명",
+  department: "가정의학과",  // 추가
   hours: "10:00-20:00",
   distance: "37m",
   address: "서울 서초구 서초대로 59번길 19, 201호",
