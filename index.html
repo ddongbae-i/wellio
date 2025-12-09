@@ -4,18 +4,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- 🔥 카카오맵 CSP 허용 -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://www.chatbase.co;
-    style-src 'self' 'unsafe-inline';
-    img-src 'self' data: https: blob:;
-    connect-src 'self' https://dapi.kakao.com https://www.chatbase.co;
-    frame-src 'self' https://dapi.kakao.com;
-    font-src 'self' data:;
-  ">
-
   <title>3조 Wellio</title>
   <link rel="icon" type="image/png" href="/favicon.ico" />
   <link rel="manifest" href="/manifest.json" />
@@ -30,7 +18,9 @@
   <meta name="twitter:image" content="/ogimg.png" />
 
   <script type="text/javascript"
-    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2700312542327196434472582c95e363=false"></script>
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=2700312542327196434472582c95e363&autoload=false">
+    </script>
+
 </head>
 
 <body>
