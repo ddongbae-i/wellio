@@ -186,66 +186,43 @@ export function HospitalDetailPage({
     document.head.appendChild(script);
   }, []);
 
-  // 2. 맵 그리기 & 주소 검색 (디버그 로그 제거됨)
-  // 2. 맵 그리기 & 주소 검색
+
+  // 2. 맵 그리기 & 주소 검색 부분을 완전히 교체하세요
   useEffect(() => {
     if (!isMapLoaded || !mapRef.current) return;
 
-    // 지도 생성
-    const mapOption = {
-      center: new window.kakao.maps.LatLng(37.566826, 126.9786567),
-      level: 3,
-    };
-    const map = new window.kakao.maps.Map(mapRef.current, mapOption);
+    // 약간의 딜레이를 주고 지도 초기화 (모바일 대응)
+    const timer = setTimeout(() => {
+      try {
+        // 좌표 설정 (hospitalInfo.ts의 좌표 사용)
+        const lat = hospital.latitude || 37.4940;
+        const lng = hospital.longitude || 127.0134;
 
-    // 좌표가 있으면 바로 사용
-    if (hospital.latitude && hospital.longitude) {
-      const coords = new window.kakao.maps.LatLng(
-        hospital.latitude,
-        hospital.longitude
-      );
+        const mapOption = {
+          center: new window.kakao.maps.LatLng(lat, lng),
+          level: 3,
+        };
 
-      new window.kakao.maps.Marker({
-        map: map,
-        position: coords,
-      });
+        const map = new window.kakao.maps.Map(mapRef.current, mapOption);
 
-      map.setCenter(coords);
-      return; // 좌표가 있으면 주소 검색 생략
-    }
+        // 마커 생성
+        const markerPosition = new window.kakao.maps.LatLng(lat, lng);
+        const marker = new window.kakao.maps.Marker({
+          position: markerPosition,
+        });
 
-    // 좌표가 없으면 주소 검색 시도
-    if (window.kakao.maps.services && hospital.address) {
-      const geocoder = new window.kakao.maps.services.Geocoder();
+        marker.setMap(map);
 
-      geocoder.addressSearch(
-        hospital.address,
-        function (result: any, status: any) {
-          if (status === window.kakao.maps.services.Status.OK) {
-            const coords = new window.kakao.maps.LatLng(
-              result[0].y,
-              result[0].x
-            );
+        // 지도 중심 재설정
+        map.setCenter(markerPosition);
 
-            new window.kakao.maps.Marker({
-              map: map,
-              position: coords,
-            });
+      } catch (error) {
+        console.error('지도 초기화 실패:', error);
+      }
+    }, 100); // 100ms 딜레이
 
-            map.setCenter(coords);
-          } else {
-            // 주소 검색 실패 시 - 기본 서울 중심 좌표 유지
-            console.warn('주소 검색 실패:', hospital.address);
-          }
-        }
-      );
-    }
-  }, [
-    isMapLoaded,
-    hospital.address,
-    hospital.latitude,
-    hospital.longitude,
-  ]);
+    return () => clearTimeout(timer);
+  }, [isMapLoaded, hospital.latitude, hospital.longitude]);
 
   const handleDirections = () => {
     const lat = hospital.latitude;

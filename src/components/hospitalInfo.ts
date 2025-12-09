@@ -30,20 +30,21 @@ export interface Hospital {
 }
 
 export const hospitalList: Hospital[] = [
-  {
-    id: 1,
-    name: "매일건강의원",
-    specialtyText: "가정의학과 전문의 2명",
-    hours: "10:00-20:00",
-    distance: "37m",
-    address: "서울 서초구 서초대로 59번길 19, 201호",
-    todayStatus: "open",
-    rating: 4.8,
-    reviews: 223,
-    imageUrl: hos1,
-     latitude: 37.4940, 
-    longitude: 127.0134,
-  },
+{
+  id: 1,
+  name: "매일건강의원",
+  specialtyText: "가정의학과 전문의 2명",
+  hours: "10:00-20:00",
+  distance: "37m",
+  address: "서울 서초구 서초대로 59번길 19, 201호",
+  todayStatus: "open",
+  rating: 4.8,
+  reviews: 223,
+  imageUrl: hos1,
+  latitude: 37.4940,    // 추가
+  longitude: 127.0134,  // 추가
+  phone: "02-1234-5678", // 있으면 추가
+}
   {
     id: 2,
     name: "365클리닉 강남본점",
