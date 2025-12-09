@@ -214,7 +214,6 @@ export function HospitalDetailPage({
   }, [isMapLoaded, hospital.latitude, hospital.longitude]);
 
   const handleDirections = () => {
-    alert(`좌표: ${hospital.latitude}, ${hospital.longitude}`);
     const lat = hospital.latitude;
     const lng = hospital.longitude;
 
@@ -403,8 +402,20 @@ export function HospitalDetailPage({
             {/* 지도 영역 */}
             <div
               ref={mapRef}
-              className="w-full h-[200px] bg-[#333333]"
-            />
+              style={{
+                width: '100%',
+                height: '200px',
+                backgroundColor: '#f0f0f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative'
+              }}
+            >
+              {!isMapLoaded && (
+                <p style={{ color: '#999' }}>지도 로딩중...</p>
+              )}
+            </div>
             <div className="px-5 pt-[12px] pb-[26px]">
               <p className="text-[17px] font-medium text-[#2b2b2b] leading-[1.3] mb-2">
                 {hospital.address}
