@@ -181,39 +181,55 @@ export function HospitalDetailPage({
     return () => clearInterval(checkInterval);
   }, []);
   // 2. 지도 그리기
+  // 2. 지도 그리기
   useEffect(() => {
-    if (!isMapLoaded || !mapRef.current) return;
+    console.log('🎯 지도 그리기 시작:', { isMapLoaded, hasRef: !!mapRef.current });
 
-    const initializeMap = () => {
+    if (!isMapLoaded || !mapRef.current) {
+      console.log('⏸️ 조건 미충족');
+      return;
+    }
+
+    const timer = setTimeout(() => {
       try {
         const lat = hospital.latitude || 37.4940;
         const lng = hospital.longitude || 127.0134;
 
-        console.log('🗺️ 지도 초기화:', lat, lng);
+        console.log('📍 좌표:', lat, lng);
+        console.log('📦 kakao:', !!window.kakao, 'maps:', !!window.kakao?.maps, 'LatLng:', !!window.kakao?.maps?.LatLng);
 
         const container = mapRef.current;
+        if (!container) {
+          console.error('❌ container 없음');
+          return;
+        }
+
+        const position = new window.kakao.maps.LatLng(lat, lng);
+        console.log('✅ LatLng 생성:', position);
+
         const options = {
-          center: new window.kakao.maps.LatLng(lat, lng),
+          center: position,
           level: 3,
         };
 
         const map = new window.kakao.maps.Map(container, options);
+        console.log('✅ Map 생성:', map);
 
-        const markerPosition = new window.kakao.maps.LatLng(lat, lng);
         const marker = new window.kakao.maps.Marker({
-          position: markerPosition,
+          position: position,
         });
+        console.log('✅ Marker 생성:', marker);
 
         marker.setMap(map);
+        console.log('✅✅✅ 지도 초기화 완료!');
 
-        console.log('✅ 지도 초기화 완료');
       } catch (error) {
-        console.error('❌ 지도 초기화 실패:', error);
+        console.error('💥 지도 초기화 실패:', error);
+        console.error('에러 상세:', error.message, error.stack);
       }
-    };
+    }, 300);
 
-    // 약간의 딜레이 후 초기화
-    setTimeout(initializeMap, 300);
+    return () => clearTimeout(timer);
   }, [isMapLoaded, hospital.latitude, hospital.longitude]);
 
   const handleDirections = () => {
