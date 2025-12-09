@@ -187,26 +187,36 @@ export function HospitalDetailPage({
   }, []);
 
   // 2. 맵 그리기 & 주소 검색 (디버그 로그 제거됨)
+  // 2. 맵 그리기 & 주소 검색
   useEffect(() => {
     if (!isMapLoaded || !mapRef.current) return;
 
     // 지도 생성
     const mapOption = {
-      center: new window.kakao.maps.LatLng(
-        37.566826,
-        126.9786567,
-      ), // 기본값
+      center: new window.kakao.maps.LatLng(37.566826, 126.9786567),
       level: 3,
     };
-    const map = new window.kakao.maps.Map(
-      mapRef.current,
-      mapOption,
-    );
+    const map = new window.kakao.maps.Map(mapRef.current, mapOption);
 
-    // 주소 검색 (Geocoding)
-    if (window.kakao.maps.services) {
-      const geocoder =
-        new window.kakao.maps.services.Geocoder();
+    // 좌표가 있으면 바로 사용
+    if (hospital.latitude && hospital.longitude) {
+      const coords = new window.kakao.maps.LatLng(
+        hospital.latitude,
+        hospital.longitude
+      );
+
+      new window.kakao.maps.Marker({
+        map: map,
+        position: coords,
+      });
+
+      map.setCenter(coords);
+      return; // 좌표가 있으면 주소 검색 생략
+    }
+
+    // 좌표가 없으면 주소 검색 시도
+    if (window.kakao.maps.services && hospital.address) {
+      const geocoder = new window.kakao.maps.services.Geocoder();
 
       geocoder.addressSearch(
         hospital.address,
@@ -214,30 +224,20 @@ export function HospitalDetailPage({
           if (status === window.kakao.maps.services.Status.OK) {
             const coords = new window.kakao.maps.LatLng(
               result[0].y,
-              result[0].x,
+              result[0].x
             );
 
-            const marker = new window.kakao.maps.Marker({
+            new window.kakao.maps.Marker({
               map: map,
               position: coords,
             });
 
             map.setCenter(coords);
           } else {
-            // 검색 실패 시 데이터 좌표 사용
-            if (hospital.latitude && hospital.longitude) {
-              const coords = new window.kakao.maps.LatLng(
-                hospital.latitude,
-                hospital.longitude,
-              );
-              new window.kakao.maps.Marker({
-                map: map,
-                position: coords,
-              });
-              map.setCenter(coords);
-            }
+            // 주소 검색 실패 시 - 기본 서울 중심 좌표 유지
+            console.warn('주소 검색 실패:', hospital.address);
           }
-        },
+        }
       );
     }
   }, [

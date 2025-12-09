@@ -41,6 +41,8 @@ export const hospitalList: Hospital[] = [
     rating: 4.8,
     reviews: 223,
     imageUrl: hos1,
+     latitude: 37.4940, 
+    longitude: 127.0134,
   },
   {
     id: 2,
