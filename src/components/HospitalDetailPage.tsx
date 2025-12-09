@@ -144,88 +144,58 @@ export function HospitalDetailPage({
         },
       ];
 
-  // 1. 카카오맵 스크립트 로드 부분을 완전히 교체
+  // 1. 카카오맵 스크립트 로드
   useEffect(() => {
-    console.log('📍 스크립트 로드 시작');
-
-    // 이미 로드되어 있으면 바로 완료
-    if (window.kakao?.maps) {
-      console.log('✅ 카카오맵 이미 로드됨');
-      setIsMapLoaded(true);
-      return;
-    }
-
-    const scriptId = "kakao-map-script";
-    const existingScript = document.getElementById(scriptId);
-
-    if (existingScript) {
-      console.log('📌 기존 스크립트 발견');
-      existingScript.addEventListener("load", () => {
-        console.log('✅ 기존 스크립트 로드 완료');
-        if (window.kakao?.maps) {
-          window.kakao.maps.load(() => {
-            setIsMapLoaded(true);
-          });
+    const loadKakaoMap = () => {
+      return new Promise((resolve, reject) => {
+        // 이미 로드되어 있으면
+        if (window.kakao && window.kakao.maps) {
+          resolve(window.kakao);
+          return;
         }
+
+        // 스크립트 생성
+        const script = document.createElement('script');
+        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&autoload=false`;
+        script.onload = () => {
+          window.kakao.maps.load(() => {
+            resolve(window.kakao);
+          });
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
       });
-      return;
-    }
-
-    console.log('🔄 새 스크립트 생성');
-    const script = document.createElement("script");
-    script.id = scriptId;
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&autoload=false`;
-    script.async = false; // ⚠️ async를 false로 변경!
-
-    script.onload = () => {
-      console.log('📦 스크립트 다운로드 완료');
-      if (window.kakao?.maps) {
-        window.kakao.maps.load(() => {
-          console.log('✅ 카카오맵 초기화 완료');
-          setIsMapLoaded(true);
-        });
-      } else {
-        console.error('❌ window.kakao.maps 없음');
-      }
     };
 
-    script.onerror = () => {
-      console.error('❌ 스크립트 로드 실패');
-    };
-
-    document.head.appendChild(script);
+    loadKakaoMap()
+      .then(() => {
+        console.log('✅ 카카오맵 로드 성공');
+        setIsMapLoaded(true);
+      })
+      .catch((error) => {
+        console.error('❌ 카카오맵 로드 실패:', error);
+      });
   }, []);
 
-
-  // 2. 맵 그리기 & 주소 검색 부분을 완전히 교체하세요
+  // 2. 지도 그리기
   useEffect(() => {
-    // 👇 이 부분만 추가!
-    console.log('🗺️ 지도 초기화 시작:', {
-      isMapLoaded,
-      hasMapRef: !!mapRef.current,
-      latitude: hospital.latitude,
-      longitude: hospital.longitude,
-      kakaoMaps: !!window.kakao?.maps
-    });
-    // 👆 여기까지만 추가!
-
     if (!isMapLoaded || !mapRef.current) return;
 
-    // 약간의 딜레이를 주고 지도 초기화 (모바일 대응)
-    const timer = setTimeout(() => {
+    const initializeMap = () => {
       try {
-        // 좌표 설정 (hospitalInfo.ts의 좌표 사용)
         const lat = hospital.latitude || 37.4940;
         const lng = hospital.longitude || 127.0134;
 
-        const mapOption = {
+        console.log('🗺️ 지도 초기화:', lat, lng);
+
+        const container = mapRef.current;
+        const options = {
           center: new window.kakao.maps.LatLng(lat, lng),
           level: 3,
         };
 
-        const map = new window.kakao.maps.Map(mapRef.current, mapOption);
+        const map = new window.kakao.maps.Map(container, options);
 
-        // 마커 생성
         const markerPosition = new window.kakao.maps.LatLng(lat, lng);
         const marker = new window.kakao.maps.Marker({
           position: markerPosition,
@@ -233,17 +203,15 @@ export function HospitalDetailPage({
 
         marker.setMap(map);
 
-        // 지도 중심 재설정
-        map.setCenter(markerPosition);
-
+        console.log('✅ 지도 초기화 완료');
       } catch (error) {
-        console.error('지도 초기화 실패:', error);
+        console.error('❌ 지도 초기화 실패:', error);
       }
-    }, 100);
+    };
 
-    return () => clearTimeout(timer);
+    // 약간의 딜레이 후 초기화
+    setTimeout(initializeMap, 300);
   }, [isMapLoaded, hospital.latitude, hospital.longitude]);
-
 
   const handleDirections = () => {
     alert(`좌표: ${hospital.latitude}, ${hospital.longitude}`);
