@@ -180,8 +180,7 @@ export function HospitalDetailPage({
 
     return () => clearInterval(checkInterval);
   }, []);
-  // 2. 지도 그리기
-  // 2. 지도 그리기
+  // 2. 지도 그리기 - 이 부분 전체를 교체
   useEffect(() => {
     console.log('🎯 지도 그리기 시작:', { isMapLoaded, hasRef: !!mapRef.current });
 
@@ -196,36 +195,22 @@ export function HospitalDetailPage({
         const lng = hospital.longitude || 127.0134;
 
         console.log('📍 좌표:', lat, lng);
-        console.log('📦 kakao:', !!window.kakao, 'maps:', !!window.kakao?.maps, 'LatLng:', !!window.kakao?.maps?.LatLng);
+        console.log('📦 kakao.maps.LatLng 있나?:', !!window.kakao?.maps?.LatLng);
 
         const container = mapRef.current;
-        if (!container) {
-          console.error('❌ container 없음');
-          return;
-        }
-
         const position = new window.kakao.maps.LatLng(lat, lng);
-        console.log('✅ LatLng 생성:', position);
+        console.log('✅ LatLng 생성 성공');
 
-        const options = {
-          center: position,
-          level: 3,
-        };
-
+        const options = { center: position, level: 3 };
         const map = new window.kakao.maps.Map(container, options);
-        console.log('✅ Map 생성:', map);
+        console.log('✅ Map 생성 성공');
 
-        const marker = new window.kakao.maps.Marker({
-          position: position,
-        });
-        console.log('✅ Marker 생성:', marker);
-
+        const marker = new window.kakao.maps.Marker({ position: position });
         marker.setMap(map);
-        console.log('✅✅✅ 지도 초기화 완료!');
+        console.log('✅✅✅ 지도 완성!');
 
       } catch (error) {
-        console.error('💥 지도 초기화 실패:', error);
-        console.error('에러 상세:', error.message, error.stack);
+        console.error('💥 에러 발생:', error);
       }
     }, 300);
 
