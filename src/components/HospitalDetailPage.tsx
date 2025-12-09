@@ -22,7 +22,7 @@ import OneclickBanner from "../assets/images/oneclick_banner.png";
 import Bot from "../assets/images/welli.svg";
 import ChevronDown from "../assets/images/icon_chevron_down_20.svg";
 
-const KAKAO_MAP_API_KEY = "ee7ef6c37b67c27768d7dcb2f13f0a83";
+const KAKAO_MAP_API_KEY = "2700312542327196434472582c95e363";
 
 // 이름 마스킹 함수 (뒤 2자를 **로 처리)
 const maskName = (name: string): string => {
@@ -183,8 +183,6 @@ export function HospitalDetailPage({
   }, []);
 
 
-  // 2. 지도 그리기
-  // 2. 지도 그리기
   // 2. 지도 그리기
   useEffect(() => {
     console.log('🎯 지도 그리기 시작:', { isMapLoaded, hasRef: !!mapRef.current });
