@@ -185,6 +185,7 @@ export function HospitalDetailPage({
 
   // 2. 지도 그리기
   // 2. 지도 그리기
+  // 2. 지도 그리기
   useEffect(() => {
     console.log('🎯 지도 그리기 시작:', { isMapLoaded, hasRef: !!mapRef.current });
 
@@ -208,13 +209,28 @@ export function HospitalDetailPage({
         const marker = new window.kakao.maps.Marker({ position: position });
         marker.setMap(map);
 
-        // 🔥 모바일 대응: 지도 강제 relayout
-        setTimeout(() => {
-          map.relayout(); // 지도 재배치
-          map.setCenter(position); // 중심 재설정
-          setIsMapRendered(true); // 로딩 텍스트 제거
-          console.log('✅✅✅ 지도 완성 + relayout!');
-        }, 100);
+        // 🔥 모바일 대응: 여러 번 relayout 시도
+        const relayoutAttempts = [100, 300, 500, 1000];
+        relayoutAttempts.forEach((delay) => {
+          setTimeout(() => {
+            map.relayout();
+            map.setCenter(position);
+          }, delay);
+        });
+
+        // 화면 크기 변경 감지해서 relayout
+        const handleResize = () => {
+          map.relayout();
+          map.setCenter(position);
+        };
+        window.addEventListener('resize', handleResize);
+
+        setIsMapRendered(true);
+        console.log('✅✅✅ 지도 완성!');
+
+        return () => {
+          window.removeEventListener('resize', handleResize);
+        };
 
       } catch (error) {
         console.error('💥 에러 발생:', error);
