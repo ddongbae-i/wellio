@@ -43,8 +43,8 @@ export const hospitalList: Hospital[] = [
   rating: 4.8,
   reviews: 223,
   imageUrl: hos1,
-  latitude: 37.4940,    // 추가
-  longitude: 127.0134,  // 추가
+  latitude: 37.50392,
+  longitude: 127.02531,  // 추가
   phone: "02-1234-5678", // 있으면 추가
 },
   {
