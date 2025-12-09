@@ -188,37 +188,34 @@ export function HospitalDetailPage({
 
 
   // 2. 맵 그리기 & 주소 검색 부분을 완전히 교체하세요
-  // HospitalDetailPage.tsx의 지도 초기화 부분을 완전히 교체
   useEffect(() => {
+    // 👇 이 부분만 추가!
+    console.log('🗺️ 지도 초기화 시작:', {
+      isMapLoaded,
+      hasMapRef: !!mapRef.current,
+      latitude: hospital.latitude,
+      longitude: hospital.longitude,
+      kakaoMaps: !!window.kakao?.maps
+    });
+    // 👆 여기까지만 추가!
+
     if (!isMapLoaded || !mapRef.current) return;
 
-    // 더 긴 딜레이와 재시도 로직 추가
-    let retryCount = 0;
-    const maxRetries = 3;
-
-    const initMap = () => {
+    // 약간의 딜레이를 주고 지도 초기화 (모바일 대응)
+    const timer = setTimeout(() => {
       try {
-        if (!window.kakao?.maps) {
-          if (retryCount < maxRetries) {
-            retryCount++;
-            setTimeout(initMap, 300);
-          }
-          return;
-        }
-
+        // 좌표 설정 (hospitalInfo.ts의 좌표 사용)
         const lat = hospital.latitude || 37.4940;
         const lng = hospital.longitude || 127.0134;
 
-        const container = mapRef.current;
-        if (!container) return;
-
-        const options = {
+        const mapOption = {
           center: new window.kakao.maps.LatLng(lat, lng),
           level: 3,
         };
 
-        const map = new window.kakao.maps.Map(container, options);
+        const map = new window.kakao.maps.Map(mapRef.current, mapOption);
 
+        // 마커 생성
         const markerPosition = new window.kakao.maps.LatLng(lat, lng);
         const marker = new window.kakao.maps.Marker({
           position: markerPosition,
@@ -226,25 +223,18 @@ export function HospitalDetailPage({
 
         marker.setMap(map);
 
-        // 지도 재조정 (모바일 대응)
-        setTimeout(() => {
-          map.relayout();
-          map.setCenter(markerPosition);
-        }, 100);
+        // 지도 중심 재설정
+        map.setCenter(markerPosition);
 
       } catch (error) {
         console.error('지도 초기화 실패:', error);
-        if (retryCount < maxRetries) {
-          retryCount++;
-          setTimeout(initMap, 300);
-        }
       }
-    };
-
-    const timer = setTimeout(initMap, 200);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [isMapLoaded, hospital.latitude, hospital.longitude]);
+
+
   const handleDirections = () => {
     const lat = hospital.latitude;
     const lng = hospital.longitude;
