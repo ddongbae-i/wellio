@@ -84,6 +84,7 @@ export function HospitalDetailPage({
   console.log('🏥 HospitalDetailPage 렌더링됨:', hospital);
   const mapRef = useRef<HTMLDivElement>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [isMapRendered, setIsMapRendered] = useState(false);
 
   // 필터 상태 관리
   const [sortFilter, setSortFilter] = useState<
@@ -180,7 +181,7 @@ export function HospitalDetailPage({
 
     return () => clearInterval(checkInterval);
   }, []);
-  const [isMapRendered, setIsMapRendered] = useState(false);
+
 
   // 2. 지도 그리기
   useEffect(() => {
@@ -400,7 +401,6 @@ export function HospitalDetailPage({
             병원 위치
           </h3>
           <div className="bg-white rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden">
-            {/* 지도 영역 */}
             {/* 지도 영역 */}
             <div
               ref={mapRef}
