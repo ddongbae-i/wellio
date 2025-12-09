@@ -81,6 +81,7 @@ export function HospitalDetailPage({
   onToggleLike,
   currentUserName,
 }: HospitalDetailPageProps) {
+  console.log('🏥 HospitalDetailPage 렌더링됨:', hospital);
   const mapRef = useRef<HTMLDivElement>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
@@ -236,6 +237,7 @@ export function HospitalDetailPage({
 
 
   const handleDirections = () => {
+    alert(`좌표: ${hospital.latitude}, ${hospital.longitude}`);
     const lat = hospital.latitude;
     const lng = hospital.longitude;
 
