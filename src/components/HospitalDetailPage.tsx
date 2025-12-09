@@ -413,23 +413,9 @@ export function HospitalDetailPage({
                 position: 'relative'
               }}
             >
-              {!isMapLoaded && (
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: '#f0f0f0',
-                  zIndex: 10
-                }}>
-                  <p style={{ color: '#999' }}>지도 로딩중...</p>
-                </div>
-              )}
+              {/* 조건을 완전히 제거하고 지도만 보이게 */}
             </div>
+
             <div className="px-5 pt-[12px] pb-[26px]">
               <p className="text-[17px] font-medium text-[#2b2b2b] leading-[1.3] mb-2">
                 {hospital.address}
