@@ -410,14 +410,24 @@ export function HospitalDetailPage({
                 width: '100%',
                 height: '200px',
                 backgroundColor: '#f0f0f0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
                 position: 'relative'
               }}
             >
               {!isMapLoaded && (
-                <p style={{ color: '#999' }}>지도 로딩중...</p>
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#f0f0f0',
+                  zIndex: 10
+                }}>
+                  <p style={{ color: '#999' }}>지도 로딩중...</p>
+                </div>
               )}
             </div>
             <div className="px-5 pt-[12px] pb-[26px]">
