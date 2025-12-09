@@ -180,7 +180,9 @@ export function HospitalDetailPage({
 
     return () => clearInterval(checkInterval);
   }, []);
-  // 2. 지도 그리기 - 이 부분 전체를 교체
+  const [isMapRendered, setIsMapRendered] = useState(false);
+
+  // 2. 지도 그리기
   useEffect(() => {
     console.log('🎯 지도 그리기 시작:', { isMapLoaded, hasRef: !!mapRef.current });
 
@@ -194,19 +196,15 @@ export function HospitalDetailPage({
         const lat = hospital.latitude || 37.4940;
         const lng = hospital.longitude || 127.0134;
 
-        console.log('📍 좌표:', lat, lng);
-        console.log('📦 kakao.maps.LatLng 있나?:', !!window.kakao?.maps?.LatLng);
-
         const container = mapRef.current;
         const position = new window.kakao.maps.LatLng(lat, lng);
-        console.log('✅ LatLng 생성 성공');
-
         const options = { center: position, level: 3 };
         const map = new window.kakao.maps.Map(container, options);
-        console.log('✅ Map 생성 성공');
 
         const marker = new window.kakao.maps.Marker({ position: position });
         marker.setMap(map);
+
+        setIsMapRendered(true); // 👈 이거 추가!
         console.log('✅✅✅ 지도 완성!');
 
       } catch (error) {
@@ -216,7 +214,6 @@ export function HospitalDetailPage({
 
     return () => clearTimeout(timer);
   }, [isMapLoaded, hospital.latitude, hospital.longitude]);
-
   const handleDirections = () => {
     const lat = hospital.latitude;
     const lng = hospital.longitude;
@@ -404,6 +401,7 @@ export function HospitalDetailPage({
           </h3>
           <div className="bg-white rounded-[16px] shadow-[0_2px_2.5px_0_rgba(201,208,216,0.20)] overflow-hidden">
             {/* 지도 영역 */}
+            {/* 지도 영역 */}
             <div
               ref={mapRef}
               style={{
@@ -413,7 +411,22 @@ export function HospitalDetailPage({
                 position: 'relative'
               }}
             >
-              {/* 조건을 완전히 제거하고 지도만 보이게 */}
+              {!isMapRendered && ( // 👈 isMapLoaded 대신 isMapRendered 사용
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#f0f0f0',
+                  zIndex: 10
+                }}>
+                  <p style={{ color: '#999' }}>지도 로딩중...</p>
+                </div>
+              )}
             </div>
 
             <div className="px-5 pt-[12px] pb-[26px]">
