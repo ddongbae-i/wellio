@@ -146,35 +146,24 @@ export function HospitalDetailPage({
 
   // 1. 카카오맵 스크립트 로드
   useEffect(() => {
-    const loadKakaoMap = () => {
-      return new Promise((resolve, reject) => {
-        // 이미 로드되어 있으면
-        if (window.kakao && window.kakao.maps) {
-          resolve(window.kakao);
-          return;
-        }
-
-        // 스크립트 생성
-        const script = document.createElement('script');
-        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&autoload=false`;
-        script.onload = () => {
-          window.kakao.maps.load(() => {
-            resolve(window.kakao);
-          });
-        };
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    };
-
-    loadKakaoMap()
-      .then(() => {
-        console.log('✅ 카카오맵 로드 성공');
+    // window.kakao.maps가 준비될 때까지 대기
+    const checkKakaoMaps = setInterval(() => {
+      if (window.kakao && window.kakao.maps) {
+        console.log('✅ 카카오맵 준비 완료');
         setIsMapLoaded(true);
-      })
-      .catch((error) => {
-        console.error('❌ 카카오맵 로드 실패:', error);
-      });
+        clearInterval(checkKakaoMaps);
+      }
+    }, 100);
+
+    // 10초 후에도 로드 안 되면 포기
+    setTimeout(() => {
+      clearInterval(checkKakaoMaps);
+      if (!window.kakao?.maps) {
+        console.error('❌ 카카오맵 로드 실패 (타임아웃)');
+      }
+    }, 10000);
+
+    return () => clearInterval(checkKakaoMaps);
   }, []);
 
   // 2. 지도 그리기
