@@ -44,7 +44,7 @@ export const hospitalList: Hospital[] = [
   latitude: 37.4940,    // 추가
   longitude: 127.0134,  // 추가
   phone: "02-1234-5678", // 있으면 추가
-}
+},
   {
     id: 2,
     name: "365클리닉 강남본점",
