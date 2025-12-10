@@ -761,7 +761,7 @@ export default function App() {
     script.id = "chatbase-widget";
     script.src = "https://www.chatbase.co/embed.min.js";
     script.defer = true;
-    script.setAttribute("chatbotId", "irCuwpc7c06Qva9cN3Qz6");
+    script.setAttribute("chatbotId", "n1HuMDtE3BHxK0kM4ot_Z");
     script.setAttribute("domain", "www.chatbase.co");
     document.body.appendChild(script);
 
