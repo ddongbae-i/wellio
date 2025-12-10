@@ -1830,7 +1830,7 @@ export default function App() {
     newPost: Omit<Post, "id" | "userName" | "userAvatar">,
   ) => {
     const today = new Date();
-    const dateStr = formatDateKey(today); // 🔹 업로드도 동일 포맷
+    const dateStr = formatDateKey(today);
 
     const post: Post = {
       ...newPost,
@@ -1841,6 +1841,8 @@ export default function App() {
       createdAt: newPost.createdAt || dateStr,
     };
     setPosts([post, ...posts]);
+
+    // ✅ 히스토리 유지하면서 커뮤니티로 복귀
     navigateTo("community");
   };
 
@@ -2009,7 +2011,7 @@ export default function App() {
 
         {currentPage === "community" && (
           <CommunityPage
-            onBack={() => navigateTo("home")}
+            onBack={navigateBack}
             onUploadClick={() => navigateTo("upload")}
             onNotificationClick={() => navigateTo("notifications")}
             posts={posts}
@@ -2065,7 +2067,7 @@ export default function App() {
 
         {currentPage === "my-reviews" && (
           <MyReviewsPage
-            onBack={() => setCurrentPage("home")}
+            onBack={navigateBack}  // ✅ 기존: () => setCurrentPage("home") → 변경: navigateBack
             reviews={myReviews}
             onDeleteReview={handleDeleteReview}
             onEditReview={(review) => {
