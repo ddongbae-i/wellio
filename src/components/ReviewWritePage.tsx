@@ -6,6 +6,7 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { hospitalMap } from "./hospitalInfo";
+import { Star } from "lucide-react";
 
 interface ReviewWritePageProps {
   onBack: () => void;
