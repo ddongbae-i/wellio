@@ -246,11 +246,11 @@ export function CalendarPage({ onBack, posts, onPostClick }: CalendarPageProps) 
           <span className="text-[19px] font-semibold text-[#202020]">
             캘린더
           </span>
-          {/* <img
+          <img
             src={ChevronDown}
             alt="뒤로가기"
             className="w-6 h-6 ml-1"
-          /> */}
+          />
         </div>
       </div>
 
