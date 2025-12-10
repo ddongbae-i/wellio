@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import { HospitalCard } from "./HospitalCard";
 import { motion } from "motion/react";
 import { CustomToast } from "./CustomToast";
@@ -52,14 +52,14 @@ export function FavoriteHospitalsPage({
   return (
     <div className="bg-[#F7F7F7] flex flex-col max-w-[500px] mx-auto min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-30 py-4 flex items-center justify-center w-full bg-[#f7f7f7]/80 backdrop-blur-xs mx-auto min-h-[80px] relative">
+      <header className="sticky top-0 z-30 py-4 flex px-5 xs:px-6 sm:px-8 items-center justify-center w-full bg-[#f7f7f7]/80 backdrop-blur-xs mx-auto min-h-[80px] relative">
         <button
           onClick={onBack}
-          className="absolute left-5 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
+          className="absolute left-5 xs:left-6 sm:left-8 flex items-center justify-center"
         >
-          <ChevronLeft size={24} className="text-[#1A1A1A]" />
+          <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>
-        <span className="text-[19px] font-semibold text-[#1A1A1A]">
+        <span className="text-[19px] font-semibold text-[#202020]">
           찜한 병원
         </span>
       </header>

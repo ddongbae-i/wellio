@@ -364,7 +364,7 @@ export function MedicalHistoryPage({
 
 
       {/* Content */}
-      <div className="px-5 xs:px-6 sm:px-8 pb-10 bg-[#F7F7F7] flex-1 mt-2">
+      <div className="px-5 xs:px-6 sm:px-8 pb-[100px] bg-[#F7F7F7] flex-1 mt-2 ">
         {activeTab === "treatment" ? (
           // 🔹 진료내역
           <div className="space-y-3">

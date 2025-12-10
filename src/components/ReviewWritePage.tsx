@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Star } from "lucide-react";
+import ChevronLeft from "../assets/images/icon_chevron_left_24.svg";
 import { useState, useRef, useEffect } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { toast } from "sonner";
@@ -166,9 +166,9 @@ export function ReviewWritePage({
             e.stopPropagation();
             onBack();
           }}
-          className="absolute left-4 xs:left-6 sm:left-8 w-6 h-6 flex items-center justify-center"
+          className="absolute left-4 xs:left-6 sm:left-8 flex items-center justify-center"
         >
-          <ChevronLeft size={24} className="text-[#555555]" />
+          <img src={ChevronLeft} alt="뒤로가기" className="w-6 h-6" />
         </button>
         <span className="text-[19px] font-semibold text-[#202020]">
           {isEditMode ? "후기 수정" : "후기 작성"}
