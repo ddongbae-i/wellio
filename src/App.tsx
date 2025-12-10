@@ -2067,7 +2067,7 @@ export default function App() {
 
         {currentPage === "my-reviews" && (
           <MyReviewsPage
-            onBack={navigateBack}  // ✅ 기존: () => setCurrentPage("home") → 변경: navigateBack
+            onBack={() => setCurrentPage("home")}
             reviews={myReviews}
             onDeleteReview={handleDeleteReview}
             onEditReview={(review) => {
