@@ -656,8 +656,8 @@ export function CommunityPage({
           return hasMyReaction && post.userName === currentUserName;
         } else {
           const nameMapping: { [key: string]: string } = {
-            엄마: "박승희",
-            아빠: "김동석",
+            박승희: "박승희",
+            김동석: "김동석",
           };
           const actualName =
             nameMapping[selectedFamilyMember] || selectedFamilyMember;
