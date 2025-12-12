@@ -208,7 +208,7 @@ export function ProfilePage({
               className="px-[30px] py-3 flex items-center justify-between last:border-b-0 cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() => onPageChange("medical-history")}
             >
-              <span className="text-[#555555]">진료 내력</span>
+              <span className="text-[#555555]">진료 내역</span>
               <img src={MyChevronRight} alt="바로가기" className="w-5 h-5" />
             </li>
             <li className="px-[30px] py-3 flex items-center justify-between border-b border-gray-100 last:border-b-0">
